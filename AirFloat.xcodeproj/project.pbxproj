@@ -1,0 +1,710 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		48487E4613D6343700E55831 /* AirFloatServerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 48487E4513D6343600E55831 /* AirFloatServerController.mm */; };
+		48487E4913D634A400E55831 /* AirFloatInterfaces.m in Sources */ = {isa = PBXBuildFile; fileRef = 48487E4813D634A400E55831 /* AirFloatInterfaces.m */; };
+		4898F9F313CDAAD1006EC97E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898F9F213CDAAD1006EC97E /* UIKit.framework */; };
+		4898F9F513CDAAD1006EC97E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898F9F413CDAAD1006EC97E /* Foundation.framework */; };
+		4898F9F713CDAAD1006EC97E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898F9F613CDAAD1006EC97E /* CoreGraphics.framework */; };
+		4898F9FD13CDAAD1006EC97E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4898F9FB13CDAAD1006EC97E /* InfoPlist.strings */; };
+		4898FA0013CDAAD1006EC97E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4898F9FF13CDAAD1006EC97E /* main.m */; };
+		4898FA0313CDAAD1006EC97E /* AirFloatAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4898FA0213CDAAD1006EC97E /* AirFloatAppDelegate.mm */; };
+		4898FA0613CDAAD1006EC97E /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4898FA0413CDAAD1006EC97E /* MainWindow.xib */; };
+		4898FA0913CDAAD1006EC97E /* AirFloatViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4898FA0813CDAAD1006EC97E /* AirFloatViewController.mm */; };
+		4898FA0C13CDAAD1006EC97E /* AirFloatViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4898FA0A13CDAAD1006EC97E /* AirFloatViewController.xib */; };
+		4898FA1413CDAAEB006EC97E /* RAOPServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4898FA1213CDAAEB006EC97E /* RAOPServer.cpp */; };
+		4898FA2313CDAB01006EC97E /* Base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4898FA1513CDAB01006EC97E /* Base64.cpp */; };
+		4898FA2413CDAB01006EC97E /* RAOPConnection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4898FA1713CDAB01006EC97E /* RAOPConnection.cpp */; };
+		4898FA2513CDAB01006EC97E /* RAOPHeader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4898FA1913CDAB01006EC97E /* RAOPHeader.cpp */; };
+		4898FA2613CDAB01006EC97E /* RAOPParameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4898FA1B13CDAB01006EC97E /* RAOPParameters.cpp */; };
+		4898FA2713CDAB01006EC97E /* RTPReceiver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4898FA1D13CDAB01006EC97E /* RTPReceiver.cpp */; };
+		4898FA2813CDAB01006EC97E /* Socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4898FA1F13CDAB01006EC97E /* Socket.cpp */; };
+		4898FA2913CDAB01006EC97E /* SocketEndPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4898FA2113CDAB01006EC97E /* SocketEndPoint.cpp */; };
+		4898FA2C13CDABB2006EC97E /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4898FA2A13CDABB2006EC97E /* Log.cpp */; };
+		4898FA7913CDB010006EC97E /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898FA7713CDB00F006EC97E /* libcrypto.a */; };
+		4898FA7A13CDB010006EC97E /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898FA7813CDB010006EC97E /* libssl.a */; };
+		4898FA7C13CDB6B9006EC97E /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4898FA7B13CDB6B9006EC97E /* Icon@2x.png */; };
+		4898FA7E13CDB6C2006EC97E /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4898FA7D13CDB6C2006EC97E /* Icon.png */; };
+		4898FA9513CF17BC006EC97E /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898FA9413CF17BC006EC97E /* QuartzCore.framework */; };
+		4898FA9713CF2D6C006EC97E /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898FA9613CF2D6C006EC97E /* AudioToolbox.framework */; };
+		48B49EDA13D216EC00AB67D1 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 48B49ED913D216EC00AB67D1 /* Settings.bundle */; };
+		A103A87A14692157004FA8ED /* openssl in Resources */ = {isa = PBXBuildFile; fileRef = A103A87914692157004FA8ED /* openssl */; };
+		A1256F1C14D2EF26006FE558 /* DisplayOff.png in Resources */ = {isa = PBXBuildFile; fileRef = A1256F1A14D2EF26006FE558 /* DisplayOff.png */; };
+		A1256F1D14D2EF26006FE558 /* DisplayOff@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1256F1B14D2EF26006FE558 /* DisplayOff@2x.png */; };
+		A1325BB414C84A19005AFE0E /* CAStreamBasicDescription.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1325BB014C84A19005AFE0E /* CAStreamBasicDescription.cpp */; };
+		A1325BB514C84A19005AFE0E /* CAXException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1325BB214C84A19005AFE0E /* CAXException.cpp */; };
+		A13D92C714CCC82700E9FD60 /* NoArtwork.png in Resources */ = {isa = PBXBuildFile; fileRef = A13D92C514CCC82700E9FD60 /* NoArtwork.png */; };
+		A13D92C814CCC82700E9FD60 /* NoArtwork@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A13D92C614CCC82700E9FD60 /* NoArtwork@2x.png */; };
+		A16A93A014CBA33300995917 /* DeviceBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A939E14CBA33200995917 /* DeviceBackground.png */; };
+		A16A93A114CBA33300995917 /* DeviceBackground@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A939F14CBA33200995917 /* DeviceBackground@2x.png */; };
+		A16A93B014CBA65000995917 /* Display.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93A214CBA65000995917 /* Display.png */; };
+		A16A93B114CBA65000995917 /* Display@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93A314CBA65000995917 /* Display@2x.png */; };
+		A16A93B214CBA65000995917 /* Next.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93A414CBA65000995917 /* Next.png */; };
+		A16A93B314CBA65000995917 /* Next@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93A514CBA65000995917 /* Next@2x.png */; };
+		A16A93B414CBA65000995917 /* NextActive.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93A614CBA65000995917 /* NextActive.png */; };
+		A16A93B514CBA65000995917 /* NextActive@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93A714CBA65000995917 /* NextActive@2x.png */; };
+		A16A93B614CBA65000995917 /* Play.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93A814CBA65000995917 /* Play.png */; };
+		A16A93B714CBA65000995917 /* Play@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93A914CBA65000995917 /* Play@2x.png */; };
+		A16A93B814CBA65000995917 /* PlayActive.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93AA14CBA65000995917 /* PlayActive.png */; };
+		A16A93B914CBA65000995917 /* PlayActive@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93AB14CBA65000995917 /* PlayActive@2x.png */; };
+		A16A93BA14CBA65000995917 /* Previous.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93AC14CBA65000995917 /* Previous.png */; };
+		A16A93BB14CBA65000995917 /* Previous@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93AD14CBA65000995917 /* Previous@2x.png */; };
+		A16A93BC14CBA65000995917 /* PreviousActive.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93AE14CBA65000995917 /* PreviousActive.png */; };
+		A16A93BD14CBA65000995917 /* PreviousActive@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93AF14CBA65000995917 /* PreviousActive@2x.png */; };
+		A16A93C214CBA74500995917 /* GreenLight.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93BE14CBA74500995917 /* GreenLight.png */; };
+		A16A93C314CBA74500995917 /* GreenLight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93BF14CBA74500995917 /* GreenLight@2x.png */; };
+		A16A93C414CBA74500995917 /* OrangeLight.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93C014CBA74500995917 /* OrangeLight.png */; };
+		A16A93C514CBA74500995917 /* OrangeLight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93C114CBA74500995917 /* OrangeLight@2x.png */; };
+		A18D7ADB14C9A4C900603A0C /* CAHostTimeBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A18D7AD914C9A4C900603A0C /* CAHostTimeBase.cpp */; };
+		A1B3E3DB14CE07BB00379E8C /* DisplayOverlay.png in Resources */ = {isa = PBXBuildFile; fileRef = A1B3E3D914CE07BB00379E8C /* DisplayOverlay.png */; };
+		A1B3E3DC14CE07BB00379E8C /* DisplayOverlay@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1B3E3DA14CE07BB00379E8C /* DisplayOverlay@2x.png */; };
+		A1B3E3E114CE09C700379E8C /* ScrollingLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B3E3E014CE09C700379E8C /* ScrollingLabel.m */; };
+		A1DDC13314CB495C00BB2661 /* AudioQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1DDC13214CB495C00BB2661 /* AudioQueue.cpp */; };
+		A1DE597914CF035C00A6767D /* ArtworkOverlay.png in Resources */ = {isa = PBXBuildFile; fileRef = A1DE597714CF035C00A6767D /* ArtworkOverlay.png */; };
+		A1DE597A14CF035C00A6767D /* ArtworkOverlay@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1DE597814CF035C00A6767D /* ArtworkOverlay@2x.png */; };
+		A1DE598714CF163500A6767D /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1DE598614CF163500A6767D /* MediaPlayer.framework */; };
+		A1DF3AF514C4623700252C95 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1DF3AF414C4623700252C95 /* AVFoundation.framework */; };
+		A1E21F9214CAF0C400FEE45B /* AudioConverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1E21F9114CAF0C400FEE45B /* AudioConverter.cpp */; };
+		A1E21F9914CAF24300FEE45B /* AppleLosslessAudioConverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1E21F9814CAF24300FEE45B /* AppleLosslessAudioConverter.cpp */; };
+		A1E21FA214CB15EA00FEE45B /* AudioPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1E21FA114CB15EA00FEE45B /* AudioPlayer.cpp */; };
+		A1EC73EC14D2A08B00C5DE5D /* MainWindow~iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = A1EC73EA14D2A08B00C5DE5D /* MainWindow~iPad.xib */; };
+		A1EC73EE14D2A1D300C5DE5D /* AirFloatViewController~iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = A1EC73ED14D2A1D300C5DE5D /* AirFloatViewController~iPad.xib */; };
+		A1EC73F014D2A36200C5DE5D /* DeviceBackground~iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = A1EC73EF14D2A36200C5DE5D /* DeviceBackground~iPad.png */; };
+		A1EC73F314D2A3FE00C5DE5D /* Display~iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = A1EC73F114D2A3FE00C5DE5D /* Display~iPad.png */; };
+		A1EC73F414D2A3FE00C5DE5D /* DisplayOverlay~iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = A1EC73F214D2A3FE00C5DE5D /* DisplayOverlay~iPad.png */; };
+		A1EC73F614D2A58800C5DE5D /* GreenLight~iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = A1EC73F514D2A58700C5DE5D /* GreenLight~iPad.png */; };
+		A1EC744114D2A59700C5DE5D /* OrangeLight~iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = A1EC744014D2A59700C5DE5D /* OrangeLight~iPad.png */; };
+		A1EC744814D2A64A00C5DE5D /* Next~iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = A1EC744214D2A64900C5DE5D /* Next~iPad.png */; };
+		A1EC744914D2A64A00C5DE5D /* NextActive~iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = A1EC744314D2A64900C5DE5D /* NextActive~iPad.png */; };
+		A1EC744A14D2A64A00C5DE5D /* Play~iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = A1EC744414D2A64900C5DE5D /* Play~iPad.png */; };
+		A1EC744B14D2A64A00C5DE5D /* PlayActive~iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = A1EC744514D2A64900C5DE5D /* PlayActive~iPad.png */; };
+		A1EC744C14D2A64A00C5DE5D /* Previous~iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = A1EC744614D2A64A00C5DE5D /* Previous~iPad.png */; };
+		A1EC744D14D2A64A00C5DE5D /* PreviousActive~iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = A1EC744714D2A64A00C5DE5D /* PreviousActive~iPad.png */; };
+		A1EC744F14D2A74A00C5DE5D /* AirFloat~iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = A1EC744E14D2A74A00C5DE5D /* AirFloat~iPad.png */; };
+		A1F2D94514C86398007AB481 /* WiFiBars.png in Resources */ = {isa = PBXBuildFile; fileRef = A1F2D94314C86397007AB481 /* WiFiBars.png */; };
+		A1F2D94614C86398007AB481 /* WiFiBars@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1F2D94414C86397007AB481 /* WiFiBars@2x.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		48487E4413D6343600E55831 /* AirFloatServerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFloatServerController.h; sourceTree = "<group>"; };
+		48487E4513D6343600E55831 /* AirFloatServerController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AirFloatServerController.mm; sourceTree = "<group>"; };
+		48487E4713D634A400E55831 /* AirFloatInterfaces.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFloatInterfaces.h; sourceTree = "<group>"; };
+		48487E4813D634A400E55831 /* AirFloatInterfaces.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFloatInterfaces.m; sourceTree = "<group>"; };
+		4898F9EE13CDAAD1006EC97E /* AirFloat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AirFloat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4898F9F213CDAAD1006EC97E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		4898F9F413CDAAD1006EC97E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		4898F9F613CDAAD1006EC97E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		4898F9FA13CDAAD1006EC97E /* AirFloat-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AirFloat-Info.plist"; sourceTree = "<group>"; };
+		4898F9FC13CDAAD1006EC97E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4898F9FE13CDAAD1006EC97E /* AirFloat-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "AirFloat-Prefix.pch"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		4898F9FF13CDAAD1006EC97E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		4898FA0113CDAAD1006EC97E /* AirFloatAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AirFloatAppDelegate.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		4898FA0213CDAAD1006EC97E /* AirFloatAppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AirFloatAppDelegate.mm; sourceTree = "<group>"; };
+		4898FA0513CDAAD1006EC97E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		4898FA0713CDAAD1006EC97E /* AirFloatViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AirFloatViewController.h; sourceTree = "<group>"; };
+		4898FA0813CDAAD1006EC97E /* AirFloatViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AirFloatViewController.mm; sourceTree = "<group>"; };
+		4898FA0B13CDAAD1006EC97E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AirFloatViewController.xib; sourceTree = "<group>"; };
+		4898FA1213CDAAEB006EC97E /* RAOPServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RAOPServer.cpp; sourceTree = "<group>"; };
+		4898FA1313CDAAEB006EC97E /* RAOPServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAOPServer.h; sourceTree = "<group>"; };
+		4898FA1513CDAB01006EC97E /* Base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Base64.cpp; sourceTree = "<group>"; };
+		4898FA1613CDAB01006EC97E /* Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64.h; sourceTree = "<group>"; };
+		4898FA1713CDAB01006EC97E /* RAOPConnection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RAOPConnection.cpp; sourceTree = "<group>"; };
+		4898FA1813CDAB01006EC97E /* RAOPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAOPConnection.h; sourceTree = "<group>"; };
+		4898FA1913CDAB01006EC97E /* RAOPHeader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RAOPHeader.cpp; sourceTree = "<group>"; };
+		4898FA1A13CDAB01006EC97E /* RAOPHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAOPHeader.h; sourceTree = "<group>"; };
+		4898FA1B13CDAB01006EC97E /* RAOPParameters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RAOPParameters.cpp; sourceTree = "<group>"; };
+		4898FA1C13CDAB01006EC97E /* RAOPParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAOPParameters.h; sourceTree = "<group>"; };
+		4898FA1D13CDAB01006EC97E /* RTPReceiver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RTPReceiver.cpp; sourceTree = "<group>"; };
+		4898FA1E13CDAB01006EC97E /* RTPReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTPReceiver.h; sourceTree = "<group>"; };
+		4898FA1F13CDAB01006EC97E /* Socket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Socket.cpp; sourceTree = "<group>"; };
+		4898FA2013CDAB01006EC97E /* Socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Socket.h; sourceTree = "<group>"; };
+		4898FA2113CDAB01006EC97E /* SocketEndPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SocketEndPoint.cpp; sourceTree = "<group>"; };
+		4898FA2213CDAB01006EC97E /* SocketEndPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketEndPoint.h; sourceTree = "<group>"; };
+		4898FA2A13CDABB2006EC97E /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Log.cpp; sourceTree = "<group>"; };
+		4898FA2B13CDABB2006EC97E /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
+		4898FA7713CDB00F006EC97E /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
+		4898FA7813CDB010006EC97E /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
+		4898FA7B13CDB6B9006EC97E /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "../Icon@2x.png"; sourceTree = "<group>"; };
+		4898FA7D13CDB6C2006EC97E /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../Icon.png; sourceTree = "<group>"; };
+		4898FA9413CF17BC006EC97E /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		4898FA9613CF2D6C006EC97E /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		48B49ED913D216EC00AB67D1 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
+		A103A87914692157004FA8ED /* openssl */ = {isa = PBXFileReference; lastKnownFileType = folder; path = openssl; sourceTree = "<group>"; };
+		A1256F1A14D2EF26006FE558 /* DisplayOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DisplayOff.png; sourceTree = "<group>"; };
+		A1256F1B14D2EF26006FE558 /* DisplayOff@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "DisplayOff@2x.png"; sourceTree = "<group>"; };
+		A1325BAE14C84A19005AFE0E /* CADebugMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CADebugMacros.h; sourceTree = "<group>"; };
+		A1325BAF14C84A19005AFE0E /* CAMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAMath.h; sourceTree = "<group>"; };
+		A1325BB014C84A19005AFE0E /* CAStreamBasicDescription.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CAStreamBasicDescription.cpp; sourceTree = "<group>"; };
+		A1325BB114C84A19005AFE0E /* CAStreamBasicDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAStreamBasicDescription.h; sourceTree = "<group>"; };
+		A1325BB214C84A19005AFE0E /* CAXException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CAXException.cpp; sourceTree = "<group>"; };
+		A1325BB314C84A19005AFE0E /* CAXException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAXException.h; sourceTree = "<group>"; };
+		A13D92C514CCC82700E9FD60 /* NoArtwork.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NoArtwork.png; sourceTree = "<group>"; };
+		A13D92C614CCC82700E9FD60 /* NoArtwork@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NoArtwork@2x.png"; sourceTree = "<group>"; };
+		A16A939E14CBA33200995917 /* DeviceBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DeviceBackground.png; sourceTree = "<group>"; };
+		A16A939F14CBA33200995917 /* DeviceBackground@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "DeviceBackground@2x.png"; sourceTree = "<group>"; };
+		A16A93A214CBA65000995917 /* Display.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Display.png; sourceTree = "<group>"; };
+		A16A93A314CBA65000995917 /* Display@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Display@2x.png"; sourceTree = "<group>"; };
+		A16A93A414CBA65000995917 /* Next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Next.png; sourceTree = "<group>"; };
+		A16A93A514CBA65000995917 /* Next@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Next@2x.png"; sourceTree = "<group>"; };
+		A16A93A614CBA65000995917 /* NextActive.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NextActive.png; sourceTree = "<group>"; };
+		A16A93A714CBA65000995917 /* NextActive@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NextActive@2x.png"; sourceTree = "<group>"; };
+		A16A93A814CBA65000995917 /* Play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Play.png; sourceTree = "<group>"; };
+		A16A93A914CBA65000995917 /* Play@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Play@2x.png"; sourceTree = "<group>"; };
+		A16A93AA14CBA65000995917 /* PlayActive.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = PlayActive.png; sourceTree = "<group>"; };
+		A16A93AB14CBA65000995917 /* PlayActive@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "PlayActive@2x.png"; sourceTree = "<group>"; };
+		A16A93AC14CBA65000995917 /* Previous.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Previous.png; sourceTree = "<group>"; };
+		A16A93AD14CBA65000995917 /* Previous@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Previous@2x.png"; sourceTree = "<group>"; };
+		A16A93AE14CBA65000995917 /* PreviousActive.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = PreviousActive.png; sourceTree = "<group>"; };
+		A16A93AF14CBA65000995917 /* PreviousActive@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "PreviousActive@2x.png"; sourceTree = "<group>"; };
+		A16A93BE14CBA74500995917 /* GreenLight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLight.png; sourceTree = "<group>"; };
+		A16A93BF14CBA74500995917 /* GreenLight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "GreenLight@2x.png"; sourceTree = "<group>"; };
+		A16A93C014CBA74500995917 /* OrangeLight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = OrangeLight.png; sourceTree = "<group>"; };
+		A16A93C114CBA74500995917 /* OrangeLight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "OrangeLight@2x.png"; sourceTree = "<group>"; };
+		A18D7AD914C9A4C900603A0C /* CAHostTimeBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CAHostTimeBase.cpp; sourceTree = "<group>"; };
+		A18D7ADA14C9A4C900603A0C /* CAHostTimeBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAHostTimeBase.h; sourceTree = "<group>"; };
+		A1B3E3D914CE07BB00379E8C /* DisplayOverlay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DisplayOverlay.png; sourceTree = "<group>"; };
+		A1B3E3DA14CE07BB00379E8C /* DisplayOverlay@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "DisplayOverlay@2x.png"; sourceTree = "<group>"; };
+		A1B3E3DF14CE09C700379E8C /* ScrollingLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScrollingLabel.h; sourceTree = "<group>"; };
+		A1B3E3E014CE09C700379E8C /* ScrollingLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScrollingLabel.m; sourceTree = "<group>"; };
+		A1DDC13214CB495C00BB2661 /* AudioQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioQueue.cpp; sourceTree = "<group>"; };
+		A1DDC13514CB496700BB2661 /* AudioQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioQueue.h; sourceTree = "<group>"; };
+		A1DE597714CF035C00A6767D /* ArtworkOverlay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ArtworkOverlay.png; sourceTree = "<group>"; };
+		A1DE597814CF035C00A6767D /* ArtworkOverlay@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ArtworkOverlay@2x.png"; sourceTree = "<group>"; };
+		A1DE598614CF163500A6767D /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		A1DF3AF414C4623700252C95 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		A1E21F9114CAF0C400FEE45B /* AudioConverter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioConverter.cpp; sourceTree = "<group>"; };
+		A1E21F9314CAF0D300FEE45B /* AudioConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioConverter.h; sourceTree = "<group>"; };
+		A1E21F9814CAF24300FEE45B /* AppleLosslessAudioConverter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AppleLosslessAudioConverter.cpp; sourceTree = "<group>"; };
+		A1E21F9A14CAF24E00FEE45B /* AppleLosslessAudioConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleLosslessAudioConverter.h; sourceTree = "<group>"; };
+		A1E21FA014CB15E100FEE45B /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
+		A1E21FA114CB15EA00FEE45B /* AudioPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioPlayer.cpp; sourceTree = "<group>"; };
+		A1EC73EB14D2A08B00C5DE5D /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = "iPad/en.lproj/MainWindow~iPad.xib"; sourceTree = "<group>"; };
+		A1EC73ED14D2A1D300C5DE5D /* AirFloatViewController~iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "AirFloatViewController~iPad.xib"; sourceTree = "<group>"; };
+		A1EC73EF14D2A36200C5DE5D /* DeviceBackground~iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "DeviceBackground~iPad.png"; sourceTree = "<group>"; };
+		A1EC73F114D2A3FE00C5DE5D /* Display~iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Display~iPad.png"; sourceTree = "<group>"; };
+		A1EC73F214D2A3FE00C5DE5D /* DisplayOverlay~iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "DisplayOverlay~iPad.png"; sourceTree = "<group>"; };
+		A1EC73F514D2A58700C5DE5D /* GreenLight~iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "GreenLight~iPad.png"; sourceTree = "<group>"; };
+		A1EC744014D2A59700C5DE5D /* OrangeLight~iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "OrangeLight~iPad.png"; sourceTree = "<group>"; };
+		A1EC744214D2A64900C5DE5D /* Next~iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Next~iPad.png"; sourceTree = "<group>"; };
+		A1EC744314D2A64900C5DE5D /* NextActive~iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NextActive~iPad.png"; sourceTree = "<group>"; };
+		A1EC744414D2A64900C5DE5D /* Play~iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Play~iPad.png"; sourceTree = "<group>"; };
+		A1EC744514D2A64900C5DE5D /* PlayActive~iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "PlayActive~iPad.png"; sourceTree = "<group>"; };
+		A1EC744614D2A64A00C5DE5D /* Previous~iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Previous~iPad.png"; sourceTree = "<group>"; };
+		A1EC744714D2A64A00C5DE5D /* PreviousActive~iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "PreviousActive~iPad.png"; sourceTree = "<group>"; };
+		A1EC744E14D2A74A00C5DE5D /* AirFloat~iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AirFloat~iPad.png"; sourceTree = "<group>"; };
+		A1F2D94314C86397007AB481 /* WiFiBars.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = WiFiBars.png; sourceTree = "<group>"; };
+		A1F2D94414C86397007AB481 /* WiFiBars@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WiFiBars@2x.png"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4898F9EB13CDAAD1006EC97E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1DE598714CF163500A6767D /* MediaPlayer.framework in Frameworks */,
+				A1DF3AF514C4623700252C95 /* AVFoundation.framework in Frameworks */,
+				4898FA9713CF2D6C006EC97E /* AudioToolbox.framework in Frameworks */,
+				4898FA9513CF17BC006EC97E /* QuartzCore.framework in Frameworks */,
+				4898F9F313CDAAD1006EC97E /* UIKit.framework in Frameworks */,
+				4898F9F513CDAAD1006EC97E /* Foundation.framework in Frameworks */,
+				4898F9F713CDAAD1006EC97E /* CoreGraphics.framework in Frameworks */,
+				4898FA7913CDB010006EC97E /* libcrypto.a in Frameworks */,
+				4898FA7A13CDB010006EC97E /* libssl.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		48487E4213D6340400E55831 /* Server */ = {
+			isa = PBXGroup;
+			children = (
+				4898FA2B13CDABB2006EC97E /* Log.h */,
+				4898FA2A13CDABB2006EC97E /* Log.cpp */,
+				A1E21F9014CAF08C00FEE45B /* Audio */,
+				A1E21F8E14CAF07700FEE45B /* Connection */,
+				4898FA7713CDB00F006EC97E /* libcrypto.a */,
+				4898FA7813CDB010006EC97E /* libssl.a */,
+			);
+			name = Server;
+			sourceTree = "<group>";
+		};
+		4898F9E313CDAAD1006EC97E = {
+			isa = PBXGroup;
+			children = (
+				4898F9F813CDAAD1006EC97E /* AirFloat */,
+				4898F9F113CDAAD1006EC97E /* Frameworks */,
+				4898F9EF13CDAAD1006EC97E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4898F9EF13CDAAD1006EC97E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4898F9EE13CDAAD1006EC97E /* AirFloat.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4898F9F113CDAAD1006EC97E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A1DE598614CF163500A6767D /* MediaPlayer.framework */,
+				A1DF3AF414C4623700252C95 /* AVFoundation.framework */,
+				4898FA9613CF2D6C006EC97E /* AudioToolbox.framework */,
+				4898FA9413CF17BC006EC97E /* QuartzCore.framework */,
+				4898F9F213CDAAD1006EC97E /* UIKit.framework */,
+				4898F9F413CDAAD1006EC97E /* Foundation.framework */,
+				4898F9F613CDAAD1006EC97E /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4898F9F813CDAAD1006EC97E /* AirFloat */ = {
+			isa = PBXGroup;
+			children = (
+				A1EC73E914D2A08A00C5DE5D /* iPad */,
+				A103A87914692157004FA8ED /* openssl */,
+				48487E4213D6340400E55831 /* Server */,
+				A1B3E3DE14CE09A300379E8C /* Custom */,
+				48487E4713D634A400E55831 /* AirFloatInterfaces.h */,
+				48487E4813D634A400E55831 /* AirFloatInterfaces.m */,
+				48487E4413D6343600E55831 /* AirFloatServerController.h */,
+				48487E4513D6343600E55831 /* AirFloatServerController.mm */,
+				4898FA0113CDAAD1006EC97E /* AirFloatAppDelegate.h */,
+				4898FA0213CDAAD1006EC97E /* AirFloatAppDelegate.mm */,
+				4898FA0413CDAAD1006EC97E /* MainWindow.xib */,
+				4898FA0713CDAAD1006EC97E /* AirFloatViewController.h */,
+				4898FA0813CDAAD1006EC97E /* AirFloatViewController.mm */,
+				4898FA0A13CDAAD1006EC97E /* AirFloatViewController.xib */,
+				4898F9F913CDAAD1006EC97E /* Supporting Files */,
+			);
+			path = AirFloat;
+			sourceTree = "<group>";
+		};
+		4898F9F913CDAAD1006EC97E /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				A1EC744E14D2A74A00C5DE5D /* AirFloat~iPad.png */,
+				A1DE597714CF035C00A6767D /* ArtworkOverlay.png */,
+				A1DE597814CF035C00A6767D /* ArtworkOverlay@2x.png */,
+				A13D92C514CCC82700E9FD60 /* NoArtwork.png */,
+				A13D92C614CCC82700E9FD60 /* NoArtwork@2x.png */,
+				A16A93BE14CBA74500995917 /* GreenLight.png */,
+				A16A93BF14CBA74500995917 /* GreenLight@2x.png */,
+				A1EC73F514D2A58700C5DE5D /* GreenLight~iPad.png */,
+				A16A93C014CBA74500995917 /* OrangeLight.png */,
+				A16A93C114CBA74500995917 /* OrangeLight@2x.png */,
+				A1EC744014D2A59700C5DE5D /* OrangeLight~iPad.png */,
+				A16A93A214CBA65000995917 /* Display.png */,
+				A16A93A314CBA65000995917 /* Display@2x.png */,
+				A1B3E3D914CE07BB00379E8C /* DisplayOverlay.png */,
+				A1B3E3DA14CE07BB00379E8C /* DisplayOverlay@2x.png */,
+				A1EC73F114D2A3FE00C5DE5D /* Display~iPad.png */,
+				A1EC73F214D2A3FE00C5DE5D /* DisplayOverlay~iPad.png */,
+				A1256F1A14D2EF26006FE558 /* DisplayOff.png */,
+				A1256F1B14D2EF26006FE558 /* DisplayOff@2x.png */,
+				A16A93A414CBA65000995917 /* Next.png */,
+				A16A93A514CBA65000995917 /* Next@2x.png */,
+				A16A93A614CBA65000995917 /* NextActive.png */,
+				A16A93A714CBA65000995917 /* NextActive@2x.png */,
+				A1EC744214D2A64900C5DE5D /* Next~iPad.png */,
+				A1EC744314D2A64900C5DE5D /* NextActive~iPad.png */,
+				A16A93A814CBA65000995917 /* Play.png */,
+				A16A93A914CBA65000995917 /* Play@2x.png */,
+				A16A93AA14CBA65000995917 /* PlayActive.png */,
+				A16A93AB14CBA65000995917 /* PlayActive@2x.png */,
+				A1EC744414D2A64900C5DE5D /* Play~iPad.png */,
+				A1EC744514D2A64900C5DE5D /* PlayActive~iPad.png */,
+				A16A93AC14CBA65000995917 /* Previous.png */,
+				A16A93AD14CBA65000995917 /* Previous@2x.png */,
+				A16A93AE14CBA65000995917 /* PreviousActive.png */,
+				A16A93AF14CBA65000995917 /* PreviousActive@2x.png */,
+				A1EC744614D2A64A00C5DE5D /* Previous~iPad.png */,
+				A1EC744714D2A64A00C5DE5D /* PreviousActive~iPad.png */,
+				A16A939E14CBA33200995917 /* DeviceBackground.png */,
+				A16A939F14CBA33200995917 /* DeviceBackground@2x.png */,
+				A1EC73EF14D2A36200C5DE5D /* DeviceBackground~iPad.png */,
+				A1F2D94314C86397007AB481 /* WiFiBars.png */,
+				A1F2D94414C86397007AB481 /* WiFiBars@2x.png */,
+				4898FA7D13CDB6C2006EC97E /* Icon.png */,
+				4898FA7B13CDB6B9006EC97E /* Icon@2x.png */,
+				4898F9FA13CDAAD1006EC97E /* AirFloat-Info.plist */,
+				4898F9FB13CDAAD1006EC97E /* InfoPlist.strings */,
+				4898F9FE13CDAAD1006EC97E /* AirFloat-Prefix.pch */,
+				4898F9FF13CDAAD1006EC97E /* main.m */,
+				48B49ED913D216EC00AB67D1 /* Settings.bundle */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		A1720DD514C5C97E0068C064 /* PublicUtility */ = {
+			isa = PBXGroup;
+			children = (
+				A18D7AD914C9A4C900603A0C /* CAHostTimeBase.cpp */,
+				A18D7ADA14C9A4C900603A0C /* CAHostTimeBase.h */,
+				A1325BAE14C84A19005AFE0E /* CADebugMacros.h */,
+				A1325BAF14C84A19005AFE0E /* CAMath.h */,
+				A1325BB014C84A19005AFE0E /* CAStreamBasicDescription.cpp */,
+				A1325BB114C84A19005AFE0E /* CAStreamBasicDescription.h */,
+				A1325BB214C84A19005AFE0E /* CAXException.cpp */,
+				A1325BB314C84A19005AFE0E /* CAXException.h */,
+			);
+			name = PublicUtility;
+			sourceTree = "<group>";
+		};
+		A1B3E3DE14CE09A300379E8C /* Custom */ = {
+			isa = PBXGroup;
+			children = (
+				A1B3E3DF14CE09C700379E8C /* ScrollingLabel.h */,
+				A1B3E3E014CE09C700379E8C /* ScrollingLabel.m */,
+			);
+			name = Custom;
+			sourceTree = "<group>";
+		};
+		A1E21F8E14CAF07700FEE45B /* Connection */ = {
+			isa = PBXGroup;
+			children = (
+				4898FA2213CDAB01006EC97E /* SocketEndPoint.h */,
+				4898FA2113CDAB01006EC97E /* SocketEndPoint.cpp */,
+				4898FA2013CDAB01006EC97E /* Socket.h */,
+				4898FA1F13CDAB01006EC97E /* Socket.cpp */,
+				4898FA1613CDAB01006EC97E /* Base64.h */,
+				4898FA1513CDAB01006EC97E /* Base64.cpp */,
+				4898FA1E13CDAB01006EC97E /* RTPReceiver.h */,
+				4898FA1D13CDAB01006EC97E /* RTPReceiver.cpp */,
+				4898FA1A13CDAB01006EC97E /* RAOPHeader.h */,
+				4898FA1913CDAB01006EC97E /* RAOPHeader.cpp */,
+				4898FA1C13CDAB01006EC97E /* RAOPParameters.h */,
+				4898FA1B13CDAB01006EC97E /* RAOPParameters.cpp */,
+				4898FA1813CDAB01006EC97E /* RAOPConnection.h */,
+				4898FA1713CDAB01006EC97E /* RAOPConnection.cpp */,
+				4898FA1313CDAAEB006EC97E /* RAOPServer.h */,
+				4898FA1213CDAAEB006EC97E /* RAOPServer.cpp */,
+			);
+			name = Connection;
+			sourceTree = "<group>";
+		};
+		A1E21F9014CAF08C00FEE45B /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				A1720DD514C5C97E0068C064 /* PublicUtility */,
+				A1E21F9314CAF0D300FEE45B /* AudioConverter.h */,
+				A1E21F9114CAF0C400FEE45B /* AudioConverter.cpp */,
+				A1E21F9A14CAF24E00FEE45B /* AppleLosslessAudioConverter.h */,
+				A1E21F9814CAF24300FEE45B /* AppleLosslessAudioConverter.cpp */,
+				A1E21FA014CB15E100FEE45B /* AudioPlayer.h */,
+				A1E21FA114CB15EA00FEE45B /* AudioPlayer.cpp */,
+				A1DDC13514CB496700BB2661 /* AudioQueue.h */,
+				A1DDC13214CB495C00BB2661 /* AudioQueue.cpp */,
+			);
+			name = Audio;
+			sourceTree = "<group>";
+		};
+		A1EC73E914D2A08A00C5DE5D /* iPad */ = {
+			isa = PBXGroup;
+			children = (
+				A1EC73EA14D2A08B00C5DE5D /* MainWindow~iPad.xib */,
+				A1EC73ED14D2A1D300C5DE5D /* AirFloatViewController~iPad.xib */,
+			);
+			name = iPad;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4898F9ED13CDAAD1006EC97E /* AirFloat */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4898FA0F13CDAAD1006EC97E /* Build configuration list for PBXNativeTarget "AirFloat" */;
+			buildPhases = (
+				4898F9EA13CDAAD1006EC97E /* Sources */,
+				4898F9EB13CDAAD1006EC97E /* Frameworks */,
+				4898F9EC13CDAAD1006EC97E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AirFloat;
+			productName = AirFloat;
+			productReference = 4898F9EE13CDAAD1006EC97E /* AirFloat.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4898F9E513CDAAD1006EC97E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = 4898F9E813CDAAD1006EC97E /* Build configuration list for PBXProject "AirFloat" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 4898F9E313CDAAD1006EC97E;
+			productRefGroup = 4898F9EF13CDAAD1006EC97E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4898F9ED13CDAAD1006EC97E /* AirFloat */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4898F9EC13CDAAD1006EC97E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4898F9FD13CDAAD1006EC97E /* InfoPlist.strings in Resources */,
+				4898FA0613CDAAD1006EC97E /* MainWindow.xib in Resources */,
+				4898FA0C13CDAAD1006EC97E /* AirFloatViewController.xib in Resources */,
+				4898FA7C13CDB6B9006EC97E /* Icon@2x.png in Resources */,
+				4898FA7E13CDB6C2006EC97E /* Icon.png in Resources */,
+				48B49EDA13D216EC00AB67D1 /* Settings.bundle in Resources */,
+				A103A87A14692157004FA8ED /* openssl in Resources */,
+				A1F2D94514C86398007AB481 /* WiFiBars.png in Resources */,
+				A1F2D94614C86398007AB481 /* WiFiBars@2x.png in Resources */,
+				A16A93A014CBA33300995917 /* DeviceBackground.png in Resources */,
+				A16A93A114CBA33300995917 /* DeviceBackground@2x.png in Resources */,
+				A16A93B014CBA65000995917 /* Display.png in Resources */,
+				A16A93B114CBA65000995917 /* Display@2x.png in Resources */,
+				A16A93B214CBA65000995917 /* Next.png in Resources */,
+				A16A93B314CBA65000995917 /* Next@2x.png in Resources */,
+				A16A93B414CBA65000995917 /* NextActive.png in Resources */,
+				A16A93B514CBA65000995917 /* NextActive@2x.png in Resources */,
+				A16A93B614CBA65000995917 /* Play.png in Resources */,
+				A16A93B714CBA65000995917 /* Play@2x.png in Resources */,
+				A16A93B814CBA65000995917 /* PlayActive.png in Resources */,
+				A16A93B914CBA65000995917 /* PlayActive@2x.png in Resources */,
+				A16A93BA14CBA65000995917 /* Previous.png in Resources */,
+				A16A93BB14CBA65000995917 /* Previous@2x.png in Resources */,
+				A16A93BC14CBA65000995917 /* PreviousActive.png in Resources */,
+				A16A93BD14CBA65000995917 /* PreviousActive@2x.png in Resources */,
+				A16A93C214CBA74500995917 /* GreenLight.png in Resources */,
+				A16A93C314CBA74500995917 /* GreenLight@2x.png in Resources */,
+				A16A93C414CBA74500995917 /* OrangeLight.png in Resources */,
+				A16A93C514CBA74500995917 /* OrangeLight@2x.png in Resources */,
+				A13D92C714CCC82700E9FD60 /* NoArtwork.png in Resources */,
+				A13D92C814CCC82700E9FD60 /* NoArtwork@2x.png in Resources */,
+				A1B3E3DB14CE07BB00379E8C /* DisplayOverlay.png in Resources */,
+				A1B3E3DC14CE07BB00379E8C /* DisplayOverlay@2x.png in Resources */,
+				A1DE597914CF035C00A6767D /* ArtworkOverlay.png in Resources */,
+				A1DE597A14CF035C00A6767D /* ArtworkOverlay@2x.png in Resources */,
+				A1EC73EC14D2A08B00C5DE5D /* MainWindow~iPad.xib in Resources */,
+				A1EC73EE14D2A1D300C5DE5D /* AirFloatViewController~iPad.xib in Resources */,
+				A1EC73F014D2A36200C5DE5D /* DeviceBackground~iPad.png in Resources */,
+				A1EC73F314D2A3FE00C5DE5D /* Display~iPad.png in Resources */,
+				A1EC73F414D2A3FE00C5DE5D /* DisplayOverlay~iPad.png in Resources */,
+				A1EC73F614D2A58800C5DE5D /* GreenLight~iPad.png in Resources */,
+				A1EC744114D2A59700C5DE5D /* OrangeLight~iPad.png in Resources */,
+				A1EC744814D2A64A00C5DE5D /* Next~iPad.png in Resources */,
+				A1EC744914D2A64A00C5DE5D /* NextActive~iPad.png in Resources */,
+				A1EC744A14D2A64A00C5DE5D /* Play~iPad.png in Resources */,
+				A1EC744B14D2A64A00C5DE5D /* PlayActive~iPad.png in Resources */,
+				A1EC744C14D2A64A00C5DE5D /* Previous~iPad.png in Resources */,
+				A1EC744D14D2A64A00C5DE5D /* PreviousActive~iPad.png in Resources */,
+				A1EC744F14D2A74A00C5DE5D /* AirFloat~iPad.png in Resources */,
+				A1256F1C14D2EF26006FE558 /* DisplayOff.png in Resources */,
+				A1256F1D14D2EF26006FE558 /* DisplayOff@2x.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4898F9EA13CDAAD1006EC97E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4898FA0013CDAAD1006EC97E /* main.m in Sources */,
+				4898FA0313CDAAD1006EC97E /* AirFloatAppDelegate.mm in Sources */,
+				4898FA0913CDAAD1006EC97E /* AirFloatViewController.mm in Sources */,
+				4898FA1413CDAAEB006EC97E /* RAOPServer.cpp in Sources */,
+				4898FA2313CDAB01006EC97E /* Base64.cpp in Sources */,
+				4898FA2413CDAB01006EC97E /* RAOPConnection.cpp in Sources */,
+				4898FA2513CDAB01006EC97E /* RAOPHeader.cpp in Sources */,
+				4898FA2613CDAB01006EC97E /* RAOPParameters.cpp in Sources */,
+				4898FA2713CDAB01006EC97E /* RTPReceiver.cpp in Sources */,
+				4898FA2813CDAB01006EC97E /* Socket.cpp in Sources */,
+				4898FA2913CDAB01006EC97E /* SocketEndPoint.cpp in Sources */,
+				4898FA2C13CDABB2006EC97E /* Log.cpp in Sources */,
+				48487E4613D6343700E55831 /* AirFloatServerController.mm in Sources */,
+				48487E4913D634A400E55831 /* AirFloatInterfaces.m in Sources */,
+				A1325BB414C84A19005AFE0E /* CAStreamBasicDescription.cpp in Sources */,
+				A1325BB514C84A19005AFE0E /* CAXException.cpp in Sources */,
+				A18D7ADB14C9A4C900603A0C /* CAHostTimeBase.cpp in Sources */,
+				A1E21F9214CAF0C400FEE45B /* AudioConverter.cpp in Sources */,
+				A1E21F9914CAF24300FEE45B /* AppleLosslessAudioConverter.cpp in Sources */,
+				A1E21FA214CB15EA00FEE45B /* AudioPlayer.cpp in Sources */,
+				A1DDC13314CB495C00BB2661 /* AudioQueue.cpp in Sources */,
+				A1B3E3E114CE09C700379E8C /* ScrollingLabel.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		4898F9FB13CDAAD1006EC97E /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4898F9FC13CDAAD1006EC97E /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		4898FA0413CDAAD1006EC97E /* MainWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4898FA0513CDAAD1006EC97E /* en */,
+			);
+			name = MainWindow.xib;
+			sourceTree = "<group>";
+		};
+		4898FA0A13CDAAD1006EC97E /* AirFloatViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4898FA0B13CDAAD1006EC97E /* en */,
+			);
+			name = AirFloatViewController.xib;
+			sourceTree = "<group>";
+		};
+		A1EC73EA14D2A08B00C5DE5D /* MainWindow~iPad.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A1EC73EB14D2A08B00C5DE5D /* en */,
+			);
+			name = "MainWindow~iPad.xib";
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		4898FA0D13CDAAD1006EC97E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		4898FA0E13CDAAD1006EC97E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
+		4898FA1013CDAAD1006EC97E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					"\"/Developer/Extras/CoreAudio/PublicUtility/\"",
+					"\"$(SRCROOT)/AirFloat\"",
+				);
+				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/AirFloat\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		4898FA1113CDAAD1006EC97E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					"\"/Developer/Extras/CoreAudio/PublicUtility/\"",
+					"\"$(SRCROOT)/AirFloat\"",
+				);
+				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/AirFloat\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4898F9E813CDAAD1006EC97E /* Build configuration list for PBXProject "AirFloat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4898FA0D13CDAAD1006EC97E /* Debug */,
+				4898FA0E13CDAAD1006EC97E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4898FA0F13CDAAD1006EC97E /* Build configuration list for PBXNativeTarget "AirFloat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4898FA1013CDAAD1006EC97E /* Debug */,
+				4898FA1113CDAAD1006EC97E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4898F9E513CDAAD1006EC97E /* Project object */;
+}
