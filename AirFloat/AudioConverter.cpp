@@ -40,12 +40,12 @@ void AudioConverter::_setupAudioDescription(AudioStreamBasicDescription* desc, i
     assert(desc != NULL && sampleRate > 0);
     
     bzero(desc, sizeof(AudioStreamBasicDescription));
-    desc->mFormatID = kAudioFormatFlagIsFloat;
-    desc->mFormatFlags = 0;
+    desc->mFormatID = kAudioFormatLinearPCM;
+    desc->mFormatFlags = kAudioFormatFlagsCanonical;
     desc->mSampleRate = sampleRate;
     desc->mChannelsPerFrame = 2;
     desc->mFramesPerPacket = 1;
-    desc->mBitsPerChannel = 32;
+    desc->mBitsPerChannel = sizeof(AudioSampleType) * 8;
     desc->mBytesPerFrame = desc->mChannelsPerFrame * (desc->mBitsPerChannel / 8);
     desc->mBytesPerPacket = desc->mBytesPerFrame * desc->mFramesPerPacket;
     
