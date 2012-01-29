@@ -412,6 +412,7 @@
 								<string key="NSFrame">{{323, 91}, {122, 26}}</string>
 								<reference key="NSSuperview" ref="152500390"/>
 								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="IBUIUserInteractionEnabled">NO</bool>
 								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
@@ -711,7 +712,7 @@
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
-				<string key="-1.CustomClassName">PocketPlayViewController</string>
+				<string key="-1.CustomClassName">AirFloatViewController</string>
 				<string key="-1.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="-2.CustomClassName">UIResponder</string>
 				<string key="-2.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -749,7 +750,7 @@
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
-					<string key="className">PocketPlayViewController</string>
+					<string key="className">AirFloatViewController</string>
 					<string key="superclassName">UIViewController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="nextButtonPresset:">id</string>
@@ -779,6 +780,8 @@
 						<string key="albumLabel">UILabel</string>
 						<string key="artistLabel">UILabel</string>
 						<string key="artworkImageView">UIImageView</string>
+						<string key="displayOffView">UIView</string>
+						<string key="displayOnView">UIView</string>
 						<string key="nextButton">UIButton</string>
 						<string key="noWifiImage">UIImageView</string>
 						<string key="noWifiLabel">UILabel</string>
@@ -801,6 +804,14 @@
 						<object class="IBToOneOutletInfo" key="artworkImageView">
 							<string key="name">artworkImageView</string>
 							<string key="candidateClassName">UIImageView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="displayOffView">
+							<string key="name">displayOffView</string>
+							<string key="candidateClassName">UIView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="displayOnView">
+							<string key="name">displayOnView</string>
+							<string key="candidateClassName">UIView</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="nextButton">
 							<string key="name">nextButton</string>
@@ -841,7 +852,7 @@
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/PocketPlayViewController.h</string>
+						<string key="minorKey">./Classes/AirFloatViewController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

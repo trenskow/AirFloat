@@ -62,6 +62,7 @@
 		A16A93C414CBA74500995917 /* OrangeLight.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93C014CBA74500995917 /* OrangeLight.png */; };
 		A16A93C514CBA74500995917 /* OrangeLight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A16A93C114CBA74500995917 /* OrangeLight@2x.png */; };
 		A18D7ADB14C9A4C900603A0C /* CAHostTimeBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A18D7AD914C9A4C900603A0C /* CAHostTimeBase.cpp */; };
+		A194311F14D46878009FC07B /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A194311E14D46878009FC07B /* CoreAudio.framework */; };
 		A1B3E3DB14CE07BB00379E8C /* DisplayOverlay.png in Resources */ = {isa = PBXBuildFile; fileRef = A1B3E3D914CE07BB00379E8C /* DisplayOverlay.png */; };
 		A1B3E3DC14CE07BB00379E8C /* DisplayOverlay@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1B3E3DA14CE07BB00379E8C /* DisplayOverlay@2x.png */; };
 		A1B3E3E114CE09C700379E8C /* ScrollingLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B3E3E014CE09C700379E8C /* ScrollingLabel.m */; };
@@ -168,6 +169,7 @@
 		A16A93C114CBA74500995917 /* OrangeLight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "OrangeLight@2x.png"; sourceTree = "<group>"; };
 		A18D7AD914C9A4C900603A0C /* CAHostTimeBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CAHostTimeBase.cpp; sourceTree = "<group>"; };
 		A18D7ADA14C9A4C900603A0C /* CAHostTimeBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAHostTimeBase.h; sourceTree = "<group>"; };
+		A194311E14D46878009FC07B /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		A1B3E3D914CE07BB00379E8C /* DisplayOverlay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DisplayOverlay.png; sourceTree = "<group>"; };
 		A1B3E3DA14CE07BB00379E8C /* DisplayOverlay@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "DisplayOverlay@2x.png"; sourceTree = "<group>"; };
 		A1B3E3DF14CE09C700379E8C /* ScrollingLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScrollingLabel.h; sourceTree = "<group>"; };
@@ -207,6 +209,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A194311F14D46878009FC07B /* CoreAudio.framework in Frameworks */,
 				A1DE598714CF163500A6767D /* MediaPlayer.framework in Frameworks */,
 				A1DF3AF514C4623700252C95 /* AVFoundation.framework in Frameworks */,
 				4898FA9713CF2D6C006EC97E /* AudioToolbox.framework in Frameworks */,
@@ -255,6 +258,7 @@
 		4898F9F113CDAAD1006EC97E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A194311E14D46878009FC07B /* CoreAudio.framework */,
 				A1DE598614CF163500A6767D /* MediaPlayer.framework */,
 				A1DF3AF414C4623700252C95 /* AVFoundation.framework */,
 				4898FA9613CF2D6C006EC97E /* AudioToolbox.framework */,
