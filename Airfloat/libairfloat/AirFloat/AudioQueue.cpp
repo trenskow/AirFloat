@@ -19,6 +19,7 @@
 #define LoopFrom(x, y, d) for (AudioPacket* x = y ; x != NULL ; x = x->d)
 #define MIN(x,y) (x < y ? x : y)
 #define MAX(x,y) (x > y ? x : y)
+#define SafeDR(x,y) if (x != NULL) *x = y
 
 static const char* statestr(AudioPacketState state) {
     
@@ -238,7 +239,7 @@ AudioPacket* AudioQueue::_popQueueFromHead() {
 
 double AudioQueue::_convertTime(uint32_t fromSampleTime, double fromTime, uint32_t toSampleTime) {
     
-    return fromTime + ((toSampleTime - fromSampleTime) / _sampleRate);
+    return fromTime + (((double)toSampleTime - (double)fromSampleTime) / _sampleRate);
     
 }
 
@@ -350,6 +351,7 @@ void AudioQueue::getPacket(void* buffer, int* size, double* time, uint32_t* samp
     pthread_mutex_lock(&_mutex);
     
     int outSize = 0;
+    SafeDR(time, 0);
     
     if (_queueHead != NULL) {
         
@@ -359,8 +361,8 @@ void AudioQueue::getPacket(void* buffer, int* size, double* time, uint32_t* samp
             
             if (outSize == 0 && sampleTime != NULL)
                 *sampleTime = audioPacket->sampleTime;
-            if (audioPacket->time > 0 && time != NULL)
-                *time = _convertTime(_queueHead->sampleTime, _queueHead->time, *sampleTime);
+            if (audioPacket->time > 0 && time != NULL && *time == 0)
+                *time = _convertTime(audioPacket->sampleTime, audioPacket->time, *sampleTime);
             
             assert(*size - outSize >= audioPacket->bufferSize);
             memcpy(&((char*)buffer)[outSize], audioPacket->buffer, audioPacket->bufferSize);
