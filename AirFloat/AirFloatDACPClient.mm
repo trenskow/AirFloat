@@ -65,28 +65,18 @@
 - (DMAPParser*)_executeCommand:(NSString*)command needsResponse:(BOOL)needsResponse {
     
     NSString* urlString = [NSString stringWithFormat:@"http://%@/%@", _host, command];
-    NSLog(@"DACP Requesting: %@", urlString);
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlString]];
     
     [request addValue:_activeRemove forHTTPHeaderField:@"Active-Remote"];
     [request addValue:_dacpId forHTTPHeaderField:@"DACP-ID"];
-    
-    NSLog(@"%@", [[request allHTTPHeaderFields] description]);
-    
+        
     NSHTTPURLResponse* response = nil;
     NSError* error = nil;
     NSData* data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
     
-    if (error == nil) {
-        
-        NSLog(@"DACP Response code: %d", [response statusCode]);
-        NSLog(@"DACP Content-Type: %@", [[response allHeaderFields] objectForKey:@"Content-Type"]);
-        NSLog(@"DACP Content-Length: %lld", [response expectedContentLength]);
-        
-        if (data && needsResponse)
-            return new DMAPParser((char*)[data bytes], [data length]);
-        
-    } else
+    if (error == nil && data && needsResponse)
+        return new DMAPParser((char*)[data bytes], [data length]);
+    else
         NSLog(@"%@", [error description]);
     
     return nil;
