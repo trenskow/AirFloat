@@ -14,10 +14,10 @@
 #import "NotificationCenter.h"
 #import "AirFloatNotificationsHub.h"
 
-static struct _airFloatNotificationBridge {
+static struct AirFloatNotificationBridge {
     const char* raopName;
     NSString* foundationName;
-} _airFloatNotificationBridge[4] = {
+} _airFloatNotificationBridge[5] = {
     
     {
         RAOPServer::clientConnectedNotificationName,
@@ -34,10 +34,14 @@ static struct _airFloatNotificationBridge {
     {
         AudioQueue::syncNotificationName,
         AirFloatRecordingStartedNotification
+    },
+    {
+        RAOPServer::localhostConnectedErrorNotificationName,
+        AirFloatLocalhostConnectedErrorNotification
     }
     
 };
-static uint32_t _airFloatNotificationBridgeCount = 4;
+static uint32_t _airFloatNotificationBridgeCount = sizeof(_airFloatNotificationBridge) / sizeof(AirFloatNotificationBridge);
 
 @interface AirFloatNotificationsHub (Private)
 
