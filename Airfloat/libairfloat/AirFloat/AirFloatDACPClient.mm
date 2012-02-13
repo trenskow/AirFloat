@@ -12,15 +12,6 @@
 #import "AirFloatNotificationsHub.h"
 #import "AirFloatDACPClient.h"
 
-typedef struct {
-    
-    uint32_t databaseId;
-    uint32_t containerId;
-    uint32_t _reserved;
-    uint32_t songId;
-    
-} AirFloatDACPNowPlayingInfo;
-
 @interface AirFloatDACPClient (Private)
 
 - (DMAPParser*)_executeCommand:(NSString*)command needsResponse:(BOOL)needsResponse;
@@ -115,22 +106,6 @@ typedef struct {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatPlaybackStatusUpdatedNotification object:self userInfo:[NSDictionary dictionaryWithObject:playbackStatus forKey:kAirFloatPlaybackStatusKey]];
                 });
-                
-                AirFloatDACPNowPlayingInfo info;
-                const void* infoBuffer;
-                if ((infoBuffer = container->bufferForIdentifier("com.AirFloat.NowPlayingInfo")) != NULL) {
-                    
-                    info = *(AirFloatDACPNowPlayingInfo*)infoBuffer;
-                    info.databaseId = htonl(info.databaseId);
-                    info.containerId = htonl(info.containerId);
-                    info.songId = htonl(info.songId);
-                    
-                    NSLog(@"Database: %d / Container: %d / Song: %d", info.databaseId, info.containerId, info.songId);
-                    
-                }
-                
-                
-                // TODO: Update playlist
                 
             }
             
