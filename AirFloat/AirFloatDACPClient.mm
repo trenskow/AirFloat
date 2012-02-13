@@ -74,9 +74,10 @@
     NSError* error = nil;
     NSData* data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
     
-    if (error == nil && data && needsResponse)
-        return new DMAPParser((char*)[data bytes], [data length]);
-    else
+    if (error == nil) {
+        if (data && needsResponse)
+            return new DMAPParser((char*)[data bytes], [data length]);
+    } else
         NSLog(@"%@", [error description]);
     
     return nil;
