@@ -25,7 +25,8 @@
 @property (retain, nonatomic) IBOutlet UIButton *nextButton;
 @property (retain, nonatomic) IBOutlet UIButton *prevButton;
 
-- (IBAction)infoViewTabGestureRecognized:(id)sender;
+- (IBAction)tabGestureRecognized:(id)sender;
+- (IBAction)swipeGestureRecognized:(id)sender;
 - (IBAction)playButtonTouchUpInside:(id)sender;
 - (IBAction)nextButtonTouchUpInside:(id)sender;
 - (IBAction)prevButtonTouchUpInside:(id)sender;
