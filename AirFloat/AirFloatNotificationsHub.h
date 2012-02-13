@@ -10,6 +10,8 @@
 
 #define kAirFloatSenderOriginKey @"kAirFloatSenderOriginKey"
 
+#define AirFloatLocalhostConnectedErrorNotification @"AirFloatLocalhostConnectedErrorNotification"
+
 #define AirFloatClientConnectedNotification @"AirFloatClientConnectedNotification"
 #define AirFloatClientDisconnectedNotification @"AirFloatClientDisconnectedNotification"
 #define AirFloatRecordingStartedNotification @"AirFloatRecordingStartedNotification"
