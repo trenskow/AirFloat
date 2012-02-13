@@ -18,9 +18,11 @@
 
 @interface AirFloatViewController (Private)
 
+- (void)_setInfoAppearence:(BOOL)visible;
 - (void)_updateNowPlayingInfoCenter;
 - (void)_updateArtwork:(UIImage*)image;
 - (void)_updateApplicationStatus;
+- (void)_applicationWillEnterForeground;
 - (void)_trackInfoUpdated:(NSNotification*)notification;
 - (void)_metadataUpdated:(NSNotification*)notification;
 - (void)_clientDisconnected:(NSNotification*)notification;
@@ -29,6 +31,9 @@
 @end
 
 @implementation AirFloatViewController
+
+#pragma mark Property Implementation
+
 @synthesize infoViews;
 @synthesize applicationStatusLabel;
 @synthesize trackTitleLabel;
@@ -39,18 +44,14 @@
 @synthesize nextButton;
 @synthesize prevButton;
 
+#pragma mark Allocation / Deallocation / Load / Unload
+
 - (id)init {
     
     if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
         return (self = [self initWithNibName:@"AirFloatViewController~iPad" bundle:nil]);
     
     return (self = [self initWithNibName:@"AirFloatViewController" bundle:nil]);
-    
-}
-
-- (BOOL)canBecomeFirstResponder {
-    
-    return YES;
     
 }
 
@@ -66,6 +67,8 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_metadataUpdated:) name:AirFloatMetadataUpdatedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_clientDisconnected:) name:AirFloatClientDisconnectedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_playbackStatusUpdated:) name:AirFloatPlaybackStatusUpdatedNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
     
     [self _updateApplicationStatus];
     
@@ -93,6 +96,32 @@
     
 }
 
+- (void)dealloc {
+    
+    [_previousPlayedAlbum release];
+    
+    [applicationStatusLabel release];
+    [trackTitleLabel release];
+    [artistNameLabel release];
+    [artworkImageView release];
+    [infoViews release];
+    [flippedArtworkImageView release];
+    [playButton release];
+    [nextButton release];
+    [prevButton release];
+    
+    [super dealloc];
+    
+}
+
+#pragma mark Remote Control Handlers
+
+- (BOOL)canBecomeFirstResponder {
+    
+    return YES;
+    
+}
+
 - (void)remoteControlReceivedWithEvent:(UIEvent *)event {
     
     if (event.type == UIEventTypeRemoteControl)
@@ -112,55 +141,20 @@
     
 }
 
-- (void)dealloc {
-    
-    [_previousPlayedAlbum release];
-    
-    [applicationStatusLabel release];
-    [trackTitleLabel release];
-    [artistNameLabel release];
-    [artworkImageView release];
-    [infoViews release];
-    [flippedArtworkImageView release];
-    [playButton release];
-    [nextButton release];
-    [prevButton release];
-    
-    [super dealloc];
-    
-}
-
 #pragma mark Action Methods
 - (IBAction)tabGestureRecognized:(id)sender {
     
-    CGRect artworkImageRect = self.artworkImageView.frame;
-    CGRect flippedArtworkImageRect = self.flippedArtworkImageView.frame;
-    BOOL willAppear = (self.infoViews.alpha == 0.0);
-    
-    artworkImageRect.origin.y = (willAppear ? 44 : artworkImageRect.origin.y = round(((self.view.bounds.size.height) - artworkImageRect.size.height) / 2) - 10);
-    
-    flippedArtworkImageRect.origin.y = (willAppear ? 0 : 44 - artworkImageRect.origin.y);
-    
-    [UIView animateWithDuration:0.5
-                          delay:0.0
-                        options:UIViewAnimationOptionCurveEaseOut
-                     animations:^{
-                         
-                         self.infoViews.alpha = (willAppear ? 1.0 : 0.0);
-                         self.artworkImageView.frame = artworkImageRect;
-                         self.flippedArtworkImageView.frame = flippedArtworkImageRect;
-                         
-                     } completion:NULL];
+    [self _setInfoAppearence:(self.infoViews.alpha == 0.0)];
     
 }
 
 - (IBAction)swipeGestureRecognized:(id)sender {
     
     switch (((UISwipeGestureRecognizer*)sender).direction) {
-        case UISwipeGestureRecognizerDirectionLeft:
+        case UISwipeGestureRecognizerDirectionRight:
             [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatPlaybackNextNotification object:nil];
             break;
-        case UISwipeGestureRecognizerDirectionRight:
+        case UISwipeGestureRecognizerDirectionLeft:
             [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatPlaybackPrevNotification object:nil];
             break;            
         default:
@@ -194,6 +188,28 @@
 }
 
 #pragma mark Private Methods
+
+- (void)_setInfoAppearence:(BOOL)visible {
+    
+    CGRect artworkImageRect = self.artworkImageView.frame;
+    CGRect flippedArtworkImageRect = self.flippedArtworkImageView.frame;
+
+    artworkImageRect.origin.y = (visible ? 44 : artworkImageRect.origin.y = round(((self.view.bounds.size.height) - artworkImageRect.size.height) / 2) - 10);
+    
+    flippedArtworkImageRect.origin.y = (visible ? 0 : 44 - artworkImageRect.origin.y);
+    
+    [UIView animateWithDuration:0.5
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseOut
+                     animations:^{
+                         
+                         self.infoViews.alpha = (visible ? 1.0 : 0.0);
+                         self.artworkImageView.frame = artworkImageRect;
+                         self.flippedArtworkImageView.frame = flippedArtworkImageRect;
+                         
+                     } completion:NULL];
+    
+}
 
 - (void)_updateNowPlayingInfoCenter {
     
@@ -238,6 +254,14 @@
     
     if (!serverController.hasClientConnected)
         self.trackTitleLabel.text = self.artistNameLabel.text = @"";
+    
+}
+
+#pragma mark Notification Handlers
+
+- (void)_applicationWillEnterForeground {
+    
+    [self _setInfoAppearence:YES];
     
 }
 
