@@ -34,6 +34,12 @@
 		4898FA9513CF17BC006EC97E /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898FA9413CF17BC006EC97E /* QuartzCore.framework */; };
 		4898FA9713CF2D6C006EC97E /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898FA9613CF2D6C006EC97E /* AudioToolbox.framework */; };
 		48B49EDA13D216EC00AB67D1 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 48B49ED913D216EC00AB67D1 /* Settings.bundle */; };
+		A10392D314E9B58400DB356F /* BarButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A10392CF14E9B58400DB356F /* BarButton.png */; };
+		A10392D414E9B58400DB356F /* BarButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A10392D014E9B58400DB356F /* BarButton@2x.png */; };
+		A10392D514E9B58400DB356F /* BarButtonHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = A10392D114E9B58400DB356F /* BarButtonHighlighted.png */; };
+		A10392D614E9B58400DB356F /* BarButtonHighlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A10392D214E9B58400DB356F /* BarButtonHighlighted@2x.png */; };
+		A10392DA14E9B6C400DB356F /* AirFloatBarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A10392D914E9B6C400DB356F /* AirFloatBarButton.m */; };
+		A10392DD14E9B8F100DB356F /* libTestFlight.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A10392DB14E9B8F100DB356F /* libTestFlight.a */; };
 		A10EB41014E81CFC00615CDB /* AirFloatDACPBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = A10EB40F14E81CFC00615CDB /* AirFloatDACPBrowser.m */; };
 		A10EB41E14E8374F00615CDB /* Next.png in Resources */ = {isa = PBXBuildFile; fileRef = A10EB41614E8374F00615CDB /* Next.png */; };
 		A10EB41F14E8374F00615CDB /* Next@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A10EB41714E8374F00615CDB /* Next@2x.png */; };
@@ -123,13 +129,21 @@
 		4898FA2213CDAB01006EC97E /* SocketEndPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketEndPoint.h; sourceTree = "<group>"; };
 		4898FA2A13CDABB2006EC97E /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Log.cpp; sourceTree = "<group>"; };
 		4898FA2B13CDABB2006EC97E /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
-		4898FA7713CDB00F006EC97E /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = AirFloat/libcrypto.a; sourceTree = "<group>"; };
-		4898FA7813CDB010006EC97E /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = AirFloat/libssl.a; sourceTree = "<group>"; };
+		4898FA7713CDB00F006EC97E /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
+		4898FA7813CDB010006EC97E /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
 		4898FA7B13CDB6B9006EC97E /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "../Icon@2x.png"; sourceTree = "<group>"; };
 		4898FA7D13CDB6C2006EC97E /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../Icon.png; sourceTree = "<group>"; };
 		4898FA9413CF17BC006EC97E /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		4898FA9613CF2D6C006EC97E /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		48B49ED913D216EC00AB67D1 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
+		A10392CF14E9B58400DB356F /* BarButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BarButton.png; sourceTree = "<group>"; };
+		A10392D014E9B58400DB356F /* BarButton@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "BarButton@2x.png"; sourceTree = "<group>"; };
+		A10392D114E9B58400DB356F /* BarButtonHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BarButtonHighlighted.png; sourceTree = "<group>"; };
+		A10392D214E9B58400DB356F /* BarButtonHighlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "BarButtonHighlighted@2x.png"; sourceTree = "<group>"; };
+		A10392D814E9B6C400DB356F /* AirFloatBarButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFloatBarButton.h; sourceTree = "<group>"; };
+		A10392D914E9B6C400DB356F /* AirFloatBarButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFloatBarButton.m; sourceTree = "<group>"; };
+		A10392DB14E9B8F100DB356F /* libTestFlight.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTestFlight.a; sourceTree = "<group>"; };
+		A10392DC14E9B8F100DB356F /* TestFlight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestFlight.h; sourceTree = "<group>"; };
 		A10EB40E14E81CFC00615CDB /* AirFloatDACPBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFloatDACPBrowser.h; sourceTree = "<group>"; };
 		A10EB40F14E81CFC00615CDB /* AirFloatDACPBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFloatDACPBrowser.m; sourceTree = "<group>"; };
 		A10EB41614E8374F00615CDB /* Next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Next.png; sourceTree = "<group>"; };
@@ -230,6 +244,7 @@
 				4898F9F713CDAAD1006EC97E /* CoreGraphics.framework in Frameworks */,
 				4898FA7913CDB010006EC97E /* libcrypto.a in Frameworks */,
 				4898FA7A13CDB010006EC97E /* libssl.a in Frameworks */,
+				A10392DD14E9B8F100DB356F /* libTestFlight.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,7 +254,7 @@
 		48487E4213D6340400E55831 /* Server */ = {
 			isa = PBXGroup;
 			children = (
-				A1C10DF814DEA47800963085 /* openssl */,
+				A10392DE14E9B90000DB356F /* OpenSSL */,
 				A1389E2414E43970004FE040 /* Logging */,
 				A1B9786014E3BD9A00E77DB9 /* Notifications */,
 				A1B4D81414DFCFDD001E2C86 /* Threading */,
@@ -253,8 +268,6 @@
 			isa = PBXGroup;
 			children = (
 				4898F9F813CDAAD1006EC97E /* AirFloat */,
-				4898FA7713CDB00F006EC97E /* libcrypto.a */,
-				4898FA7813CDB010006EC97E /* libssl.a */,
 				4898F9F113CDAAD1006EC97E /* Frameworks */,
 				4898F9EF13CDAAD1006EC97E /* Products */,
 			);
@@ -289,6 +302,7 @@
 			children = (
 				48487E4213D6340400E55831 /* Server */,
 				A1389E1114E422B8004FE040 /* iOS App */,
+				A10392DF14E9B93100DB356F /* TestFlight */,
 			);
 			path = AirFloat;
 			sourceTree = "<group>";
@@ -296,6 +310,10 @@
 		4898F9F913CDAAD1006EC97E /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				A10392CF14E9B58400DB356F /* BarButton.png */,
+				A10392D014E9B58400DB356F /* BarButton@2x.png */,
+				A10392D114E9B58400DB356F /* BarButtonHighlighted.png */,
+				A10392D214E9B58400DB356F /* BarButtonHighlighted@2x.png */,
 				A10EB41614E8374F00615CDB /* Next.png */,
 				A10EB41714E8374F00615CDB /* Next@2x.png */,
 				A10EB41814E8374F00615CDB /* Pause.png */,
@@ -327,6 +345,26 @@
 				48B49ED913D216EC00AB67D1 /* Settings.bundle */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		A10392DE14E9B90000DB356F /* OpenSSL */ = {
+			isa = PBXGroup;
+			children = (
+				A1C10DF814DEA47800963085 /* openssl */,
+				4898FA7713CDB00F006EC97E /* libcrypto.a */,
+				4898FA7813CDB010006EC97E /* libssl.a */,
+			);
+			name = OpenSSL;
+			sourceTree = "<group>";
+		};
+		A10392DF14E9B93100DB356F /* TestFlight */ = {
+			isa = PBXGroup;
+			children = (
+				A10392DB14E9B8F100DB356F /* libTestFlight.a */,
+				A10392DC14E9B8F100DB356F /* TestFlight.h */,
+			);
+			name = TestFlight;
+			path = ..;
 			sourceTree = "<group>";
 		};
 		A10EB41114E81D0200615CDB /* DACP */ = {
@@ -440,6 +478,8 @@
 				A10ECCA114E4F70000C1BFAA /* AirFloatImageView.m */,
 				A149208B14E7096500849DC3 /* AirFloatGradiantMaskedView.h */,
 				A149208C14E7096500849DC3 /* AirFloatGradiantMaskedView.m */,
+				A10392D814E9B6C400DB356F /* AirFloatBarButton.h */,
+				A10392D914E9B6C400DB356F /* AirFloatBarButton.m */,
 			);
 			name = Custom;
 			sourceTree = "<group>";
@@ -604,6 +644,10 @@
 				A10EB42314E8374F00615CDB /* Play@2x.png in Resources */,
 				A10EB42414E8374F00615CDB /* Prev.png in Resources */,
 				A10EB42514E8374F00615CDB /* Prev@2x.png in Resources */,
+				A10392D314E9B58400DB356F /* BarButton.png in Resources */,
+				A10392D414E9B58400DB356F /* BarButton@2x.png in Resources */,
+				A10392D514E9B58400DB356F /* BarButtonHighlighted.png in Resources */,
+				A10392D614E9B58400DB356F /* BarButtonHighlighted@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -653,6 +697,7 @@
 				A149209314E7170800849DC3 /* AirFloatDACPClient.mm in Sources */,
 				A149209814E7C5C700849DC3 /* DMAPParser.cpp in Sources */,
 				A10EB41014E81CFC00615CDB /* AirFloatDACPBrowser.m in Sources */,
+				A10392DA14E9B6C400DB356F /* AirFloatBarButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -758,7 +803,10 @@
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				OTHER_CFLAGS = "-DDEBUG";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -778,7 +826,10 @@
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -826,7 +877,10 @@
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				OTHER_CFLAGS = (
 					"-DLOG_SERVER",
 					"-DDEBUG",
