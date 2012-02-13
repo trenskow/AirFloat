@@ -9,6 +9,8 @@
 #import <QuartzCore/QuartzCore.h>
 #import <MediaPlayer/MediaPlayer.h>
 
+#import "TestFlight.h"
+
 #import "UIView+AirFloatAdditions.h"
 #import "RTPReceiver.h"
 #import "AirFloatAppDelegate.h"
@@ -135,9 +137,9 @@
     CGRect flippedArtworkImageRect = self.flippedArtworkImageView.frame;
     BOOL willAppear = (self.infoViews.alpha == 0.0);
     
-    artworkImageRect.origin.y = (willAppear ? 46 : artworkImageRect.origin.y = round(((self.view.bounds.size.height) - artworkImageRect.size.height) / 2) - 10);
+    artworkImageRect.origin.y = (willAppear ? 44 : artworkImageRect.origin.y = round(((self.view.bounds.size.height) - artworkImageRect.size.height) / 2) - 10);
     
-    flippedArtworkImageRect.origin.y = (willAppear ? 0 : 46 - artworkImageRect.origin.y);
+    flippedArtworkImageRect.origin.y = (willAppear ? 0 : 44 - artworkImageRect.origin.y);
     
     [UIView animateWithDuration:0.5
                           delay:0.0
@@ -168,6 +170,12 @@
 
     [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatPlaybackPrevNotification object:nil];
 
+}
+
+- (IBAction)betaFeedbackTouchUpInside:(id)sender {
+    
+    [TestFlight openFeedbackView];
+    
 }
 
 #pragma mark Private Methods

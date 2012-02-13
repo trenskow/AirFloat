@@ -29,5 +29,6 @@
 - (IBAction)playButtonTouchUpInside:(id)sender;
 - (IBAction)nextButtonTouchUpInside:(id)sender;
 - (IBAction)prevButtonTouchUpInside:(id)sender;
+- (IBAction)betaFeedbackTouchUpInside:(id)sender;
 
 @end
