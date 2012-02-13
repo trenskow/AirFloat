@@ -131,7 +131,7 @@
 }
 
 #pragma mark Action Methods
-- (IBAction)infoViewTabGestureRecognized:(id)sender {
+- (IBAction)tabGestureRecognized:(id)sender {
     
     CGRect artworkImageRect = self.artworkImageView.frame;
     CGRect flippedArtworkImageRect = self.flippedArtworkImageView.frame;
@@ -151,6 +151,21 @@
                          self.flippedArtworkImageView.frame = flippedArtworkImageRect;
                          
                      } completion:NULL];
+    
+}
+
+- (IBAction)swipeGestureRecognized:(id)sender {
+    
+    switch (((UISwipeGestureRecognizer*)sender).direction) {
+        case UISwipeGestureRecognizerDirectionLeft:
+            [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatPlaybackNextNotification object:nil];
+            break;
+        case UISwipeGestureRecognizerDirectionRight:
+            [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatPlaybackPrevNotification object:nil];
+            break;            
+        default:
+            break;
+    }
     
 }
 

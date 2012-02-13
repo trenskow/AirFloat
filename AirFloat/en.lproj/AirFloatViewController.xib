@@ -12,12 +12,13 @@
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<string>IBUITapGestureRecognizer</string>
-			<string>IBUIButton</string>
-			<string>IBUIImageView</string>
 			<string>IBUIView</string>
+			<string>IBUIImageView</string>
 			<string>IBUILabel</string>
 			<string>IBProxyObject</string>
+			<string>IBUISwipeGestureRecognizer</string>
+			<string>IBUITapGestureRecognizer</string>
+			<string>IBUIButton</string>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -288,7 +289,7 @@
 										<string key="NSFrameSize">{320, 44}</string>
 										<reference key="NSSuperview" ref="881396234"/>
 										<reference key="NSWindow"/>
-										<reference key="NSNextKeyView" ref="73742643"/>
+										<reference key="NSNextKeyView" ref="209757733"/>
 										<string key="NSReuseIdentifierKey">_NS:328</string>
 										<bool key="IBUIOpaque">NO</bool>
 										<bool key="IBUIClipsSubviews">YES</bool>
@@ -381,7 +382,7 @@
 											<int key="NSfFlags">16</int>
 										</object>
 									</object>
-									<object class="IBUIButton" id="73742643">
+									<object class="IBUIButton" id="209757733">
 										<reference key="NSNextResponder" ref="881396234"/>
 										<int key="NSvFlags">292</int>
 										<string key="NSFrame">{{6, 7}, {103, 30}}</string>
@@ -452,6 +453,10 @@
 				<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 			</object>
 			<object class="IBUITapGestureRecognizer" id="395044947"/>
+			<object class="IBUISwipeGestureRecognizer" id="1066902234"/>
+			<object class="IBUISwipeGestureRecognizer" id="495284810">
+				<int key="IBUIDirection">2</int>
+			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
 			<object class="NSMutableArray" key="connectionRecords">
@@ -548,11 +553,11 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
-						<string key="label">infoViewTabGestureRecognized:</string>
+						<string key="label">tabGestureRecognized:</string>
 						<reference key="source" ref="395044947"/>
 						<reference key="destination" ref="372490531"/>
 					</object>
-					<int key="connectionID">103</int>
+					<int key="connectionID">141</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
@@ -592,13 +597,49 @@
 					<int key="connectionID">130</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletCollectionConnection" key="connection">
+						<string key="label">gestureRecognizers</string>
+						<reference key="source" ref="10341013"/>
+						<reference key="destination" ref="495284810"/>
+						<string key="cachedDesigntimeCollectionClassName">NSArray</string>
+						<bool key="addsContentToExistingCollection">YES</bool>
+					</object>
+					<int key="connectionID">136</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletCollectionConnection" key="connection">
+						<string key="label">gestureRecognizers</string>
+						<reference key="source" ref="10341013"/>
+						<reference key="destination" ref="495284810"/>
+						<string key="cachedDesigntimeCollectionClassName">NSArray</string>
+						<bool key="addsContentToExistingCollection">YES</bool>
+					</object>
+					<int key="connectionID">137</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
 						<string key="label">betaFeedbackTouchUpInside:</string>
-						<reference key="source" ref="73742643"/>
+						<reference key="source" ref="209757733"/>
 						<reference key="destination" ref="372490531"/>
 						<int key="IBEventType">7</int>
 					</object>
 					<int key="connectionID">133</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchEventConnection" key="connection">
+						<string key="label">swipeGestureRecognized:</string>
+						<reference key="source" ref="495284810"/>
+						<reference key="destination" ref="372490531"/>
+					</object>
+					<int key="connectionID">140</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchEventConnection" key="connection">
+						<string key="label">swipeGestureRecognized:</string>
+						<reference key="source" ref="1066902234"/>
+						<reference key="destination" ref="372490531"/>
+					</object>
+					<int key="connectionID">138</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -683,7 +724,7 @@
 							<reference ref="971654827"/>
 							<reference ref="793265093"/>
 							<reference ref="59454354"/>
-							<reference ref="73742643"/>
+							<reference ref="209757733"/>
 						</object>
 						<reference key="parent" ref="779431445"/>
 					</object>
@@ -751,8 +792,18 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">131</int>
-						<reference key="object" ref="73742643"/>
+						<reference key="object" ref="209757733"/>
 						<reference key="parent" ref="881396234"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">135</int>
+						<reference key="object" ref="1066902234"/>
+						<reference key="parent" ref="0"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">134</int>
+						<reference key="object" ref="495284810"/>
+						<reference key="parent" ref="0"/>
 					</object>
 				</object>
 			</object>
@@ -774,6 +825,8 @@
 					<string>129.IBPluginDependency</string>
 					<string>131.CustomClassName</string>
 					<string>131.IBPluginDependency</string>
+					<string>134.IBPluginDependency</string>
+					<string>135.IBPluginDependency</string>
 					<string>6.IBPluginDependency</string>
 					<string>79.IBPluginDependency</string>
 					<string>80.IBPluginDependency</string>
@@ -809,6 +862,8 @@
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
+					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
+					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>AirFloatImageView</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -831,7 +886,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">133</int>
+			<int key="maxID">141</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -868,13 +923,15 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>betaFeedbackTouchUpInside:</string>
-							<string>infoViewTabGestureRecognized:</string>
 							<string>nextButtonTouchUpInside:</string>
 							<string>playButtonTouchUpInside:</string>
 							<string>prevButtonTouchUpInside:</string>
+							<string>swipeGestureRecognized:</string>
+							<string>tabGestureRecognized:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -887,19 +944,16 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>betaFeedbackTouchUpInside:</string>
-							<string>infoViewTabGestureRecognized:</string>
 							<string>nextButtonTouchUpInside:</string>
 							<string>playButtonTouchUpInside:</string>
 							<string>prevButtonTouchUpInside:</string>
+							<string>swipeGestureRecognized:</string>
+							<string>tabGestureRecognized:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
 								<string key="name">betaFeedbackTouchUpInside:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">infoViewTabGestureRecognized:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -912,6 +966,14 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">prevButtonTouchUpInside:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">swipeGestureRecognized:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">tabGestureRecognized:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 						</object>
