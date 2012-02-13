@@ -15,9 +15,13 @@
 #include <pthread.h>
 #include <stdlib.h>
 
+#include "NotificationCenter.h"
 #include "Log.h"
 #include "RAOPConnection.h"
 #include "RAOPServer.h"
+
+const char* RAOPServer::clientConnectedNotificationName = "serverConnectionCreated";
+const char* RAOPServer::localhostConnectedErrorNotificationName = "serverLocalhostConnectedError";
 
 RAOPServer::RAOPServer(const char* host, int port) {
     
@@ -32,7 +36,7 @@ RAOPServer::RAOPServer(int port) {
     _setup();
     
     _localEndPoint = new SocketEndPoint();
-    _localEndPoint->SetupIPv6(port);
+    _localEndPoint->setupIPv6(port);
     
 }
 
@@ -41,7 +45,7 @@ RAOPServer::RAOPServer() {
     _setup();
     
     _localEndPoint = new SocketEndPoint();
-    _localEndPoint->SetupIPv6(5000);
+    _localEndPoint->setupIPv6(5000);
     
 }
 
@@ -53,8 +57,6 @@ RAOPServer::~RAOPServer() {
 
 void RAOPServer::_setup() {
     
-    _connCreatedClbk = NULL;
-    _connCreatedCtx = NULL;
     _isRunning = false;
     
 }
@@ -75,31 +77,32 @@ void RAOPServer::_serverLoop() {
 
         Socket* newSocket = _socket->Accept();
         if (newSocket == NULL) {
-            log(LOG_INFO, "Server was stopped");
             break;
         }
         
         char localip[50];
         char remoteip[50];
-        newSocket->LocalEndPoint()->GetHost(localip, 50);
-        newSocket->RemoteEndPoint()->GetHost(remoteip, 50);
+        newSocket->GetLocalEndPoint()->getHost(localip, 50);
+        newSocket->GetRemoteEndPoint()->getHost(remoteip, 50);
         
-//        if (strcmp(localip, remoteip) != 0) {
-            
-            log(LOG_INFO, "Accepted connection from %s (%s)", remoteip, (IN6_IS_ADDR_V4MAPPED(&((struct sockaddr_in6*)newSocket->RemoteEndPoint()->SocketAdress())->sin6_addr) ? "IPv4in6" : "IPv6"));
+#if !defined (DEBUG)
+        if (strcmp(localip, remoteip) != 0) {
+#endif
+            log(LOG_INFO, "Accepted connection from %s (%s)", remoteip, (IN6_IS_ADDR_V4MAPPED(&((struct sockaddr_in6*)newSocket->GetRemoteEndPoint()->getSocketAddress())->sin6_addr) ? "IPv4in6" : "IPv6"));
             
             RAOPConnection* connection = new RAOPConnection(newSocket);
             
             connection->_takeOver();
             
-            if (_connCreatedClbk != NULL)
-                _connCreatedClbk(this, connection, _connCreatedCtx);
+            NotificationCenter::defaultCenter()->postNotification(RAOPServer::clientConnectedNotificationName, this, connection);
             
-//        } else {
-//            newSocket->Close();
-//            log(LOG_ERROR, "Refused connection from localhost.");
-//        }
-        
+#if !defined (DEBUG)
+        } else {
+            newSocket->Close();
+            log(LOG_ERROR, "Refused connection from localhost.");
+            NotificationCenter::defaultCenter()->postNotification(RAOPServer::localhostConnectedErrorNoticationName, this, NULL);
+        }
+#endif
         
     }
     
@@ -131,13 +134,6 @@ bool RAOPServer::startServer() {
         log(LOG_ERROR, "Unable to create socket");
     
     return false;
-    
-}
-
-void RAOPServer::setConnectionCallback(connectionCreatedClbk clbk, void* ctx) {
-    
-    _connCreatedClbk = clbk;
-    _connCreatedCtx = ctx;
     
 }
 

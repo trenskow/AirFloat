@@ -10,6 +10,8 @@
 
 #import "AirFloatServerController.h"
 
+#define AirFloatSharedAppDelegate ((AirFloatAppDelegate*)[UIApplication sharedApplication].delegate)
+
 @class AirFloatViewController;
 
 @interface AirFloatAppDelegate : NSObject <UIApplicationDelegate> {

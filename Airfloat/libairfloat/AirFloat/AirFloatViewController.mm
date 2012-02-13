@@ -6,159 +6,43 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import <QuartzCore/QuartzCore.h>
 #import <MediaPlayer/MediaPlayer.h>
 
+#import "UIView+AirFloatAdditions.h"
 #import "RTPReceiver.h"
 #import "AirFloatAppDelegate.h"
 #import "AirFloatViewController.h"
 
 @interface AirFloatViewController (Private)
 
-- (void)_updateNowPlaying:(UIImage*)artwork;
-- (void)_setImage:(NSData *)imageData;
+- (void)_updateNowPlayingInfoCenter;
+- (void)_updateArtwork:(UIImage*)image;
+- (void)_updateApplicationStatus;
+- (void)_trackInfoUpdated:(NSNotification*)notification;
+- (void)_metadataUpdated:(NSNotification*)notification;
+- (void)_clientDisconnected:(NSNotification*)notification;
+- (void)_playbackStatusUpdated:(NSNotification*)notification;
 
 @end
 
 @implementation AirFloatViewController
-@synthesize nowPlayingView = _nowPlayingView;
-@synthesize artworkImageView = _artworkImageView;
-@synthesize artistLabel = _artistLabel;
-@synthesize albumLabel = _albumLabel;
-@synthesize trackLabel = _trackLabel;
-@synthesize displayOnView = _displayOnView;
-@synthesize displayOffView = _displayOffView;
-
-@synthesize serverSwitch=_serverSwitch, statusLightImage=_statusLightImage, noWifiImage=_noWifiImage, noWifiLabel = _noWifiLabel, prevButton=_prevButton, playButton=_playButton, nextButton=_nextButton;
+@synthesize infoViews;
+@synthesize applicationStatusLabel;
+@synthesize trackTitleLabel;
+@synthesize artistNameLabel;
+@synthesize artworkImageView;
+@synthesize flippedArtworkImageView;
+@synthesize playButton;
+@synthesize nextButton;
+@synthesize prevButton;
 
 - (id)init {
     
     if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
         return (self = [self initWithNibName:@"AirFloatViewController~iPad" bundle:nil]);
-        
+    
     return (self = [self initWithNibName:@"AirFloatViewController" bundle:nil]);
-    
-}
-
-- (void)_updateNowPlaying:(UIImage*)artwork {
-    
-    [_nowPlayingArtwork release];
-    _nowPlayingArtwork = [artwork retain];
-    
-    NSDictionary* dictionary = [NSDictionary dictionaryWithObjectsAndKeys:self.trackLabel.text, MPMediaItemPropertyTitle,
-                                self.artistLabel.text, MPMediaItemPropertyArtist,
-                                self.albumLabel.text, MPMediaItemPropertyAlbumTitle,
-                                (artwork ? [[[MPMediaItemArtwork alloc] initWithImage:artwork] autorelease] : nil), MPMediaItemPropertyArtwork, nil];
-    
-    [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = dictionary;
-    
-}
-
-- (void)_didReceiveServerControllerNotification:(NSNotification*)notification {
-    
-    if ([[notification name] isEqualToString:AirFloatServerStartedNotification])
-        self.statusLightImage.image = [UIImage imageNamed:@"GreenLight.png"];
-    if ([[notification name] isEqualToString:AirFloatClientSupportsPlayControlsNotification]) {
-        
-        self.prevButton.alpha = self.playButton.alpha = self.nextButton.alpha = 0.0;
-        
-        CGRect prevFinalFrame, prevStartFrame;
-        CGRect nextFinalFrame, nextStartFrame;
-        prevFinalFrame = prevStartFrame = self.prevButton.frame;
-        nextFinalFrame = nextStartFrame = self.nextButton.frame;
-        
-        prevStartFrame.origin.x -= 100;
-        nextStartFrame.origin.x += 100;
-        
-        self.prevButton.frame = prevStartFrame;
-        self.nextButton.frame = nextStartFrame;
-        
-        self.prevButton.hidden = self.playButton.hidden = self.nextButton.hidden = NO;
-        
-        [UIView animateWithDuration:0.5
-                              delay:0.0
-                            options:UIViewAnimationCurveEaseOut
-                         animations:^(void) {
-                             
-                             self.prevButton.frame = prevFinalFrame;
-                             self.nextButton.frame = nextFinalFrame;
-                             
-                             self.prevButton.alpha = self.playButton.alpha = self.nextButton.alpha = 1.0;
-                             
-                         } completion:NULL];
-        
-    } else if ([[notification name] isEqualToString:AirFloatClientConnectedNotification] || [[notification name] isEqualToString:AirFloatClientStoppedRecordingNotification]) {
-        self.statusLightImage.image = [UIImage imageNamed:@"OrangeLight.png"];
-        self.statusLightImage.hidden = NO;
-    } else if ([[notification name] isEqualToString:AirFloatClientDisconnectedNotification]) {
-        
-        self.statusLightImage.image = [UIImage imageNamed:@"GreenLight.png"];
-        
-        self.trackLabel.text = self.albumLabel.text = self.artistLabel.text = @"";
-        self.artworkImageView.image = [UIImage imageNamed:@"NoArtwork.png"];
-        
-        [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = nil;
-        
-        [UIView animateWithDuration:0.5
-                              delay:0.0
-                            options:UIViewAnimationCurveEaseOut
-                         animations:^(void) {
-                             
-                             self.prevButton.alpha = self.playButton.alpha = self.nextButton.alpha = 0.0;                             
-                             
-                         } completion:^(BOOL finished) {
-                             
-                             self.prevButton.hidden = self.playButton.hidden = self.nextButton.hidden = YES;
-                             
-                         }];
-        
-    } else if ([[notification name] isEqualToString:AirFloatClientUpdatedMetadataNotification]) {
-        
-        NSData* data = [notification.userInfo objectForKey:kAirFloatClientMetadataData];
-        NSString* contentType = [notification.userInfo objectForKey:kAirFloatClientMetadataContentType];
-        
-        if ([contentType isEqualToString:@"image/jpeg"]) {
-            
-            UIImage* image = [UIImage imageWithData:data];
-            
-            [self _updateNowPlaying:image];
-            
-            UIGraphicsBeginImageContextWithOptions(self.artworkImageView.bounds.size, YES, self.view.window.screen.scale);
-            
-            CGContextRef context = UIGraphicsGetCurrentContext();
-            
-            UIGraphicsPushContext(context);
-            
-            [image drawInRect:self.artworkImageView.bounds];
-            
-            UIGraphicsPopContext();
-            
-            self.artworkImageView.image = UIGraphicsGetImageFromCurrentImageContext();
-            
-            UIGraphicsEndImageContext();
-            
-        } else if ([contentType isEqualToString:@"image/none"]) {
-            self.artworkImageView.image = [UIImage imageNamed:@"NoArtwork.png"];
-            [self _updateNowPlaying:nil];
-        } else if ([contentType isEqualToString:@"application/x-dmap-tagged"] && [data length] > 8) {
-            
-            UIImage* image = nil;
-            
-            if (![self.albumLabel.text isEqualToString:[notification.userInfo objectForKey:kAirFloatClientMetadataAlbum]])
-                self.artworkImageView.image = [UIImage imageNamed:@"NoArtwork.png"];
-            else
-                image = [[_nowPlayingArtwork retain] autorelease];
-            
-            self.trackLabel.text = [notification.userInfo objectForKey:kAirFloatClientMetadataTrackTitle];
-            self.artistLabel.text = [notification.userInfo objectForKey:kAirFloatClientMetadataArtistName];
-            self.albumLabel.text = [notification.userInfo objectForKey:kAirFloatClientMetadataAlbum];
-            
-            [self _updateNowPlaying:image];
-            
-        }
-        
-    }
-    
-    self.displayOffView.hidden = !(self.displayOnView.hidden = ([self.trackLabel.text length] == 0));
     
 }
 
@@ -168,87 +52,255 @@
     
 }
 
-- (void)remoteControlReceivedWithEvent:(UIEvent *)event {
-    
-    
-}
-
 - (void)viewDidLoad {
     
-    _serverController = [((AirFloatAppDelegate*)[UIApplication sharedApplication].delegate).serverController retain];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_didReceiveServerControllerNotification:) name:nil object:_serverController];
-    
-    [self becomeFirstResponder];
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    [self becomeFirstResponder];
     
-    self.trackLabel.text = self.artistLabel.text = self.albumLabel.text = @"";
+    self.flippedArtworkImageView.flipped = YES;
     
-    if (!_serverController.isWifiAvailable)
-        self.noWifiImage.hidden = self.noWifiLabel.hidden = NO;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateApplicationStatus) name:AirFloatServerControllerDidChangeStatus object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_trackInfoUpdated:) name:AirFloatTrackInfoUpdatedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_metadataUpdated:) name:AirFloatMetadataUpdatedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_clientDisconnected:) name:AirFloatClientDisconnectedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_playbackStatusUpdated:) name:AirFloatPlaybackStatusUpdatedNotification object:nil];
+    
+    [self _updateApplicationStatus];
+    
+    [super viewDidLoad];
     
 }
 
 - (void)viewDidUnload {
-    [self setDisplayOffView:nil];
-    [self setDisplayOnView:nil];
-    [self setArtworkImageView:nil];
-    [self setTrackLabel:nil];
-    [self setAlbumLabel:nil];
-    [self setArtistLabel:nil];
-    [self setNowPlayingView:nil];
-    [self setNoWifiLabel:nil];
     
     [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [_serverController release];
+    
+    [self setApplicationStatusLabel:nil];
+    [self setTrackTitleLabel:nil];
+    [self setArtistNameLabel:nil];
+    [self setArtworkImageView:nil];
+    [self setInfoViews:nil];
+    [self setFlippedArtworkImageView:nil];
+    [self setPlayButton:nil];
+    [self setNextButton:nil];
+    [self setPrevButton:nil];
+    
+    [super viewDidUnload];
     
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (void)remoteControlReceivedWithEvent:(UIEvent *)event {
     
-    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
-        return YES;
-    
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-
-- (IBAction)serverSwitchValueChanged:(id)sender {
-    
-    
-}
-
-- (IBAction)prevButtonPresset:(id)sender {
-    
-    [_serverController dacpPrev];
-    
-}
-
-- (IBAction)playButtonPresset:(id)sender {
-    
-    [_serverController dacpPlay];
-    
-}
-
-- (IBAction)nextButtonPresset:(id)sender {
-    
-    [_serverController dacpNext];
+    if (event.type == UIEventTypeRemoteControl)
+        switch (event.subtype) {
+            case UIEventSubtypeRemoteControlTogglePlayPause:
+                [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatPlaybackPlayPauseNotification object:nil];
+                break;
+            case UIEventSubtypeRemoteControlNextTrack:
+                [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatPlaybackNextNotification object:nil];
+                break;
+            case UIEventSubtypeRemoteControlPreviousTrack:
+                [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatPlaybackPrevNotification object:nil];
+                break;
+            default:
+                break;
+        }
     
 }
 
 - (void)dealloc {
     
-    [_nowPlayingArtwork release];
+    [_previousPlayedAlbum release];
     
-    [_noWifiLabel release];
-    [_nowPlayingView release];
-    [_artistLabel release];
-    [_albumLabel release];
-    [_trackLabel release];
-    [_artworkImageView release];
-    [_displayOnView release];
-    [_displayOffView release];
+    [applicationStatusLabel release];
+    [trackTitleLabel release];
+    [artistNameLabel release];
+    [artworkImageView release];
+    [infoViews release];
+    [flippedArtworkImageView release];
+    [playButton release];
+    [nextButton release];
+    [prevButton release];
+    
     [super dealloc];
+    
 }
+
+#pragma mark Action Methods
+- (IBAction)infoViewTabGestureRecognized:(id)sender {
+    
+    CGRect artworkImageRect = self.artworkImageView.frame;
+    CGRect flippedArtworkImageRect = self.flippedArtworkImageView.frame;
+    BOOL willAppear = (self.infoViews.alpha == 0.0);
+    
+    artworkImageRect.origin.y = (willAppear ? 46 : artworkImageRect.origin.y = round(((self.view.bounds.size.height) - artworkImageRect.size.height) / 2) - 10);
+    
+    flippedArtworkImageRect.origin.y = (willAppear ? 0 : 46 - artworkImageRect.origin.y);
+    
+    [UIView animateWithDuration:0.5
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseOut
+                     animations:^{
+                         
+                         self.infoViews.alpha = (willAppear ? 1.0 : 0.0);
+                         self.artworkImageView.frame = artworkImageRect;
+                         self.flippedArtworkImageView.frame = flippedArtworkImageRect;
+                         
+                     } completion:NULL];
+    
+}
+
+- (IBAction)playButtonTouchUpInside:(id)sender {
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatPlaybackPlayPauseNotification object:nil];
+    
+}
+
+- (IBAction)nextButtonTouchUpInside:(id)sender {
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatPlaybackNextNotification object:nil];
+
+}
+
+- (IBAction)prevButtonTouchUpInside:(id)sender {
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatPlaybackPrevNotification object:nil];
+
+}
+
+#pragma mark Private Methods
+
+- (void)_updateNowPlayingInfoCenter {
+    
+    if ([self.trackTitleLabel.text length] > 0 && NSClassFromString(@"MPNowPlayingInfoCenter")) {
+        
+        NSMutableDictionary* nowPlayingDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                                     self.trackTitleLabel.text, MPMediaItemPropertyTitle,
+                                                     self.artistNameLabel.text, MPMediaItemPropertyArtist,
+                                                     _previousPlayedAlbum, MPMediaItemPropertyAlbumTitle, nil];
+        
+        if (self.artworkImageView.fullsizeImage)
+            [nowPlayingDictionary setObject:[[[MPMediaItemArtwork alloc] initWithImage:self.artworkImageView.fullsizeImage] autorelease] forKey:MPMediaItemPropertyArtwork];
+        
+        [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = nowPlayingDictionary;
+        
+    } else
+        [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = nil;
+    
+}
+
+- (void)_updateArtwork:(UIImage*)image {
+    
+    self.flippedArtworkImageView.image = image;
+    self.artworkImageView.image = image;
+    
+    [self _updateNowPlayingInfoCenter];
+    
+}
+
+- (void)_updateApplicationStatus {
+    
+    AirFloatServerController* serverController = AirFloatSharedAppDelegate.serverController;
+    
+    if (!serverController.wifiReachability.isAvailable)
+        self.applicationStatusLabel.text = @"Connect to Wireless Network";
+    else if (!serverController.isRunning)
+        self.applicationStatusLabel.text = @"Broke";
+    else if (serverController.isRecording)
+        self.applicationStatusLabel.text = @"Playing";
+    else
+        self.applicationStatusLabel.text = @"Ready";
+    
+    if (!serverController.hasClientConnected)
+        self.trackTitleLabel.text = self.artistNameLabel.text = @"";
+    
+}
+
+- (void)_trackInfoUpdated:(NSNotification *)notification {
+    
+    NSString* trackTitle = [notification.userInfo objectForKey:kAirFloatTrackInfoTrackTitleKey];
+    NSString* artistName = [notification.userInfo objectForKey:kAirFloatTrackInfoArtistNameKey];
+
+    NSString* albumName = [notification.userInfo objectForKey:kAirFloatTrackInfoAlbumNameKey];
+    
+    if (([[albumName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length] == 0 ||
+        ![_previousPlayedAlbum isEqualToString:albumName]) && 
+        !([self.trackTitleLabel.text isEqualToString:trackTitle] && [self.artistNameLabel.text isEqualToString:artistName]))
+        [self _updateArtwork:nil];
+    
+    self.trackTitleLabel.text = trackTitle;
+    self.artistNameLabel.text = artistName;    
+    
+    [_previousPlayedAlbum release];
+    _previousPlayedAlbum = [albumName retain];
+    
+    [self _updateNowPlayingInfoCenter];
+    
+}
+
+- (void)_metadataUpdated:(NSNotification *)notification {
+    
+    NSString* contentType = [notification.userInfo objectForKey:kAirFloatMetadataContentType];
+    
+    if ([contentType isEqualToString:@"image/jpeg"] || [contentType isEqualToString:@"image/png"])
+        [self _updateArtwork:[UIImage imageWithData:[notification.userInfo objectForKey:kAirFloatMetadataDataKey]]];
+    
+}
+
+- (void)_clientDisconnected:(NSNotification*)notification {
+    
+    void* sender = [[notification.userInfo objectForKey:kAirFloatSenderOriginKey] pointerValue];
+    
+    RTPReceiver* streamingReceiver = RTPReceiver::getStreamingReceiver();
+    
+    void* currentConnection = NULL;
+    
+    if (streamingReceiver)
+        currentConnection = streamingReceiver->getConnection();
+    
+    if (currentConnection == NULL || currentConnection == sender) {
+        self.trackTitleLabel.text = self.artistNameLabel.text = @"";
+        [self _updateArtwork:nil];
+    }
+    
+    self.playButton.alpha = self.nextButton.alpha = self.prevButton.alpha = 0.0;
+    self.playButton.enabled = self.nextButton.enabled = self.prevButton.enabled = NO;
+    
+}
+
+- (void)_playbackStatusUpdated:(NSNotification *)notification {
+    
+    [self.playButton setImage:[UIImage imageNamed:([[notification.userInfo objectForKey:kAirFloatPlaybackStatusKey] integerValue] == kAirFloatPlaybackStatusPlaying ? @"Pause.png" : @"Play.png")] forState:UIControlStateNormal];
+    
+    if (!playButton.enabled) {
+        
+        CGRect prevEndFrame = self.prevButton.frame;
+        CGRect nextEndFrame = self.nextButton.frame;
+        
+        CGRect prevStartFrame = prevEndFrame;
+        CGRect nextStartFrame = nextEndFrame;
+        
+        prevStartFrame.origin.x -= 50;
+        nextStartFrame.origin.x += 50;
+        
+        self.prevButton.frame = prevStartFrame;
+        self.nextButton.frame = nextStartFrame;
+        
+        self.playButton.enabled = self.nextButton.enabled = self.prevButton.enabled = YES;
+        
+        [UIView animateWithDuration:0.3
+                              delay:0.0 
+                            options:UIViewAnimationOptionCurveEaseOut
+                         animations:^{
+                             self.playButton.alpha = self.nextButton.alpha = self.prevButton.alpha = 1.0;
+                             self.prevButton.frame = prevEndFrame;
+                             self.nextButton.frame = nextEndFrame;
+                         } completion:NULL];
+        
+    }
+    
+}
+
 @end

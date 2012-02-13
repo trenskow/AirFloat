@@ -7,52 +7,38 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "AirFloatDACPClient.h"
+#import "AirFloatDACPBrowser.h"
+#import "AirFloatNotificationsHub.h"
+#import "AirFloatInterfaces.h"
+#import "AirFloatReachability.h"
+#import "AirFloatBonjourController.h"
 #import "RAOPServer.h"
 
-#define AirFloatServerStartedNotification @"AirFloatServerStartedNotification"
-#define AirFloatServerStoppedNotification @"AirFloatServerStartedNotification"
+#define AirFloatServerControllerDidChangeStatus @"AirFloatServerControllerDidChangeStatus"
 
-#define AirFloatClientSupportsPlayControlsNotification @"AirFloatClientSupportsPlayControlsNotification"
-#define AirFloatClientConnectedNotification @"AirFloatClientConnectedNotification"
-#define AirFloatClientDisconnectedNotification @"AirFloatClientDisconnectedNotification"
-#define AirFloatClientStartedRecordingNotification @"AirFloatClientStartedRecordingNotification"
-#define AirFloatClientStoppedRecordingNotification @"AirFloatClientStoppedRecordingNotification"
-#define AirFloatClientUpdatedMetadataNotification @"AirFloatClientUpdatedMetadataNotification"
-
-#define kAirFloatClientMetadataData @"kAirFloatClientMetadataData"
-#define kAirFloatClientMetadataArtistName @"kAirFloatClientMetadataArtist"
-#define kAirFloatClientMetadataTrackTitle @"kAirFloatClientMetadataTitle"
-#define kAirFloatClientMetadataAlbum @"kAirFloatClientMetadataAlbum"
-#define kAirFloatClientMetadataContentType @"kAirFloatClientMetadataContentType"
-
-@interface AirFloatServerController : NSObject <NSNetServiceBrowserDelegate, NSNetServiceDelegate> {
+@interface AirFloatServerController : NSObject <NSNetServiceBrowserDelegate, NSNetServiceDelegate, AirFloatReachabilityDelegate, AirFloatDACPBrowserDelegate> {
     
-    NSRunLoop* _netServicesRunLoop;
-    NSNetService* _netService;
     RAOPServer* _server;
     
-    NSString* _serverMacAddress;
-    int _serverPort;
+    AirFloatBonjourController* _bonjour;
+    AirFloatReachability* _wifiReachability;
+    AirFloatDACPBrowser* _dacpBrowser;
+    AirFloatDACPClient* _dacpClient;
     
-    NSNetServiceBrowser* _netServiceBrowser;
-
-    RAOPConnection* _currentConnection;
-    NSString* _dacpHost;
-    int _dacpPort;
+    AirFloatNotificationsHub* _notificationHub;
     
-    BOOL _isWifiAvailable;
+    uint32_t _connectionCount;
+    BOOL _recording;
     
 }
 
-@property (nonatomic, readonly) BOOL isWifiAvailable;
-@property (nonatomic, readonly) BOOL isRunning;
-@property (nonatomic, readonly) BOOL hasClientConnected;
+@property (readonly) AirFloatReachability* wifiReachability;
+@property (readonly) BOOL isRunning;
+@property (readonly) BOOL hasClientConnected;
+@property (readonly) BOOL isRecording;
 
-- (BOOL)start;
+- (void)start;
 - (void)stop;
-
-- (void)dacpNext;
-- (void)dacpPlay;
-- (void)dacpPrev;
 
 @end

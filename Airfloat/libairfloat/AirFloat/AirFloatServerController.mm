@@ -6,276 +6,100 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <string.h>
+#import "RTPReceiver.h"
+#import "RAOPConnection.h"
 
 #import "AirFloatServerController.h"
-#import "RAOPConnection.h"
-#import "RTPReceiver.h"
 
-#import "Log.h"
+@interface  AirFloatServerController (Private)
 
-extern "C" {
-    #import "AirFloatInterfaces.h"
-}
-
-@interface AirFloatServerController (PrivateMethods)
-
-- (void)_clientStartedRecording:(RAOPConnection*)connection;
-- (void)_clientDisconnected:(RAOPConnection*)connection;
-- (void)_clientUpdatedMetadata:(RAOPConnection*)connection;
+- (void)_updateServerStatus;
+- (void)_recordingStarted;
+- (void)_recordingEnded;
+- (void)_clientConnected;
+- (void)_clientDisconnected;
 
 @end
 
-static void _clientStartedRecording(RAOPConnection* connection, void* ctx) {
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:AirFloatClientStartedRecordingNotification object:(AirFloatServerController*)ctx]];
-        [(AirFloatServerController*)ctx _clientStartedRecording:connection];
-    });
-    
-}
-
-static void _clientStoppedRecording(RAOPConnection* connection, void* ctx) {
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:AirFloatClientStoppedRecordingNotification object:(AirFloatServerController*)ctx]];
-    });
-    
-}
-static void _clientDisconnected(RAOPConnection* connection, void* ctx) {
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:AirFloatClientDisconnectedNotification object:(AirFloatServerController*)ctx]];
-        [(AirFloatServerController*)ctx _clientDisconnected:connection];
-    });
-    
-}
-
-static NSString* stringFromFrame(char* buf, int size) {
-    
-    char ret[size+1];
-    memcpy(ret, buf, size);
-    ret[size] = '\0';
-    
-    return [NSString stringWithCString:ret encoding:NSUTF8StringEncoding];
-    
-}
-
-static void _clientUpdatedMetadata(RAOPConnection* connection, void* buffer, int size, const char* contentType, void* ctx) {
-    
-    AirFloatServerController* serverController = (AirFloatServerController*)ctx;
-    
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    
-    NSData* data = [NSData dataWithBytes:buffer length:size];
-    NSString* cType = [[[NSString alloc] initWithCString:contentType encoding:NSUTF8StringEncoding] autorelease];
-    NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithObjectsAndKeys:data, kAirFloatClientMetadataData, cType, kAirFloatClientMetadataContentType, nil];
-    if ([cType isEqualToString:@"application/x-dmap-tagged"]) {
-        
-        int length = size - 8;
-        if (size > 0) {
-            char* mBuffer = &((char*)buffer)[8];
-            
-            while (length > 0) {
-                
-                char* name = mBuffer;
-                int frameSize = htonl(*((uint32_t*)&mBuffer[4]));
-                mBuffer += 8;
-                length -= 8;
-                
-                if (0 == memcmp(name, "asal", 4)) // Album
-                    [dict setObject:stringFromFrame(mBuffer, frameSize) forKey:kAirFloatClientMetadataAlbum];
-                else if (0 == memcmp(name, "asar", 4)) // Artist
-                    [dict setObject:stringFromFrame(mBuffer, frameSize) forKey:kAirFloatClientMetadataArtistName];
-                else if (0 == memcmp(name, "minm", 4)) // Track
-                    [dict setObject:stringFromFrame(mBuffer, frameSize) forKey:kAirFloatClientMetadataTrackTitle];
-                    
-                mBuffer += frameSize;
-                length -= frameSize;
-                
-            }
-            
-        }        
-        
-    }
-    
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [serverController  _clientUpdatedMetadata:connection];
-        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:AirFloatClientUpdatedMetadataNotification object:serverController userInfo:dict]];
-    });
-    
-    [pool release];
-    
-}
-
-static void _clientConnected(RAOPServer* server, RAOPConnection* connection, void* ctx) {
-    
-    connection->SetCallbacksContext(ctx);
-    connection->SetRecordingStartedClbk(_clientStartedRecording);
-    connection->SetClientDisconnectedClbk(_clientDisconnected);
-    connection->SetClientUpdatedMetadataClbk(_clientUpdatedMetadata);
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:AirFloatClientConnectedNotification object:(AirFloatServerController*)ctx]];
-    });
-    
-}
-
 @implementation AirFloatServerController
 
-@synthesize isWifiAvailable=_isWifiAvailable;
+@synthesize wifiReachability=_wifiReachability;
 
 - (id)init {
     
     if ((self = [super init])) {
-        _netServiceBrowser = [[NSNetServiceBrowser alloc] init];
-        [_netServiceBrowser setDelegate:self];
+        _wifiReachability = [[AirFloatReachability wifiReachability] retain];
+        _wifiReachability.delegate = self;
+        
+        _dacpBrowser = [[AirFloatDACPBrowser alloc] init];
+        _dacpBrowser.delegate = self;
+        
+        _notificationHub = [[AirFloatNotificationsHub alloc] init];
     }
     
     return self;
     
 }
 
-- (void)_cleanUpClientData {
-    
-    if (_currentConnection != NULL)
-        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:AirFloatClientDisconnectedNotification object:self]];
-    
-    _currentConnection = NULL;
-    [_dacpHost release];
-    _dacpHost = nil;
-    _dacpPort = 0;
-    
-}
-
 - (void)dealloc {
     
-    [self stop];
-    [_netServiceBrowser release];
-    [self _cleanUpClientData];
+    [_bonjour release];
+    [_dacpBrowser release];
+    [_notificationHub release];
+    [_wifiReachability release];
     
     [super dealloc];
     
 }
 
-- (void)updateBonjour {
-        
-     if (_serverMacAddress && _serverPort) {
-        
-        if (!_netService)
-            _netService = [[NSNetService alloc] initWithDomain:@"local." type:@"_raop._tcp." name:[NSString stringWithFormat:@"%@@%@", _serverMacAddress, [UIDevice currentDevice].name] port:_serverPort];
-         
-        [_netService stop];
-        
-        NSDictionary* txtRecord = [NSDictionary dictionaryWithObjectsAndKeys:
-                                   @"1", @"txtvers",
-                                   @"0,1", @"et",
-                                   @"1", @"ek",
-                                   @"16", @"ss",
-                                   @"44100", @"sr",
-                                   @"TCP,UDP", @"tp",
-                                   @"0,1", @"cn",
-                                   @"true", @"da",
-                                   @"0x4", @"sf",
-                                   @"65537", @"vn",
-                                   @"0,1,2", @"md",
-                                   @"104.29", @"vs",
-                                   @"false", @"sv",
-                                   @"false", @"sm",
-                                   @"2", @"ch",
-                                   @"44100", @"sr",
-                                   ([[[NSUserDefaults standardUserDefaults] objectForKey:@"pw"] length] > 0 ? @"true" : @"false"), @"pw",
-                                   nil];
-        
-        [_netService setTXTRecordData:[NSNetService dataFromTXTRecordDictionary:txtRecord]];
-        
-        [_netService publish];
-        
-    } else if (_netService)
-        [_netService stop];
+- (void)start {
     
-}
-
-- (BOOL)start {
+    if (_server || !_wifiReachability.isAvailable)
+        return;
     
-    if (!_server) {
+    for (NSInteger port = 5000 ; port < 5010 ; port++) {
         
-        NSDictionary* ifs = allInterfaces();
-        NSString* interface = nil;
+        _server = new RAOPServer(port);
         
-        for (NSString* key in [ifs allKeys]) {
+        if (_server->startServer()) {
             
-            if ([key length] >= 3 && [[key substringToIndex:2] isEqualToString:@"en"] &&
-                [[key substringFromIndex:2] integerValue] < 3 &&
-                [[ifs objectForKey:key] objectForKey:@"address"] != nil) {
-                interface = key;
-                break;
-            }
+            [_bonjour release];
+            _bonjour = [[AirFloatBonjourController alloc] initWithMacAddress:[[AirFloatInterfaces wifiInterface] objectForKey:@"mac"] andPort:port];
+            
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_recordingStarted) name:AirFloatRecordingStartedNotification object:nil];
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_recordingEnded) name:AirFloatRecordingEndedNotification object:nil];
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_clientConnected) name:AirFloatClientConnectedNotification object:nil];
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_clientDisconnected) name:AirFloatClientDisconnectedNotification object:nil];
+            
+            [self _updateServerStatus];
+            
+            return;
             
         }
         
-        if ((_isWifiAvailable = (interface != nil))) {
-            
-            int port = 5000;        
-            
-            log(LOG_INFO, "Interface: %s (MAC:%s/IPv4:%s/IPv6:%s)", 
-                [interface cStringUsingEncoding:NSASCIIStringEncoding], 
-                [[[ifs objectForKey:interface] objectForKey:@"mac"] cStringUsingEncoding:NSASCIIStringEncoding],
-                [[[ifs objectForKey:interface] objectForKey:@"address"] cStringUsingEncoding:NSASCIIStringEncoding],
-                [[[ifs objectForKey:interface] objectForKey:@"address6"] cStringUsingEncoding:NSASCIIStringEncoding]);
-            
-            for (;;) {
-                
-                _server = new RAOPServer(port);
-                _server->setConnectionCallback(_clientConnected, self);
-                
-                if (_server->startServer()) {
-                    
-                    _serverMacAddress = [[[ifs objectForKey:interface] objectForKey:@"mac"] retain];
-                    _serverPort = port;
-                    
-                    [self updateBonjour];
-                    
-                    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:AirFloatServerStartedNotification object:self]];
-                    
-                    return YES;
-                    
-                } else
-                    log(LOG_ERROR, "Unable to start server at port %d.", port);
-                
-                port++;
-                
-                if (port == 5010) {
-                    log(LOG_ERROR, "Tried ten different ports. Nothing worked. Exiting");
-                    break;
-                }
-                
-            }
-            
-        } else
-            log(LOG_ERROR, "No availabe interface found");
+        delete _server;
+        _server = NULL;
         
     }
-    
-    return NO;
     
 }
 
 - (void)stop {
     
-    if (_server) {
+    if (_server && RTPReceiver::isAvailable()) {
         
         _server->stopServer();
-        [_serverMacAddress release];
-        _serverMacAddress = NULL;
-        _serverPort = 0;
         delete _server;
         _server = NULL;
+        _connectionCount = 0;
         
-        [self updateBonjour];
+        [_bonjour release];
+        _bonjour = nil;
         
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+        
+        [self _updateServerStatus];
+                
     }
     
 }
@@ -288,148 +112,79 @@ static void _clientConnected(RAOPServer* server, RAOPConnection* connection, voi
 
 - (BOOL)hasClientConnected {
     
-    return (self.isRunning && !RTPReceiver::IsAvailable());
+    return (self.isRunning && (_connectionCount > 0));
     
 }
 
-// DACP
-
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
+- (BOOL)isRecording {
     
-    return nil;
+    return (self.hasClientConnected && _recording);
     
 }
 
-- (NSURLRequest*)_urlRequestForCommand:(NSString*)cmd {
-    
-    if (_dacpHost) {
-        
-        NSString* dacpId = [NSString stringWithCString:_currentConnection->GetDacpId() encoding:NSASCIIStringEncoding];
-        NSString* activeRemote = [NSString stringWithCString:_currentConnection->GetActiveRemote() encoding:NSASCIIStringEncoding];
-        NSString* sessionId = [NSString stringWithCString:_currentConnection->GetSessionId() encoding:NSASCIIStringEncoding];
-        
-        NSString* urlString = [NSString stringWithFormat:@"http://%@:%d/ctrl-int/1/%@?session-id=%@", _dacpHost, _dacpPort, cmd, sessionId];
-        NSMutableURLRequest* urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlString]];
-        
-        NSLog(@"DACP: URL Request: %@", urlString);
+#pragma mark DACP Browser Delegate Methods
 
-        if ([dacpId length] > 0)
-            [urlRequest addValue:dacpId forHTTPHeaderField:@"Dacp-Id"];
-        if ([activeRemote length] > 0)
-            [urlRequest addValue:activeRemote forHTTPHeaderField:@"Active-Remote"];
-        
-        return urlRequest;
-        
+- (void)dacpBrowser:(AirFloatDACPBrowser *)browser didFindHost:(NSString *)host {
+    
+    [_dacpClient release];
+    _dacpClient = [[AirFloatDACPClient alloc] initWithHost:host
+                                                    dacpId:[NSString stringWithCString:RTPReceiver::getStreamingReceiver()->getConnection()->getDacpId() encoding:NSUTF8StringEncoding]
+                                           andActiveRemove:[NSString stringWithCString:RTPReceiver::getStreamingReceiver()->getConnection()->getActiveRemote() encoding:NSUTF8StringEncoding]];
+    
+}
+
+#pragma mark Reachability Delegate Methods
+
+- (void)reachability:(AirFloatReachability *)sender didChangeStatus:(BOOL)reachable {
+    
+    if (reachable && !_server)
+        [self start];
+    else if (!reachable && _server)
+        [self stop];
+    
+}
+
+#pragma mark Private Methods
+
+- (void)_updateServerStatus {
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatServerControllerDidChangeStatus object:self];
+    
+}
+
+- (void)_recordingStarted {
+    
+    NSString* identifier = [NSString stringWithCString:RTPReceiver::getStreamingReceiver()->getConnection()->getDacpId() encoding:NSUTF8StringEncoding];
+    [_dacpBrowser findServerForIdentifier:identifier];
+    
+    _recording = YES;
+    [self _updateServerStatus];
+    
+}
+
+- (void)_recordingEnded {
+    
+    _recording = NO;
+    [self _updateServerStatus];
+    
+}
+
+- (void)_clientConnected {
+    
+    _connectionCount++;
+    [self _updateServerStatus];
+    
+}
+
+- (void)_clientDisconnected {
+    
+    if (_connectionCount == 0) {
+        [_dacpClient release];
+        _dacpClient = nil;
     }
     
-    return nil;
-    
-}
-
-- (void)_executeDacpCommand:(NSString*)cmd {
-    
-    [NSURLConnection connectionWithRequest:[self _urlRequestForCommand:cmd] delegate:self];
-    
-}
-
-- (void)dacpNext {
-    
-    [self _executeDacpCommand:@"nextitem"];
-    
-}
-
-- (void)dacpPlay {
-    
-    [self _executeDacpCommand:@"playpause"];
-    
-}
-
-- (void)dacpPrev {
-    
-    [self _executeDacpCommand:@"previtem"];
-    
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    
-    NSLog(@"DACP: Response %d", [(NSHTTPURLResponse*)response statusCode]);
-    
-}
-
-- (void)_clientUpdatedMetadata:(RAOPConnection *)connection {
-    
-    [self _executeDacpCommand:@"playstatusupdate"];
-    
-}
-
-// Delegate methods
-
-- (void)netServiceDidResolveAddress:(NSNetService *)sender {
-    
-    if (_currentConnection) {
-        
-        for (NSData* saData in [sender addresses]) {
-            
-            struct sockaddr* sa = (sockaddr*)[saData bytes];
-            
-            struct in6_addr addr;
-            memset(&addr, 0, sizeof(in6_addr));
-            
-            if (sa->sa_family == AF_INET)
-                addr = SocketEndPoint::IPv4AddressToIPv6Address(((struct sockaddr_in*)sa)->sin_addr);
-            else if (sa->sa_family == AF_INET6)
-                addr = ((struct sockaddr_in6*)sa)->sin6_addr;
-            
-            sockaddr_in6* host = (struct sockaddr_in6*) _currentConnection->GetHost().SocketAdress();
-            
-            if (memcmp(&addr, &host->sin6_addr, sizeof(in6_addr)) == 0) {
-                
-                _dacpHost = [sender hostName];
-                _dacpPort = [sender port];
-                
-                [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:AirFloatClientSupportsPlayControlsNotification object:self]];
-                
-                [self _executeDacpCommand:@"playstatusupdate"];
-                
-                break;
-                
-            }
-            
-        }
-        
-    }
-    
-    [sender release];
-    
-}
-
-- (void)netService:(NSNetService *)sender didNotResolve:(NSDictionary *)errorDict {
-    
-    [sender release];
-    
-}
-
-- (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didFindService:(NSNetService *)netService moreComing:(BOOL)moreServicesComing {
-    
-    [netService retain];
-    [netService setDelegate:self];
-    [netService resolveWithTimeout:5.0];
-    
-}
-
-// Callbacks
-
-- (void)_clientStartedRecording:(RAOPConnection*)connection {
-    
-    [_netServiceBrowser searchForServicesOfType:@"_dacp._tcp." inDomain:@"local."];
-    
-    _currentConnection = connection;
-    
-}
-
-- (void)_clientDisconnected:(RAOPConnection*)connection {
-    
-    [self _cleanUpClientData];
+    _connectionCount--;
+    [self _updateServerStatus];
     
 }
 

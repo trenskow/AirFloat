@@ -13,26 +13,29 @@
 
 #define SYNC_BACKLOG 10
 
+#include "NotificationCenter.h"
+#include "Mutex.h"
+#include "Condition.h"
 #include "AudioPlayer.h"
 #include "Socket.h"
 
 typedef struct {
     
-    unsigned short seq_num;
+    uint16_t seq_num;
     
     bool extension;
-    unsigned char source;
-    unsigned char payload_type;
+    uint8_t source;
+    uint8_t payload_type;
     bool marker;
     
-    unsigned char* packet_data;
-    int packet_data_length;
+    uint8_t* packet_data;
+    uint32_t packet_data_length;
     
 } RTPPacket;
 
 class RAOPConnection;
 
-class RTPReceiver {
+class RTPReceiver : public NotificationObserver {
     
 public:
     RTPReceiver(const char* localHost, const char* remoteHost, const unsigned char aesKey[16], const unsigned char aesIv[16], RAOPConnection* connection, int* fmtp, int fmtpLen);
@@ -44,10 +47,14 @@ public:
     void stop();
     bool started();
     
-    int GetSession(char* to);
-    static bool IsAvailable();
+    int getSession(char* to);
+    static bool isAvailable();
+    static RTPReceiver* getStreamingReceiver();
     
+    RAOPConnection* getConnection();
     AudioPlayer* getAudioPlayer();
+    
+    void _notificationReceived(Notification* notification);
     
 private:
     
@@ -61,7 +68,6 @@ private:
     void _startSynchronizationLoop();
     void _stopSynchronizationLoop();
     
-    static void _queueFlushCalback(AudioQueue* queue, void* ctx);
     static void _queueSyncCalback(AudioQueue* queue, void* ctx);
     
     void _synchronizationLoop();
@@ -79,9 +85,9 @@ private:
     
     pthread_t _serverSockThread, _timingSockThread, _controlSockThread;
     
-    pthread_mutex_t _timerMutex;
-    pthread_cond_t _timerCond;
-    pthread_cond_t _syncCond;
+    Mutex _timerMutex;
+    Condition _timerCond;
+    Condition _syncCond;
     pthread_t _timerThread;
     
     bool _timerRunning;

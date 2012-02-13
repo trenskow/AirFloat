@@ -9,6 +9,18 @@
 			<string>Authentication</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
+			<key>FooterText</key>
+			<string>Authentication will require the streaming user to enter the password when connecting.</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Enable Authentication</string>
+			<key>Key</key>
+			<string>authenticate</string>
+			<key>DefaultValue</key>
+			<false/>
 		</dict>
 		<dict>
 			<key>AutocapitalizationType</key>

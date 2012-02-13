@@ -9,17 +9,18 @@
 #ifndef AirFloat_AudioConverter_h
 #define AirFloat_AudioConverter_h
 
+#include "Mutex.h"
 #include <AudioToolbox/AudioToolbox.h>
 
 class AudioConverter {
     
 public:
-    AudioConverter(int srcSampleRate, int destSampleRate);
+    AudioConverter(double srcSampleRate, double destSampleRate);
     virtual ~AudioConverter();
     
-    virtual void Convert(void* srcBuffer, int srcSize, void* destBuffer, int* destSize);
-    int CalculateOutput(int inputSize);
-    AudioStreamBasicDescription GetDestDescription();
+    virtual void convert(void* srcBuffer, uint32_t srcSize, void* destBuffer, uint32_t* destSize);
+    virtual int calculateOutput(int inputSize);
+    virtual AudioStreamBasicDescription getDestDescription();
     
 protected:
     
@@ -33,9 +34,11 @@ protected:
     void* _currentBuffer;
     int _currentBufferSize;
     
+    Mutex _decoderMutex;
+    
 private:
     
-    void _setupAudioDescription(AudioStreamBasicDescription* desc, int sampleRate);
+    void _setupAudioDescription(AudioStreamBasicDescription* desc, double sampleRate);
         
 };
 

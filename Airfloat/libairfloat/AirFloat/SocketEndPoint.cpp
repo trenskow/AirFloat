@@ -22,7 +22,7 @@ SocketEndPoint::SocketEndPoint() {
 
 SocketEndPoint::SocketEndPoint(const char* host, unsigned short port, unsigned int scopeId) {
     
-    Setup(host, port, scopeId);
+    setup(host, port, scopeId);
     
 }
 
@@ -39,7 +39,7 @@ SocketEndPoint& SocketEndPoint::operator=(SocketEndPoint &ep) {
     
 }
 
-void SocketEndPoint::Setup(const char* host, unsigned short port, unsigned int scopeId) {
+void SocketEndPoint::setup(const char* host, unsigned short port, unsigned int scopeId) {
     
     assert(port > 0);
     
@@ -59,7 +59,7 @@ void SocketEndPoint::Setup(const char* host, unsigned short port, unsigned int s
     
 }
 
-void SocketEndPoint::SetupIPv6(unsigned short port, unsigned int scopeId) {
+void SocketEndPoint::setupIPv6(unsigned short port, unsigned int scopeId) {
     
     struct sockaddr_in6 addr6;
     memset(&addr6, 0, sizeof(addr6));
@@ -72,7 +72,7 @@ void SocketEndPoint::SetupIPv6(unsigned short port, unsigned int scopeId) {
     
 }
 
-bool SocketEndPoint::IsHost(const char* host) {
+bool SocketEndPoint::isHost(const char* host) {
     
     assert(host != NULL);
     
@@ -84,7 +84,7 @@ bool SocketEndPoint::IsHost(const char* host) {
             
 }
 
-bool SocketEndPoint::GetHost(char* buffer, long size) {
+bool SocketEndPoint::getHost(char* buffer, long size) {
     
     assert(buffer != NULL && size > 0);
     
@@ -97,27 +97,19 @@ bool SocketEndPoint::GetHost(char* buffer, long size) {
     
 }
 
-unsigned short SocketEndPoint::Port() {
+unsigned short SocketEndPoint::port() {
     
     return ntohs(_ep.sin6_port);
     
 }
 
-unsigned int SocketEndPoint::ScopeId() {
+unsigned int SocketEndPoint::getScopeId() {
     
     return _ep.sin6_scope_id;
     
 }
 
-bool SocketEndPoint::isHostsEqual(SocketEndPoint* ep2) {
-    
-    assert(ep2 != NULL);
-    
-    return (memcmp(&_ep.sin6_port, &ep2->_ep.sin6_addr, 16) == 0);
-
-}
-
-struct sockaddr* SocketEndPoint::SocketAdress() {
+struct sockaddr* SocketEndPoint::getSocketAddress() {
     
     return (sockaddr*) &_ep;
     

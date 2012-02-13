@@ -24,16 +24,14 @@ public:
     
     SocketEndPoint& operator=(SocketEndPoint &ep);
     
-    void Setup(const char* host, unsigned short port, unsigned int scopeId = 0);
-    void SetupIPv6(unsigned short port, unsigned int scopeId = 0);
-    bool IsHost(const char* host);
-    bool GetHost(char* buffer, long size);
-    unsigned short Port();    
-    unsigned int ScopeId();
+    void setup(const char* host, unsigned short port, unsigned int scopeId = 0);
+    void setupIPv6(unsigned short port, unsigned int scopeId = 0);
+    bool isHost(const char* host);
+    bool getHost(char* buffer, long size);
+    unsigned short port();    
+    unsigned int getScopeId();
     
-    bool isHostsEqual(SocketEndPoint* ep2);
-    
-    struct sockaddr* SocketAdress();
+    struct sockaddr* getSocketAddress();
     
     static in6_addr IPv4AddressToIPv6Address(in_addr addr);
     

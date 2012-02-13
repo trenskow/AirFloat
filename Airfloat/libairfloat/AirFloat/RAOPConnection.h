@@ -9,6 +9,7 @@
 #ifndef __RAOPCONNECTION_H
 #define __RAOPCONNECTION_H
 
+#include <CoreFoundation/CoreFoundation.h>
 #include <pthread.h>
 #include "RTPReceiver.h"
 #include "Socket.h"
@@ -16,6 +17,7 @@
 #define DACPID_MAXLENGTH 200
 #define ACTIVEREMOTE_MAXLENGTH 50
 #define SESSION_MAXLENGTH 50
+#define READ_SIZE 16384
 
 typedef enum {
     kRAOPConnectionAudio_RouteAirPlay = 0,
@@ -23,11 +25,19 @@ typedef enum {
     kRAOPConnectionAudio_RouteUnknown
 } RAOPConnectionAudioRoute;
 
-class RAOPConnection;
+typedef struct {
+    void* content;
+    uint32_t contentLength;
+    const char* contentType;
+} RAOPConnectionClientUpdatedMetadataNotificationInfo;
 
-typedef void(*simpleConnectionClbk)(RAOPConnection* connection, void* ctx);
-typedef void(*clientSetVolumeClbk)(RAOPConnection* connection, float volume, void* ctx);
-typedef void(*clientUpdatedMetadataClbk)(RAOPConnection* connection, void* buffer, int size, const char* contentType, void* ctx);
+typedef struct {
+    double position;
+    double total;
+} RAOPConnectionClientUpdatedProgressNotificationInfo;
+
+class RAOPConnection;
+class RAOPHeader;
 
 class RAOPConnection {
 
@@ -37,48 +47,42 @@ public:
     RAOPConnection(Socket* sock);
     ~RAOPConnection();
     
-    RTPReceiver* GetRTPReceiver();
+    RTPReceiver* getRTPReceiver();
     
-    SocketEndPoint GetHost();
+    SocketEndPoint getRemoteEndPoint();
     
-    void SetCallbacksContext(void* ctx);
-    void SetRecordingStartedClbk(simpleConnectionClbk clbk);
-    void SetRecordingStoppedClbk(simpleConnectionClbk clbk);
-    void SetClientDisconnectedClbk(simpleConnectionClbk clbk);
-    void SetClientSetVolumeClbk(clientSetVolumeClbk clbk);
-    void SetClientUpdatedMetadataClbk(clientUpdatedMetadataClbk clbk);
+    const char* getDacpId();
+    const char* getActiveRemote();
+    const char* getSessionId();
     
-    const char* GetDacpId();
-    const char* GetActiveRemote();
-    const char* GetSessionId();
+    unsigned int getNetworkScopeId();
     
-    unsigned int GetNetworkScopeId();
+    static const char* recordingStartedNotificationName;
+    static const char* clientDisconnectedNotificationName;
+    static const char* clientUpdatedTrackInfoNofificationName;
+    static const char* clientUpdatedMetadataNotificationName;
+    static const char* clientUpdatedProgressNotificationName;
     
 private:
     void _takeOver();
     void _appleResponse(const char* challenge, long length, char* response, long* resLength);
     bool _checkAuthentication(const char* method, const char* uri, const char* authenticationParameter);
-    bool _processData(unsigned char* buffer, long length);
+    bool _processData(const char* cmd, const char* path, RAOPHeader* headers, unsigned char* content, long contentLength);
     static void* _connectionLoopKickStarter(void* t);
     void _connectionLoop();
     RAOPConnectionAudioRoute _getAudioRoute();
     
-    long _ensureNewLines(unsigned char* buffer, long length);
+    long _convertNewLines(unsigned char* buffer, long length);
     pthread_t _connectionLoopThread;
     
     Socket* _sock;
     
     RTPReceiver* _rtp;
     
+    bool _authenticationEnabled;
+    CFStringRef _password;
     char _digestNonce[33];
-    
-    void* _clbkCtx;
-    simpleConnectionClbk _recordingStartedClbk;
-    simpleConnectionClbk _recordingStoppedClbk;
-    simpleConnectionClbk _clientDisconnectedClbk;
-    clientSetVolumeClbk _clientSetVolumeClbk;
-    clientUpdatedMetadataClbk _clientUpdatedMetadataClbk;
-    
+        
     char _dacpId[DACPID_MAXLENGTH];
     char _activeRemote[ACTIVEREMOTE_MAXLENGTH];
     char _sessionId[SESSION_MAXLENGTH];

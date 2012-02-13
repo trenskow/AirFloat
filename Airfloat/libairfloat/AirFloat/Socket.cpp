@@ -47,7 +47,7 @@ bool Socket::Bind(SocketEndPoint* ep) {
     if (_socket == -1)
         _socket = socket(AF_INET6, (_isUDP ? SOCK_DGRAM : SOCK_STREAM), (_isUDP ? IPPROTO_UDP : IPPROTO_TCP));
     
-    struct sockaddr_in6* addr6 = (struct sockaddr_in6*) ep->SocketAdress();
+    struct sockaddr_in6* addr6 = (struct sockaddr_in6*) ep->getSocketAddress();
     if (bind(_socket, (struct sockaddr*)addr6, sizeof(struct sockaddr_in6)) == 0) {
         _localEndPoint = *ep;
         return true;
@@ -123,13 +123,13 @@ void Socket::Close() {
         
 }
 
-SocketEndPoint* Socket::LocalEndPoint() {
+SocketEndPoint* Socket::GetLocalEndPoint() {
     
     return &_localEndPoint;
     
 }
 
-SocketEndPoint* Socket::RemoteEndPoint() {
+SocketEndPoint* Socket::GetRemoteEndPoint() {
     
     return &_remoteEndPoint;
     

@@ -9,38 +9,12 @@
 #ifndef AirFloat_AudioQueue_h
 #define AirFloat_AudioQueue_h
 
-#include <pthread.h>
 #include <stdint.h>
 
-class  AudioPlayer;
+#include "Mutex.h"
+#include "AudioPacket.h"
 
-typedef enum {
-    
-    kAudioPacketStateComplete = 0,
-    kAudioPacketStateWaiting,
-    kAudioPacketStateMissing,
-    kAudioPacketStateRequested
-    
-} AudioPacketState;
-
-typedef struct AudioPacket {
-    
-    void* buffer;
-    size_t bufferSize;
-    int seqNo;
-    uint32_t sampleTime;
-    double time;
-    AudioPacketState state;
-    
-    AudioPacket* next;
-    AudioPacket* prev;
-    
-} AudioPacket;
-
-class AudioQueue;
-
-typedef int(*audioQueueAddPacketClbk)(AudioQueue* queue, void* buffer, int size, void* outBuffer, int outBufferSize, void* ctx);
-typedef void(*audioQueueSimpleClbk)(AudioQueue* queue, void* ctx);
+class AudioPlayer;
 
 class AudioQueue {
     
@@ -52,25 +26,25 @@ public:
     
     bool hasAvailablePacket();
     double getPacketTime();
-    void getPacket(void* buffer, int* size, double* time, uint32_t* sampleTime);
+    void getPacket(void* buffer, uint32_t* size, double* time, uint32_t* sampleTime);
+    void discardPacket();
     void synchronize(uint32_t currentSampleTime, double currentTime, uint32_t nextSampleTime);
     int getNextMissingWindow(int* seqNo);
     
-    void setAddPacketCallback(audioQueueAddPacketClbk clbk, void* ctx);
-    void setFlushCallback(audioQueueSimpleClbk clbk, void* ctx);
-    void setSyncCallback(audioQueueSimpleClbk clbk, void* ctx);
-    
+    static const char* flushNotificationName;
+    static const char* syncNotificationName;
+
 private:
     
-    int _addAudioPacket(void* buffer, int size, int seqNo, uint32_t sampleTime);
-    void _flush();
+    int _addAudioPacket(void* buffer, uint32_t size, int seqNo, uint32_t sampleTime);
     void _checkQueueConsistency();
-    AudioPacket* _createPacket(AudioPacketState state = kAudioPacketStateWaiting);
+    AudioPacket* _createPacket(AudioPacketState state);
     void _disposePacket(AudioPacket* packet);
     void _addPacketToQueueTail(AudioPacket* packet);
-    AudioPacket* _addEmptyPacket(AudioPacketState state = kAudioPacketStateWaiting);
-    AudioPacket* _replacePacket(AudioPacket* oldPacket, AudioPacket* newPacket);
+    AudioPacket* _addEmptyPacket();
     AudioPacket* _popQueueFromHead();
+    int _handleSequenceOverflow(int seqNo);
+    void _flush();
     
     double _convertTime(uint32_t fromSampleTime, double fromTime, uint32_t toSampleTime);
 
@@ -86,16 +60,10 @@ private:
     int _queueCount;
     int _missingCount;
     
-    bool _isSynced;
+    double _lastKnowSampleTime;
+    double _lastKnowSampleTimesTime;
     
-    audioQueueAddPacketClbk _addPacketClbk;
-    void* _addPacketClbkCtx;
-    audioQueueSimpleClbk _flushClbk;
-    void* _flushClbkCtx;
-    audioQueueSimpleClbk _syncClbk;
-    void* _syncClbkCtx;
-    
-    pthread_mutex_t _mutex;
+    Mutex _mutex;
     
 };
 
