@@ -11,8 +11,8 @@
 
 #define BUFFER_COUNT 10
 
-#include <pthread.h>
-#include "AppleLosslessAudioConverter.h"
+#include "Mutex.h"
+#include "AudioConverter.h"
 #include "AudioQueue.h"
 #include <AudioToolbox/AudioToolbox.h>
 
@@ -27,31 +27,33 @@ typedef enum {
 } AudioPlayerSpeed;
 
 class AudioPlayer {
-    
+        
 public:
     AudioPlayer(int* fmts, int fmtsSize);
     ~AudioPlayer();
     
     void start();
-    void flush();
+    void flush(int32_t lastSeq = -1);
     void setClientTime(double time);
     
     void setVolume(double volume);
     
-    int addAudio(void* buffer, int size, int seqNo, uint32_t sampleTime);
+    int addAudio(void* buffer, uint32_t size, int seqNo, uint32_t sampleTime);
+    
+    double getSampleRate();
     
     AudioQueue* getAudioQueue();
     
 private:
     
-    void _audioQueueCallback(AudioQueueRef inAQ, AudioQueueBufferRef inBuffer);
-    static void _audioQueueCallbackHelper(void* aqData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer);
+    void _audioOutputCallback(AudioQueueRef inAQ, AudioQueueBufferRef inBuffer);
+    static void _audioOutputCallbackHelper(void* aqData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer);
     
     int _srcFramesPerPacket;
     struct {
         AudioStreamBasicDescription outDesc;
         AudioQueueTimelineRef timeline;
-        AppleLosslessAudioConverter* losslessConverter;
+        AudioConverter* losslessConverter;
         AudioConverter* speedUpConverter;
         AudioConverter* slowDownConverter;
         AudioQueueRef queue;
@@ -66,10 +68,16 @@ private:
     double _nextPacketTime;
     bool _outputIsHomed;
     
-    pthread_mutex_t _timeMutex;
+    Mutex _timeMutex;
 
+    AudioQueueParameterValue _preFlushVolume;
+    
     AudioQueue* _audioQueue;
     AudioPlayerSpeed _speed;
+    
+    int32_t _flushedSeq;
+    
+    Mutex _packetMutex;
             
 };
 

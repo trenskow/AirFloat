@@ -10,6 +10,7 @@
 #define __LOG_H
 
 #include <pthread.h>
+#include <stdint.h>
 
 #define LOG_INFO  0
 #define LOG_ERROR 1
@@ -18,6 +19,7 @@
 #define exitFunc() log_exit(__func__)
 
 void log(int level, const char* message, ...);
+void log_data(int level, const char* data, uint32_t size);
 void log_enter(const char* func);
 void log_exit(const char* func);
 void set_log_thread(pthread_t thread);

@@ -11,12 +11,12 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
-#include <sys/time.h>
 #include <math.h>
 #include <assert.h>
 
 #include <QuartzCore/QuartzCore.h>
 
+#include "Mutex.h"
 #include "Log.h"
 #include "RAOPConnection.h"
 #include "RTPReceiver.h"
@@ -34,9 +34,11 @@
 #define RTP_AUDIO_DATA                  0x60
 
 #define SafeDR(x, v) if (x != NULL) *x = v
+#ifndef MIN
 #define MIN(x, y) (x < y ? x : y)
+#endif
 
-static pthread_mutex_t __globalMutex = PTHREAD_MUTEX_INITIALIZER;
+static Mutex __globalMutex;
 static RTPReceiver* __globalReceiver = NULL;
 
 typedef struct {
@@ -129,7 +131,7 @@ RTPPacket readHeader(const unsigned char* buffer, long length) {
     
     ret.packet_data = (unsigned char*) &buffer[4];
     ret.packet_data_length = length - 4;
-        
+    
     return ret;
     
 }
@@ -163,10 +165,6 @@ RTPReceiver::~RTPReceiver() {
     _connection = NULL;
     stop();    
     
-    pthread_mutex_destroy(&_timerMutex);
-    pthread_cond_destroy(&_syncCond);
-    pthread_cond_destroy(&_timerCond);
-    
     free(_localHost);
     free(_remoteHost);
     
@@ -183,10 +181,6 @@ void RTPReceiver::_setup(const char* localHost, const char* remoteHost, RAOPConn
     
     strcpy(_localHost, localHost);
     strcpy(_remoteHost, remoteHost);
-        
-    pthread_mutex_init(&_timerMutex, NULL);
-    pthread_cond_init(&_syncCond, NULL);
-    pthread_cond_init(&_timerCond, NULL);
         
     _clientTimingPort = _clientControlPort = 0;
     
@@ -205,12 +199,12 @@ void RTPReceiver::_setup(const char* localHost, const char* remoteHost, RAOPConn
     
     _timerRunning = false;
     
-    _audioPlayer->getAudioQueue()->setFlushCallback(RTPReceiver::_queueFlushCalback, this);
-    _audioPlayer->getAudioQueue()->setSyncCallback(RTPReceiver::_queueSyncCalback, this);
+    NotificationCenter::defaultCenter()->addObserver(this, AudioQueue::flushNotificationName, NULL);
+    NotificationCenter::defaultCenter()->addObserver(this, AudioQueue::syncNotificationName, NULL);
     
 }
 
-int RTPReceiver::GetSession(char* to) {
+int RTPReceiver::getSession(char* to) {
     
     assert(to != NULL);
     
@@ -225,13 +219,29 @@ bool RTPReceiver::started() {
     
 }
 
-bool RTPReceiver::IsAvailable() {
+bool RTPReceiver::isAvailable() {
     
-    pthread_mutex_lock(&__globalMutex);
+    __globalMutex.lock();
     bool ret = !(__globalReceiver != NULL && __globalReceiver->started());
-    pthread_mutex_unlock(&__globalMutex);
+    __globalMutex.unlock();
     
     return ret;
+    
+}
+
+RTPReceiver* RTPReceiver::getStreamingReceiver() {
+    
+    __globalMutex.lock();
+    RTPReceiver* ret = __globalReceiver;
+    __globalMutex.unlock();
+    
+    return ret;
+    
+}
+
+RAOPConnection* RTPReceiver::getConnection() {
+    
+    return _connection;
     
 }
 
@@ -263,12 +273,14 @@ void RTPReceiver::_processTimingResponsePacket(RTPPacket* packet) {
     double referenceTime = ntpTimeToDouble(*((NTPTime*)&packet->packet_data[4]));
     double receivedTime = ntpTimeToDouble(*((NTPTime*)&packet->packet_data[12]));
     double sendTime = ntpTimeToDouble(*((NTPTime*)&packet->packet_data[20]));
-    
+
+    /*
     log(LOG_INFO, "current time: %1.6f", currentTime);
     log(LOG_INFO, "reference time: %1.6f", referenceTime);
     log(LOG_INFO, "received time: %1.6f", receivedTime);
     log(LOG_INFO, "send time: %1.6f", sendTime);
-    
+    */
+     
     double delay = ((currentTime - referenceTime) - (sendTime - receivedTime)) / 2;
     double clientTime = receivedTime + (sendTime - receivedTime) + delay;
         
@@ -282,7 +294,7 @@ void RTPReceiver::_processTimingResponsePacket(RTPPacket* packet) {
         this->_sendTimingRequest();
     else
         if (_timeResponseCount == 3)
-            pthread_cond_signal(&_timerCond);
+            _timerCond.signal();
     
 }
 
@@ -290,7 +302,7 @@ void RTPReceiver::_sendPacket(const char* buffer, size_t len, unsigned short por
     
     assert(buffer != NULL && len > 0 && port != 0 && sock != NULL);
     
-    SocketEndPoint* ep = new SocketEndPoint(_remoteHost, port, _connection->GetNetworkScopeId());
+    SocketEndPoint* ep = new SocketEndPoint(_remoteHost, port, _connection->getNetworkScopeId());
     sock->SendTo(ep, buffer, len);
     delete ep;
         
@@ -347,30 +359,23 @@ void* RTPReceiver::_synchronizationLoopKickStarter(void* t) {
 
 void RTPReceiver::_synchronizationLoop() {
 
-    struct timeval tv;
-    struct timespec req = {2, 0};
-    
-    pthread_mutex_lock(&_timerMutex);
+    _timerMutex.lock();
 
     while (_timerRunning) {
         
         _sendTimingRequest();
         
-        gettimeofday(&tv, NULL);
-        req.tv_sec = tv.tv_sec + 2;
-        req.tv_nsec = tv.tv_usec * 1000;
-        
-        pthread_cond_timedwait(&_syncCond, &_timerMutex, &req);
+        _syncCond.timedWait(&_timerMutex, 2000);
         
     }
     
-    pthread_mutex_unlock(&_timerMutex);
+    _timerMutex.unlock();
     
 }
 
 void RTPReceiver::_startSynchronizationLoop() {
     
-    pthread_mutex_lock(&_timerMutex);
+    _timerMutex.lock();
     
     if (!_timerRunning) {
         
@@ -381,25 +386,24 @@ void RTPReceiver::_startSynchronizationLoop() {
         
     }
     
-    pthread_mutex_unlock(&_timerMutex);
+    _timerMutex.unlock();
     
 }
 
 void RTPReceiver::_stopSynchronizationLoop() {
     
-    pthread_mutex_lock(&_timerMutex);
+    _timerMutex.lock();
     
     if (_timerRunning) {
         _timerRunning = false;
-        pthread_cond_signal(&_syncCond);
+        _syncCond.signal();
+        log(LOG_INFO, "Synchronization loop stopped");
     }
     
-    pthread_mutex_unlock(&_timerMutex);
+    _timerMutex.unlock();
     
     pthread_join(_timerThread, NULL);
-    
-    log(LOG_INFO, "Synchronization loop stopped");
-    
+
 }
 
 void RTPReceiver::_processAudioPacket(RTPPacket* packet) {
@@ -410,11 +414,11 @@ void RTPReceiver::_processAudioPacket(RTPPacket* packet) {
     uint16_t cSeq = (int)packet->seq_num;
     
     unsigned char* packetAudioData = &packet->packet_data[8];
-    size_t len = packet->packet_data_length - 8;
+    uint32_t len = packet->packet_data_length - 8;
+    size_t encryptedLen = len & ~0xf;
     
     if (_streamIsEncrypted) {
         
-        size_t encryptedLen = len & ~0xf;
         unsigned char iv[16];
         unsigned char out[encryptedLen];
         
@@ -453,16 +457,12 @@ void RTPReceiver::_streamLoop(Socket* sock) {
     
     log(LOG_INFO, "Stream loop started");
     
-    unsigned char* buffer = (unsigned char*)malloc(16384);
-    
     for (;;) {
         
-//        unsigned char buffer[16384];
+        unsigned char buffer[16384];
         long read = sock->Receive(buffer, 16384);
         
-        //log(LOG_INFO, "Read %ld bytes from socket", read);
-        
-        if (read > 0 && sock->RemoteEndPoint()->IsHost(_remoteHost)) {
+        if (read > 0 && sock->GetRemoteEndPoint()->isHost(_remoteHost)) {
             
             RTPPacket packet = readHeader(buffer, read);
             
@@ -489,8 +489,6 @@ void RTPReceiver::_streamLoop(Socket* sock) {
         
     }
     
-    free(buffer);
-    
     sock->Close();
     
 }
@@ -506,10 +504,10 @@ Socket* RTPReceiver::_setupSocket(unsigned short* port) {
         unsigned short p;
         for (p = 6000 ; p < 6100 ; p++) {
             SocketEndPoint ep;
-            ep.SetupIPv6(p);
+            ep.setupIPv6(p);
             if (ret->Bind(&ep)) {
                 SafeDR(port, p);
-                log(LOG_INFO, "Setup socket on port %u", *port);
+                log(LOG_INFO, "Setup socket on port %u", p);
                 return ret;
             }
         }
@@ -571,9 +569,9 @@ pthread_t RTPReceiver::_start(Socket* socket, const char* name) {
 
 void RTPReceiver::start(unsigned short startSeq) {
     
-    pthread_mutex_lock(&__globalMutex);
+    __globalMutex.lock();
     __globalReceiver = this;
-    pthread_mutex_unlock(&__globalMutex);
+    __globalMutex.unlock();
     
     _audioPlayer->start();
     
@@ -591,17 +589,10 @@ void RTPReceiver::start(unsigned short startSeq) {
         
         log(LOG_INFO, "Waiting for synchronization");
         
-        struct timeval tv;
-        struct timespec req = {4, 0};
+        _timerMutex.lock();
+        _timerCond.timedWait(&_timerMutex, 4000);
+        _timerMutex.unlock();
         
-        gettimeofday(&tv, NULL);
-        req.tv_sec = tv.tv_sec + 4;
-        req.tv_nsec = tv.tv_usec * 1000;
-        
-        pthread_mutex_lock(&_timerMutex);
-        pthread_cond_timedwait(&_timerCond, &_timerMutex, &req);
-        pthread_mutex_unlock(&_timerMutex);
-
         log(LOG_INFO, "Synchronization complete");
         
     } else
@@ -633,20 +624,17 @@ void RTPReceiver::stop() {
     _serverSockThread = _timingSockThread = _controlSockThread = NULL;
     _clientTimingPort = _clientControlPort = 0;
     
-    pthread_mutex_lock(&__globalMutex);
+    __globalMutex.lock();
     __globalReceiver = NULL;
-    pthread_mutex_unlock(&__globalMutex);
+    __globalMutex.unlock();
     
 }
 
-void RTPReceiver::_queueFlushCalback(AudioQueue* queue, void* ctx) {
+void RTPReceiver::_notificationReceived(Notification* notification) {
     
-    ((RTPReceiver*)ctx)->_stopSynchronizationLoop();
-    
-}
-
-void RTPReceiver::_queueSyncCalback(AudioQueue* queue, void* ctx) {
-    
-    ((RTPReceiver*)ctx)->_startSynchronizationLoop();
+    if (*notification == AudioQueue::flushNotificationName)
+        _stopSynchronizationLoop();
+    else if (*notification == AudioQueue::syncNotificationName)
+        _startSynchronizationLoop();
     
 }

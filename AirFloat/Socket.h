@@ -27,8 +27,8 @@ public:
     
     virtual void Close();
     
-    virtual SocketEndPoint* LocalEndPoint();
-    virtual SocketEndPoint* RemoteEndPoint();
+    virtual SocketEndPoint* GetLocalEndPoint();
+    virtual SocketEndPoint* GetRemoteEndPoint();
     
 private:
     

@@ -17,6 +17,8 @@ RAOPParameters::RAOPParameters(const char* buffer, long length, ParameterType ty
     _parameters = NULL;
     _parameterCount = 0;
     
+    log_data(LOG_INFO, buffer, length);
+    
     if (type == ParameterTypeDigest)
         delimiter = ',';
     

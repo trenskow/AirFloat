@@ -1,3 +1,4 @@
+
 //
 //  RAOPConnection.cpp
 //  AirFloatCF
@@ -23,9 +24,10 @@
 #include <ifaddrs.h>
 #include <net/if_dl.h>
 
-#include <CoreFoundation/CoreFoundation.h>
 #include <AudioToolbox/AudioToolbox.h>
 
+#include "DMAPParser.h"
+#include "NotificationCenter.h"
 #include "Log.h"
 #include "Base64.h"
 #include "RAOPHeader.h"
@@ -221,7 +223,7 @@ static void binaryIP(struct in_addr localaddr, unsigned char* buf) {
     char ip[50];
     inet_ntop(AF_INET, &localaddr.s_addr, ip, 50);
     
-    char* parts[4];
+    char* parts[4] = { NULL, NULL, NULL, NULL };
     parts[0] = ip;
     int p = 1;
     long l = strlen(ip);
@@ -253,9 +255,13 @@ static long padBase64(const char* base64, long length, char* out) {
 
 static void md5ToString(unsigned char* md5, char* out) {
     
+    char hexValues[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+    
     out[32] = '\0';
-    for (int i = 0 ; i < 16 ; i++)
-        sprintf(&out[i*2], "%02X", md5[i]);
+    for (int i = 0 ; i < 16 ; i++) {
+        out[i*2] = hexValues[(md5[i] >> 4) & 0xF];
+        out[(i*2)+1] = hexValues[md5[i] & 0xF];
+    }
     
 }
 
@@ -268,18 +274,24 @@ static void md5(const char* content, size_t length, unsigned char* md5) {
     
 }
 
+const char* RAOPConnection::recordingStartedNotificationName = "connectionRecordingStarted";
+const char* RAOPConnection::clientDisconnectedNotificationName = "connectionClientDisconnected";
+const char* RAOPConnection::clientUpdatedMetadataNotificationName = "connectionClientUpdatedMetadata";
+const char* RAOPConnection::clientUpdatedProgressNotificationName = "connectionClientUpdatedProgress";
+const char* RAOPConnection::clientUpdatedTrackInfoNofificationName = "connectionClientUpdatedTrackInfo";
+
 RAOPConnection::RAOPConnection(Socket* sock) {
         
     _sock = sock;
     
-    _recordingStartedClbk = NULL;
-    _recordingStoppedClbk = NULL;
-    _clientDisconnectedClbk = NULL;
-    _clientSetVolumeClbk = NULL;
-    _clientUpdatedMetadataClbk = NULL;
-    
     _rtp = NULL;
     
+    Boolean authenticateIsSet = false;
+    Boolean authenticate = CFPreferencesGetAppBooleanValue(CFSTR("authenticate"), kCFPreferencesCurrentApplication, &authenticateIsSet);
+    
+    _authenticationEnabled = (authenticateIsSet != 0 && authenticate != 0);    
+    _password = (CFStringRef) CFPreferencesCopyAppValue(CFSTR("pw"), kCFPreferencesCurrentApplication);
+
     memset(_digestNonce, 0, 33);
     
     _dacpId[0] = _activeRemote[0] = _sessionId[0] = '\0';
@@ -295,22 +307,25 @@ RAOPConnection::~RAOPConnection() {
         _rtp = NULL;
     }
     
+    if (_password != NULL)
+        CFRelease(_password);
+    
     log(LOG_INFO, "Connection cleanup complete");
     
 }
 
-RTPReceiver* RAOPConnection::GetRTPReceiver() {
+RTPReceiver* RAOPConnection::getRTPReceiver() {
     
     return _rtp;
     
 }
 
-SocketEndPoint RAOPConnection::GetHost() {
+SocketEndPoint RAOPConnection::getRemoteEndPoint() {
     
     SocketEndPoint ret;
     
-    if (_sock->RemoteEndPoint() != NULL)
-        ret = *_sock->RemoteEndPoint();
+    if (_sock->GetRemoteEndPoint() != NULL)
+        ret = *_sock->GetRemoteEndPoint();
     
     return ret;
     
@@ -324,7 +339,7 @@ void* RAOPConnection::_connectionLoopKickStarter(void* t) {
     
 }
 
-long RAOPConnection::_ensureNewLines(unsigned char* buffer, long length) {
+long RAOPConnection::_convertNewLines(unsigned char* buffer, long length) {
     
     for (long i = 0; i < length; i++) {
         if (buffer[i] == '\r')
@@ -351,7 +366,7 @@ void RAOPConnection::_appleResponse(const char* challenge, long length, char* re
     if (actualLength != 16)
         log(LOG_ERROR, "Apple-Challenge: Expected 16 bytes - got %d", actualLength);
     
-    char* interface = interfaceForIp((struct sockaddr_in6*)_sock->LocalEndPoint()->SocketAdress());
+    char* interface = interfaceForIp((struct sockaddr_in6*)_sock->GetLocalEndPoint()->getSocketAddress());
     
     if (interface != NULL) {
         
@@ -363,7 +378,7 @@ void RAOPConnection::_appleResponse(const char* challenge, long length, char* re
         
         if (hwid != NULL) {
             
-            if (!IN6_IS_ADDR_V4MAPPED(&((struct sockaddr_in6*)_sock->RemoteEndPoint()->SocketAdress())->sin6_addr)) {
+            if (!IN6_IS_ADDR_V4MAPPED(&((struct sockaddr_in6*)_sock->GetRemoteEndPoint()->getSocketAddress())->sin6_addr)) {
                 
                 responseSize = 48;
                 
@@ -440,61 +455,70 @@ bool RAOPConnection::_checkAuthentication(const char* method, const char* uri, c
     
     assert(method != NULL && uri != NULL);
     
-    CFStringRef pw;
-    pw = (CFStringRef) CFPreferencesCopyAppValue(CFSTR("pw"), kCFPreferencesCurrentApplication);
-    
-    if (pw != NULL && CFStringGetLength(pw) > 0) {
+    if (_authenticationEnabled && _password && CFStringGetLength(_password) > 0) {
         
-        if (authenticationParameter != NULL) {
+        if (CFStringGetLength(_password) > 0) {
             
-            const char* paramBegin = strstr(authenticationParameter, " ") + 1;
-            if (paramBegin) {
-                RAOPParameters* parameters = new RAOPParameters(paramBegin, strlen(paramBegin), ParameterTypeDigest);
-
-                const char* nonce = parameters->valueForParameter("nonce");
-                const char* response = parameters->valueForParameter("response");
-
-                // Check if nonce is correct
-                if (nonce != NULL && strlen(nonce) == 32 && strcmp(nonce, _digestNonce) == 0) {
+            if (authenticationParameter != NULL) {
+                
+                const char* paramBegin = strstr(authenticationParameter, " ") + 1;
+                if (paramBegin) {
+                    RAOPParameters* parameters = new RAOPParameters(paramBegin, strlen(paramBegin), ParameterTypeDigest);
                     
-                    const char* username = parameters->valueForParameter("username");
-                    const char* realm = parameters->valueForParameter("realm");
-                    int pwLen = CFStringGetLength(pw);
-                    char password[pwLen + 1];
-                    CFStringGetCString(pw, password, pwLen + 1, kCFStringEncodingASCII);
+                    const char* nonce = parameters->valueForParameter("nonce");
+                    const char* response = parameters->valueForParameter("response");
                     
-                    char a1pre[strlen(username) + strlen(realm) + pwLen + 3];
-                    sprintf(a1pre, "%s:%s:%s", username, realm, password);
+                    char wResponse[strlen(response) + 1];
+                    strcpy(wResponse, response);
                     
-                    char a2pre[strlen(method) + strlen(uri) + 2];
-                    sprintf(a2pre, "%s:%s", method, uri);
-                    
-                    unsigned char a1[16], a2[16];
-                    md5(a1pre, strlen(a1pre), a1);
-                    md5(a2pre, strlen(a2pre), a2);
-                    
-                    char ha1[33], ha2[33];
-                    md5ToString(a1, ha1);
-                    md5ToString(a2, ha2);
-                    
-                    char finalpre[67 + strlen(_digestNonce)];
-                    sprintf(finalpre, "%s:%s:%s", ha1, _digestNonce, ha2);
-                    
-                    unsigned char final[16];
-                    md5(finalpre, strlen(finalpre), final);
-                    
-                    char hfinal[33];
-                    md5ToString(final, hfinal);
-                    
-                    if (strcmp(hfinal, response) == 0) {
-                        log(LOG_INFO, "Authentication success");
-                        return true;
+                    // Check if nonce is correct
+                    if (nonce != NULL && strlen(nonce) == 32 && strcmp(nonce, _digestNonce) == 0) {
+                        
+                        const char* username = parameters->valueForParameter("username");
+                        const char* realm = parameters->valueForParameter("realm");
+                        int pwLen = CFStringGetLength(_password);
+                        const char* password = CFStringGetCStringPtr(_password, CFStringGetFastestEncoding(_password));
+                        
+                        char a1pre[strlen(username) + strlen(realm) + pwLen + 3];
+                        sprintf(a1pre, "%s:%s:%s", username, realm, password);
+                        
+                        char a2pre[strlen(method) + strlen(uri) + 2];
+                        sprintf(a2pre, "%s:%s", method, uri);
+                        
+                        unsigned char a1[16], a2[16];
+                        md5(a1pre, strlen(a1pre), a1);
+                        md5(a2pre, strlen(a2pre), a2);
+                        
+                        char ha1[33], ha2[33];
+                        md5ToString(a1, ha1);
+                        md5ToString(a2, ha2);
+                        
+                        char finalpre[67 + strlen(_digestNonce)];
+                        sprintf(finalpre, "%s:%s:%s", ha1, _digestNonce, ha2);
+                        
+                        unsigned char final[16];
+                        md5(finalpre, strlen(finalpre), final);
+                        
+                        char hfinal[33];
+                        md5ToString(final, hfinal);
+                        
+                        for (int i = 0 ; i < 32 ; i++) {
+                            hfinal[i] = tolower(hfinal[i]);
+                            wResponse[i] = tolower(wResponse[i]);
+                        }
+                        
+                        if (strcmp(hfinal, wResponse) == 0) {
+                            log(LOG_INFO, "Authentication success");
+                            return true;
+                        }
+                        
                     }
                     
                 }
                 
-            }
-            
+            } else
+                log(LOG_INFO, "Authentication header missing");
+
         }
         
         log(LOG_INFO, "Authentication failed!");
@@ -530,77 +554,34 @@ RAOPConnectionAudioRoute RAOPConnection::_getAudioRoute() {
     
 }
 
-bool RAOPConnection::_processData(unsigned char* inBuffer, long length) {
+bool RAOPConnection::_processData(const char* cmd, const char* path, RAOPHeader* header, unsigned char* content, long contentLength) {
     
-    char* buffer = (char*)malloc(length);
-    char* bufferStart = buffer;
-    memcpy(buffer, inBuffer, length);
-    
-    bool success = true;
-    bool end = false;
-    char* cmdLine = (char*)buffer;
-    long cmdLength = 0;
-    char* parts[3] = { NULL, NULL, NULL };
-    parts[0] = (char*)buffer;
     int cSeq = 0;
     int responseCode = 200;
-    
-    for (int i = 0 ; i < length ; i++)
-        if (buffer[i] == '\n') {
-            buffer[i] = ' ';
-            buffer = &buffer[i+1];
-            length -= i + 1;
-            cmdLength = i + 1;
-            break;
-        }
-    
-    long cPart = 1;
-    for (long i = 0 ; i < cmdLength ; i++)
-        if (cmdLine[i] == ' ') {
-            if (cPart < 3)
-                parts[cPart++] = &cmdLine[i + 1];
-            cmdLine[i] = '\0';
-        }
-
-    char* cmd = parts[0];
-    char* path = parts[1];
-    char* protocol = parts[2];
+    bool success = true;
+    bool end = false;
     
     char* response = (char*)malloc(1);
     char* finalResponse = (char*)malloc(1);
     finalResponse[0] = response[0] = '\0';
     
-    if (cmd != NULL && path != NULL && protocol != NULL) {
+    if (cmd != NULL && path != NULL) {
     
-        log(LOG_INFO, "CMD: %s / PATH: %s / PROTOCOL: %s", cmd, path, protocol);
+        log(LOG_INFO, "CMD: %s / PATH: %s", cmd, path);
         
-        RAOPHeader* header = new RAOPHeader((char*)buffer, strstr((char*)buffer, "\n\n") - (char*)buffer + 1);
         RAOPParameters* parameters = NULL;
         
         if (header->valueForName("CSeq") != NULL)
             cSeq = atoi(header->valueForName("CSeq"));
         
-        buffer = &buffer[header->usedBuffer()];
-        length -= header->usedBuffer();
-        
-        
-        const char* clStr;
-        if ((clStr = header->valueForName("Content-Length")) != NULL) {
-            if (length > 0) {
-                int contentLength = MIN(atoi(clStr), length);
-                if (strcmp(header->valueForName("Content-Type"), "application/sdp") == 0 || strcmp(header->valueForName("Content-Type"), "text/parameters") == 0) {
-                    int newLength = _ensureNewLines((unsigned char*)buffer, length);
-                    contentLength -= length - newLength;
-                    length = newLength;
-                    if (strcmp(header->valueForName("Content-Type"), "application/sdp") == 0)
-                        parameters = new RAOPParameters((char*)buffer, contentLength, ParameterTypeSDP);
-                    else if (strcmp(header->valueForName("Content-Type"), "text/parameters") == 0)
-                        parameters = new RAOPParameters((char*)buffer, contentLength, ParameterTypeTextParameters);
-                    buffer = &buffer[contentLength];
-                    length -= contentLength;
-                }
-            } else
-                success = false;
+        if (contentLength > 0) {
+            if (strcmp(header->valueForName("Content-Type"), "application/sdp") == 0 || strcmp(header->valueForName("Content-Type"), "text/parameters") == 0) {
+                int cl = _convertNewLines((unsigned char*)content, contentLength);
+                if (strcmp(header->valueForName("Content-Type"), "application/sdp") == 0)
+                    parameters = new RAOPParameters((char*)content, cl, ParameterTypeSDP);
+                else if (strcmp(header->valueForName("Content-Type"), "text/parameters") == 0)
+                    parameters = new RAOPParameters((char*)content, cl, ParameterTypeTextParameters);
+            }
         }
         
         const char* dacpId;
@@ -617,263 +598,312 @@ bool RAOPConnection::_processData(unsigned char* inBuffer, long length) {
         
         response = appendBuffer(response, true, "Server: AirTunes/104.29");
         
-        if (success) {
+        response = appendBuffer(response, true, "CSeq: %d", cSeq);
+        
+        if (_checkAuthentication(cmd, path, header->valueForName("Authorization"))) {
             
-            response = appendBuffer(response, true, "CSeq: %d", cSeq);
-            
-            if (_checkAuthentication(cmd, path, header->valueForName("Authorization"))) {
+            if (0 == strcmp(cmd, "OPTIONS"))
+                response = appendBuffer(response, true, "Public: ANNOUNCE, RECORD, PAUSE, FLUSH, TEARDOWN, OPTIONS, GET_PARAMETER, SET_PARAMETER, POST, GET");
+            else if (0 == strcmp(cmd, "ANNOUNCE")) {
                 
-                if (0 == strcmp(cmd, "OPTIONS"))
-                    response = appendBuffer(response, true, "Public: ANNOUNCE, RECORD, PAUSE, FLUSH, TEARDOWN, OPTIONS, GET_PARAMETER, SET_PARAMETER, POST, GET");
-                else if (0 == strcmp(cmd, "ANNOUNCE")) {
+                const char* codec = NULL;
+                int codecIdentifier;
+                
+                const char* rtpmap;
+                if ((rtpmap = parameters->valueForParameter("a-rtpmap")) != NULL) {
                     
-                    const char* codec = NULL;
-                    int codecIdentifier;
+                    codecIdentifier = atoi(rtpmap);
+                    for (long i = 0 ; i < strlen(rtpmap) - 1 ; i++)
+                        if (rtpmap[i] == ' ') {
+                            codec = &rtpmap[i+1];
+                            break;
+                        }
                     
-                    const char* rtpmap;
-                    if ((rtpmap = parameters->valueForParameter("a-rtpmap")) != NULL) {
+                    const char* fmtp;
+                    if ((fmtp = parameters->valueForParameter("a-fmtp")) != NULL && atoi(fmtp) == codecIdentifier) {
                         
-                        codecIdentifier = atoi(rtpmap);
-                        for (long i = 0 ; i < strlen(rtpmap) - 1 ; i++)
-                            if (rtpmap[i] == ' ') {
-                                codec = &rtpmap[i+1];
-                                break;
-                            }
+                        int size = 0;
+                        size_t fmtpLen = strlen(fmtp);
+                        for (long i = 0 ; i < fmtpLen ; i++)
+                            if (fmtp[i] == ' ')
+                                size++;
                         
-                        const char* fmtp;
-                        if ((fmtp = parameters->valueForParameter("a-fmtp")) != NULL && atoi(fmtp) == codecIdentifier) {
-                            
-                            int size = 0;
-                            size_t fmtpLen = strlen(fmtp);
-                            for (long i = 0 ; i < fmtpLen ; i++)
-                                if (fmtp[i] == ' ')
-                                    size++;
-                            
-                            int fmtps[size];
-                            int cfmtp = 0;
-                            for (long i = 0 ; i < fmtpLen ; i++)
-                                if (fmtp[i] == ' ')
-                                    fmtps[cfmtp++] = atoi(&fmtp[i +1]);
-                                                        
-                            char localHost[100];
-                            char remoteHost[100];
-                            _sock->LocalEndPoint()->GetHost(localHost, 100);
-                            _sock->RemoteEndPoint()->GetHost(remoteHost, 100);
-                            
-                            unsigned char aeskey[16];
-                            unsigned char aesiv[16];
-                            
-                            bzero(aeskey, 16);
-                            bzero(aesiv, 16);
-                            
-                            if (_rtp != NULL) {
-                                delete _rtp;
-                                _rtp = NULL;
-                            }
-                            
-                            const char* aesKeyBase64Encoded;
-                            if ((aesKeyBase64Encoded = parameters->valueForParameter("a-rsaaeskey")) != NULL) {
-                                
-                                char aesKeyBase64EncodedPadded[strlen(aesKeyBase64Encoded) + 5];
-                                long size = padBase64(aesKeyBase64Encoded, strlen(aesKeyBase64Encoded), aesKeyBase64EncodedPadded);
-                                char aesKeyEncryptet[size];
-                                size = base64_decode(aesKeyBase64EncodedPadded, aesKeyEncryptet);
-                                
-                                RSA* rsa = applePrivateKey();
-                                unsigned char aesKey[size + 1];
-                                size = RSA_private_decrypt((int)size, (unsigned char*)aesKeyEncryptet, aesKey, rsa, RSA_PKCS1_OAEP_PADDING);
-                                
-                                if (size >= 16)
-                                    memcpy(aeskey, aesKey, 16);
-                                
-                                log(LOG_INFO, "AES key length: %d bits", size * 8);
-                                
-                                const char* aesInitializerBase64Encoded = parameters->valueForParameter("a-aesiv");
-                                char aesInitializerBase64EncodedPadded[strlen(aesInitializerBase64Encoded) + 5];
-                                size = padBase64(aesInitializerBase64Encoded, strlen(aesInitializerBase64Encoded), aesInitializerBase64EncodedPadded);
-                                char aesInitializer[size];
-                                size = base64_decode(aesInitializerBase64EncodedPadded, aesInitializer);
-                                
-                                if (size >= 16)
-                                    memcpy(aesiv, aesInitializer, 16);
-                                
-                                log(LOG_INFO, "AES initialization vector length: %d bits", size * 8);
-                                
-                                _rtp = new RTPReceiver(localHost, remoteHost, aeskey, aesiv, this, fmtps, size);
-                                
-                            } else // Stream is clear text
-                                _rtp = new RTPReceiver(localHost, remoteHost, this, fmtps, size);
-                            
-                        } else
-                            responseCode = 400; // Bad request
+                        int fmtps[size];
+                        int cfmtp = 0;
+                        for (long i = 0 ; i < fmtpLen ; i++)
+                            if (fmtp[i] == ' ')
+                                fmtps[cfmtp++] = atoi(&fmtp[i +1]);
                         
-                    } else                        
+                        char localHost[100];
+                        char remoteHost[100];
+                        _sock->GetLocalEndPoint()->getHost(localHost, 100);
+                        _sock->GetRemoteEndPoint()->getHost(remoteHost, 100);
+                        
+                        unsigned char aeskey[16];
+                        unsigned char aesiv[16];
+                        
+                        bzero(aeskey, 16);
+                        bzero(aesiv, 16);
+                        
+                        if (_rtp != NULL) {
+                            delete _rtp;
+                            _rtp = NULL;
+                        }
+                        
+                        const char* aesKeyBase64Encoded;
+                        if ((aesKeyBase64Encoded = parameters->valueForParameter("a-rsaaeskey")) != NULL) {
+                            
+                            char aesKeyBase64EncodedPadded[strlen(aesKeyBase64Encoded) + 5];
+                            long size = padBase64(aesKeyBase64Encoded, strlen(aesKeyBase64Encoded), aesKeyBase64EncodedPadded);
+                            char aesKeyEncryptet[size];
+                            size = base64_decode(aesKeyBase64EncodedPadded, aesKeyEncryptet);
+                            
+                            RSA* rsa = applePrivateKey();
+                            unsigned char aesKey[size + 1];
+                            size = RSA_private_decrypt((int)size, (unsigned char*)aesKeyEncryptet, aesKey, rsa, RSA_PKCS1_OAEP_PADDING);
+                            
+                            if (size >= 16)
+                                memcpy(aeskey, aesKey, 16);
+                            
+                            log(LOG_INFO, "AES key length: %d bits", size * 8);
+                            
+                            const char* aesInitializerBase64Encoded = parameters->valueForParameter("a-aesiv");
+                            char aesInitializerBase64EncodedPadded[strlen(aesInitializerBase64Encoded) + 5];
+                            size = padBase64(aesInitializerBase64Encoded, strlen(aesInitializerBase64Encoded), aesInitializerBase64EncodedPadded);
+                            char aesInitializer[size];
+                            size = base64_decode(aesInitializerBase64EncodedPadded, aesInitializer);
+                            
+                            if (size >= 16)
+                                memcpy(aesiv, aesInitializer, 16);
+                            
+                            log(LOG_INFO, "AES initialization vector length: %d bits", size * 8);
+                            
+                            _rtp = new RTPReceiver(localHost, remoteHost, aeskey, aesiv, this, fmtps, size);
+                            
+                        } else // Stream is clear text
+                            _rtp = new RTPReceiver(localHost, remoteHost, this, fmtps, size);
+                        
+                    } else
                         responseCode = 400; // Bad request
                     
-                } else if (0 == strcmp(cmd, "SETUP")) {
-                    
-                    if (RTPReceiver::IsAvailable() && _getAudioRoute() != kRAOPConnectionAudio_RouteAirPlay) {
-                        
-                        const char* transport;
-                        if (_rtp != NULL && (transport = header->valueForName("Transport"))) {
-                            
-                            char session[10];
-                            _rtp->GetSession(session);
-                            response = appendBuffer(response, true, "Session: %02X%02X%02X%02X", session[0], session[1], session[2], session[3]);
-                            
-                            RAOPParameters* transportParams = new RAOPParameters(transport, strlen(transport), ParameterTypeSDP, ';');
-                            
-                            unsigned short timing_port, control_port;
-                            timing_port = control_port = 0;
-                            
-                            const char *tp, *cp;
-                            if ((tp = transportParams->valueForParameter("timing_port"))) {
-                                timing_port = atoi(tp);
-                                transportParams->removeParameter("timing_port");
-                            }
-                            if ((cp = transportParams->valueForParameter("control_port"))) {
-                                control_port = atoi(cp);
-                                transportParams->removeParameter("control_port");
-                            }
-                            
-                            unsigned short port;
-                            if ((port = _rtp->setup(&timing_port, &control_port))) {
-                                
-                                response = appendBuffer(response, false, "Transport: ");
-                                
-                                for (long i = 0 ; i < transportParams->count() ; i++) {
-                                    const char* key = transportParams->parameterAtIndex(i);
-                                    const char* value;
-                                    if ((value = transportParams->valueForParameter(key)) != key)
-                                        response = appendBuffer(response, false, "%s=%s;", key, value);
-                                    else
-                                        response = appendBuffer(response, false, "%s;", key);
-                                }
-                                
-                                if (control_port > 0)
-                                    response = appendBuffer(response, false, "control_port=%d;", control_port);
-                                if (timing_port > 0)
-                                    response = appendBuffer(response, false, "timing_port=%d;", timing_port);
-                                
-                                response = appendBuffer(response, true, "server_port=%d", port);
-                                
-                                log(LOG_INFO, "RTP receiver set up at port %d", port);
-                                
-                            } else
-                                log(LOG_ERROR, "RTP Receiver didn't start");
-                            
-                        } else                            
-                            responseCode = 400; // Bad request
-                        
-                    } else 
-                        responseCode = 453; // Not enough bandwidth;
-                    
-                } else if (0 == strcmp(cmd, "RECORD")) {
-                    
-                    char session[10];
-                    _rtp->GetSession(session);
-                    response = appendBuffer(response, true, "Session: %02X%02X%02X%02X", session[0], session[1], session[2], session[3]);
-                    
-                    const char* rtpinfo;
-                    if ((rtpinfo = header->valueForName("RTP-Info"))) {
-                        
-                        RAOPParameters* rtpParams = new RAOPParameters(rtpinfo, strlen(rtpinfo), ParameterTypeSDP, ';');
-                        _rtp->start(atoi(rtpParams->valueForParameter("seq")));
-                        
-                        delete rtpParams;
-                        
-                    } else {
-                        _rtp->start();
-                    }
-                    
-                    if (_recordingStartedClbk != NULL)
-                        _recordingStartedClbk(this, _clbkCtx);
-                    
-                    responseCode = 200;
-                    
-                } else if (0 == strcmp(cmd, "SET_PARAMETER")) {
-                    
-                    if (parameters != NULL) {
-                        
-                        const char* volume;
-                        if ((volume = parameters->valueForParameter("volume"))) {
-                            float fVolume;
-                            sscanf(volume, "%f", &fVolume);
-                            log(LOG_INFO, "Client set volume: %f", (30.0 + fVolume) / 30.0);
-                            
-                            fVolume = (fVolume == -144 ? 0.0 : (30.0 + fVolume) / 30.0);
-                            _rtp->getAudioPlayer()->setVolume(fVolume);
-                            
-                            if (_clientSetVolumeClbk != NULL)
-                                _clientSetVolumeClbk(this, fVolume, _clbkCtx);
-                        }
-
-                    } else {
-                        log(LOG_INFO, "Track info received (Content-Type: %s)", header->valueForName("Content-Type"));
-                        if (_clientUpdatedMetadataClbk != NULL)
-                            _clientUpdatedMetadataClbk(this, buffer, length, header->valueForName("Content-Type"), _clbkCtx);
-                    }
-                    
-//                    responseCode = 200;
-                    
-                } else if (0 == strcmp(cmd, "FLUSH")) {
-                    
-                    _rtp->getAudioPlayer()->flush();
-                    responseCode = 200;
-                    
-                    if (_recordingStoppedClbk)
-                        _recordingStoppedClbk(this, _clbkCtx);
-                    
-                } else if (0 == strcmp(cmd, "TEARDOWN")) {
-                    
-                    _rtp->stop();
-                    response = appendBuffer(response, true, "Connection: Close");
-                    end = true;
-                    
-                } else
+                } else                        
                     responseCode = 400; // Bad request
                 
-            } else {
+            } else if (0 == strcmp(cmd, "SETUP")) {
                 
-                unsigned char nonce[16];
+                if (RTPReceiver::isAvailable() && _getAudioRoute() != kRAOPConnectionAudio_RouteAirPlay) {
+                    
+                    const char* transport;
+                    if (_rtp != NULL && (transport = header->valueForName("Transport"))) {
+                        
+                        char session[10];
+                        _rtp->getSession(session);
+                        response = appendBuffer(response, true, "Session: %02X%02X%02X%02X", session[0], session[1], session[2], session[3]);
+                        
+                        RAOPParameters* transportParams = new RAOPParameters(transport, strlen(transport), ParameterTypeSDP, ';');
+                        
+                        unsigned short timing_port, control_port;
+                        timing_port = control_port = 0;
+                        
+                        const char *tp, *cp;
+                        if ((tp = transportParams->valueForParameter("timing_port"))) {
+                            timing_port = atoi(tp);
+                            transportParams->removeParameter("timing_port");
+                        }
+                        if ((cp = transportParams->valueForParameter("control_port"))) {
+                            control_port = atoi(cp);
+                            transportParams->removeParameter("control_port");
+                        }
+                        
+                        unsigned short port;
+                        if ((port = _rtp->setup(&timing_port, &control_port))) {
+                            
+                            response = appendBuffer(response, false, "Transport: ");
+                            
+                            for (long i = 0 ; i < transportParams->count() ; i++) {
+                                const char* key = transportParams->parameterAtIndex(i);
+                                const char* value;
+                                if ((value = transportParams->valueForParameter(key)) != key)
+                                    response = appendBuffer(response, false, "%s=%s;", key, value);
+                                else
+                                    response = appendBuffer(response, false, "%s;", key);
+                            }
+                            
+                            if (control_port > 0)
+                                response = appendBuffer(response, false, "control_port=%d;", control_port);
+                            if (timing_port > 0)
+                                response = appendBuffer(response, false, "timing_port=%d;", timing_port);
+                            
+                            response = appendBuffer(response, true, "server_port=%d", port);
+                            
+                            log(LOG_INFO, "RTP receiver set up at port %d", port);
+                            
+                        } else
+                            log(LOG_ERROR, "RTP Receiver didn't start");
+                        
+                    } else                            
+                        responseCode = 400; // Bad request
+                    
+                } else 
+                    responseCode = 453; // Not enough bandwidth;
                 
-                for (int i = 0 ; i < 16 ; i++)
-                    nonce[i] = (char) rand() % 256;
+            } else if (0 == strcmp(cmd, "RECORD")) {
                 
-                md5ToString(nonce, _digestNonce);
-
-                response = appendBuffer(response, true, "WWW-Authenticate: Digest realm=\"raop\", nonce=\"%s\"", _digestNonce);
+                char session[10];
+                _rtp->getSession(session);
+                response = appendBuffer(response, true, "Session: %02X%02X%02X%02X", session[0], session[1], session[2], session[3]);
                 
-                responseCode = 401; // Unauthorized
-                
-            }
-            
-            const char* challenge;
-            if ((challenge = header->valueForName("Apple-Challenge"))) {
-                
-                char ares[1000];
-                long resLength = 100;
-                
-                char rchallenge[strlen(challenge) + 5];
-                padBase64(challenge, strlen(challenge), rchallenge);
-                _appleResponse(rchallenge, strlen(rchallenge), ares, &resLength);
-                
-                if (resLength > 0) {
-                    ares[resLength] = '\0';
-                    response = appendBuffer(response, true, "Apple-Response: %s", ares);
+                const char* rtpinfo;
+                if ((rtpinfo = header->valueForName("RTP-Info"))) {
+                    
+                    RAOPParameters* rtpParams = new RAOPParameters(rtpinfo, strlen(rtpinfo), ParameterTypeSDP, ';');
+                    _rtp->start(atoi(rtpParams->valueForParameter("seq")));
+                    
+                    delete rtpParams;
+                    
+                } else {
+                    _rtp->start();
                 }
                 
-            }
+                NotificationCenter::defaultCenter()->postNotification(RAOPConnection::recordingStartedNotificationName, this, NULL);
+                
+                response = appendBuffer(response, true, "Audio-Latency: 15049");
+                
+                responseCode = 200;
+                
+            } else if (0 == strcmp(cmd, "SET_PARAMETER")) {
+                
+                if (parameters != NULL) {
+                    
+                    const char* volume;
+                    const char* progress;
+                    if ((volume = parameters->valueForParameter("volume"))) {
+                        float fVolume;
+                        sscanf(volume, "%f", &fVolume);
+                        log(LOG_INFO, "Client set volume: %f", (30.0 + fVolume) / 30.0);
+                        
+                        fVolume = (fVolume == -144 ? 0.0 : (30.0 + fVolume) / 30.0);
+                        _rtp->getAudioPlayer()->setVolume(fVolume * fVolume * fVolume);
+                        
+                    } else if ((progress = parameters->valueForParameter("progress"))) {
+                        
+                        const char* parts[3] = { NULL, NULL, NULL };
+                        int cPart = 1;
+                        parts[0] = progress;
+                        
+                        for (int i = 0 ; i < strlen(progress) ; i++)
+                            if (progress[i] == '/')
+                                parts[cPart++] = &progress[i+1];
+                        
+                        double start = atoi(parts[0]);
+                        
+                        RAOPConnectionClientUpdatedProgressNotificationInfo info;
+                        info.position = (atoi(parts[1]) - start) / _rtp->getAudioPlayer()->getSampleRate();
+                        info.total = (atoi(parts[2]) - start) / _rtp->getAudioPlayer()->getSampleRate();
+                        
+                        NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientUpdatedProgressNotificationName, this, &info);
+                        
+                    }
+                    
+                } else {
+                    
+                    const char* contentType = header->valueForName("Content-Type");
+                    
+                    if (0 == strcmp(contentType, "application/x-dmap-tagged")) {
+                        
+                        DMAPParser* tags = new DMAPParser(content, contentLength);
+                        
+                        uint32_t containerTag;
+                        if (tags->count() > 0 && DMAPParser::typeForTag((containerTag = tags->tagAtIndex(0))) == kDMAPTypeContainer) {
+                            
+                            DMAPParser* trackTags = tags->containerForAtom(containerTag);
+                            NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientUpdatedTrackInfoNofificationName, this, trackTags);
+                            
+                            const char* title = trackTags->stringForIdentifier("dmap.itemname");
+                            const char* artist = trackTags->stringForIdentifier("daap.songartist");
+                            if (title != NULL && artist != NULL)
+                                log(LOG_INFO, "Now playing: \"%s\" by %s", title, artist);
+                            
+                        }
+                        
+                        delete tags;
+                        
+                    } else {
+                    
+                        log(LOG_INFO, "Track info received (Content-Type: %s)", header->valueForName("Content-Type"));
+                        RAOPConnectionClientUpdatedMetadataNotificationInfo info;
+                        info.content = content;
+                        info.contentLength = contentLength;
+                        info.contentType = header->valueForName("Content-Type");
+                        
+                        NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientUpdatedMetadataNotificationName, this, &info);
+
+                    }
+                    
+                }
+                
+            } else if (0 == strcmp(cmd, "FLUSH")) {
+                
+                int32_t lastSeq = -1;
+                const char* rtpInfo;
+                if ((rtpInfo = header->valueForName("RTP-Info")) != NULL) {
+                    
+                    RAOPParameters* rtpParams = new RAOPParameters(rtpInfo, strlen(rtpInfo), ParameterTypeSDP, ';');
+                    
+                    const char* seq;
+                    if ((seq = rtpParams->valueForParameter("seq")) != NULL)
+                        lastSeq = atoi(seq);
+                }
+                
+                _rtp->getAudioPlayer()->flush(lastSeq);
+                responseCode = 200;
+                
+            } else if (0 == strcmp(cmd, "TEARDOWN")) {
+                
+                _rtp->stop();
+                response = appendBuffer(response, true, "Connection: Close");
+                end = true;
+                
+            } else
+                responseCode = 400; // Bad request
             
-            //response = appendBuffer(response, true, "Audio-Jack-Status: %s", (_getAudioRoute() == kRAOPConnectionAudio_RouteHeadphones ? "connected; type=analog" : "disconnected"));
-            response = appendBuffer(response, true, "Audio-Jack-Status: connected; type=digital");
+        } else {
+            
+            unsigned char nonce[16];
+            
+            for (int i = 0 ; i < 16 ; i++)
+                nonce[i] = (char) rand() % 256;
+            
+            md5ToString(nonce, _digestNonce);
+            
+            response = appendBuffer(response, true, "WWW-Authenticate: Digest realm=\"raop\", nonce=\"%s\"", _digestNonce);
+            
+            responseCode = 401; // Unauthorized
             
         }
         
+        const char* challenge;
+        if ((challenge = header->valueForName("Apple-Challenge"))) {
+            
+            char ares[1000];
+            long resLength = 100;
+            
+            char rchallenge[strlen(challenge) + 5];
+            padBase64(challenge, strlen(challenge), rchallenge);
+            _appleResponse(rchallenge, strlen(rchallenge), ares, &resLength);
+            
+            if (resLength > 0) {
+                ares[resLength] = '\0';
+                response = appendBuffer(response, true, "Apple-Response: %s", ares);
+            }
+            
+        }
+        
+        //response = appendBuffer(response, true, "Audio-Jack-Status: %s", (_getAudioRoute() == kRAOPConnectionAudio_RouteHeadphones ? "connected; type=analog" : "disconnected"));
+        response = appendBuffer(response, true, "Audio-Jack-Status: connected; type=digital");
+                    
         if (parameters != NULL)
             delete parameters;
-        
-        delete header;
         
     } else
         responseCode = 400; // Bad request
@@ -909,7 +939,6 @@ bool RAOPConnection::_processData(unsigned char* inBuffer, long length) {
     if (end)
         _sock->Close();
     
-    free(bufferStart);
     free(finalResponse);
     free(response);
     
@@ -921,52 +950,86 @@ bool RAOPConnection::_processData(unsigned char* inBuffer, long length) {
 
 void RAOPConnection::_connectionLoop() {
     
-    long readsize = 16384;
-    long buffersize = 0;
+    uint32_t buffersize = 0;
     unsigned char* buffer = NULL;
-    long readpos = 0;
+    uint32_t readpos = 0;
     
     for (;;) {
         
-        if (buffersize - (readpos + readsize) < 0) {
-            buffersize += readsize;
+        if (READ_SIZE + readpos > buffersize) {
+            buffersize += READ_SIZE;
             buffer = (unsigned char*)realloc(buffer, buffersize);
         }
         
-        long read = _sock->Receive(&buffer[readpos], readsize);
+        int32_t read = _sock->Receive(&buffer[readpos], READ_SIZE);
                 
         if (read <= 0)
             break;
         
-        read = _ensureNewLines(buffer, readpos + read) - readpos;
+        readpos += read;
         
-        buffer[readpos + read] = '\0';
-        log(LOG_INFO, "%s", &buffer[readpos]);
-        
-        bool foundend = false;
-        for (long i = 0 ; i < read + readpos ; i++)
-            if (buffer[i] == '\n' && buffer[i + 1] == '\n') {
-                char* headerEnd = (char*) &buffer[readpos + i + 2];
-                char* contentLengthEntry;
-                if ((contentLengthEntry = (char*) memmem(buffer, headerEnd - (char*)buffer, "Content-Length:", 15)) != NULL) {
-                    char* end = (char*)memchr(contentLengthEntry, '\n', headerEnd - contentLengthEntry);
-                    end[0] = '\0';
-                    int length = atoi(&contentLengthEntry[16]);
-                    end[0] = '\n';
-                    
-                    int currentLength = read + readpos - (i + 2);
-                    if (currentLength == length)
-                        foundend = true;
-                    
-                } else 
-                    foundend = true;
-                break;
+        unsigned char* contentStart;
+        unsigned char* headerStart = buffer;
+        if ((contentStart = (unsigned char*)memmem(buffer, readpos, "\r\n\r\n", 4)) != NULL) { // Find request end
+            contentStart += 4;
+            
+            uint32_t headerLength = _convertNewLines(buffer, contentStart - headerStart);
+
+            log_data(LOG_INFO, (char*)buffer, headerLength - 1);
+            
+            char* cmd = (char*) headerStart;
+            char* path = NULL;
+            while (headerStart[0] != '\n') {
+                if (headerStart[0] == ' ') {
+                    if (path == NULL)
+                        path = (char*)&headerStart[1];
+                    headerStart[0] = '\0';
+                }
+                headerStart++;
+                headerLength--;
             }
+            
+            headerStart++;
+            headerLength--;
+            
+            RAOPHeader headers((char*)headerStart, contentStart - headerStart);
+            const char* contentLengthStr;
+            unsigned char* content = NULL;
+            uint32_t contentLength = 0;
+            if ((contentLengthStr = headers.valueForName("Content-Length")) != NULL && (contentLength = atoi(contentLengthStr)) > 0) {
+                
+                content = (unsigned char*) malloc(contentLength);
+                uint32_t contentReadPos = readpos - (contentStart - buffer);
+                memcpy(content, contentStart, contentReadPos);
+                
+                while (contentReadPos < contentLength) {
+                    
+                    int32_t contentRead = _sock->Receive(&content[contentReadPos], contentLength - contentReadPos);
+                    
+                    if (contentRead < 0) {
+                        log(LOG_ERROR, "Connection read error");
+                        break;
+                    }
+                    
+                    contentReadPos += contentRead;
+                    
+                }
+                
+                log(LOG_INFO, "(Content of length: %d bytes)\n", contentLength);
+                
+            }
+            
+            _processData(cmd, path, &headers, content, contentLength);
+            
+            if (content != NULL)
+                free(content);
+            
+        }
         
-        if (foundend && _processData(buffer, readpos + read))
-            readpos = 0;
-        else
-            readpos += read;
+        free(buffer);
+        buffer = NULL;
+        buffersize = 0;
+        readpos = 0;
         
     }
     
@@ -974,8 +1037,7 @@ void RAOPConnection::_connectionLoop() {
     
     _sock->Close();
     
-    if (_clientDisconnectedClbk != NULL)
-        _clientDisconnectedClbk(this, _clbkCtx);
+    NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientDisconnectedNotificationName, this, NULL);
 
     if (buffer != NULL)
         free(buffer);
@@ -990,68 +1052,32 @@ void RAOPConnection::_takeOver() {
     pthread_create(&_connectionLoopThread, NULL, _connectionLoopKickStarter, this);
     
     char ip[50];
-    _sock->RemoteEndPoint()->GetHost(ip, 50);
+    _sock->GetRemoteEndPoint()->getHost(ip, 50);
     
-    log(LOG_INFO, "RAOPConnection (%p) took over connection from %s:%d", this, ip, _sock->RemoteEndPoint()->Port());
-    
-}
-
-void RAOPConnection::SetCallbacksContext(void *ctx) {
-    
-    _clbkCtx = ctx;
+    log(LOG_INFO, "RAOPConnection (%p) took over connection from %s:%d", this, ip, _sock->GetRemoteEndPoint()->port());
     
 }
 
-void RAOPConnection::SetRecordingStartedClbk(simpleConnectionClbk clbk) {
-    
-    _recordingStartedClbk = clbk;
-    
-}
-
-void RAOPConnection::SetRecordingStoppedClbk(simpleConnectionClbk clbk) {
-    
-    _recordingStoppedClbk = clbk;
-    
-}
-
-void RAOPConnection::SetClientDisconnectedClbk(simpleConnectionClbk clbk) {
-    
-    _clientDisconnectedClbk = clbk;
-    
-}
-
-void RAOPConnection::SetClientSetVolumeClbk(clientSetVolumeClbk clbk) {
-    
-    _clientSetVolumeClbk = clbk;
-    
-}
-
-void RAOPConnection::SetClientUpdatedMetadataClbk(clientUpdatedMetadataClbk clbk) {
-    
-    _clientUpdatedMetadataClbk = clbk;
-    
-}
-
-const char* RAOPConnection::GetDacpId() {
+const char* RAOPConnection::getDacpId() {
     
     return _dacpId;
     
 }
 
-const char* RAOPConnection::GetActiveRemote() {
+const char* RAOPConnection::getActiveRemote() {
     
     return _activeRemote;
     
 }
 
-const char* RAOPConnection::GetSessionId() {
+const char* RAOPConnection::getSessionId() {
     
     return _sessionId;
     
 }
 
-unsigned int RAOPConnection::GetNetworkScopeId() {
+unsigned int RAOPConnection::getNetworkScopeId() {
     
-    return _sock->LocalEndPoint()->ScopeId();
+    return _sock->GetLocalEndPoint()->getScopeId();
     
 }

@@ -8,4 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-NSDictionary* allInterfaces();
+@interface AirFloatInterfaces
+
++ (NSDictionary*)interfaces;
++ (NSDictionary*)wifiInterface;
+
+@end

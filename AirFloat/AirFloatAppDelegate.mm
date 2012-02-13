@@ -6,6 +6,7 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import "UIView+AirFloatAdditions.h"
 #import "AirFloatAppDelegate.h"
 #import "AirFloatViewController.h"
 #import <AudioToolbox/AudioToolbox.h>
@@ -33,22 +34,8 @@
     
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application
-{
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
     
-    if (!_serverController.hasClientConnected)
-        [_serverController stop];
-    
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application
-{
-    
-    
-}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application
-{
     
     
 }
@@ -56,9 +43,13 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     
+    [_serverController start];
     
-    if (!_serverController.isRunning)
-        [_serverController start];
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    
+    [_serverController stop];
     
 }
 

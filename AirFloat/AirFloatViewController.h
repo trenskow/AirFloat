@@ -6,43 +6,28 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import "AirFloatImageView.h"
 #import <UIKit/UIKit.h>
-#import "AirFloatServerController.h"
-
 
 @interface AirFloatViewController : UIViewController {
     
-    UISwitch* _serverSwitch;
-    UIImageView* _statusLightImage;
-    UIImageView* _noWifiImage;
-    UIButton* _prevButton;
-    UIButton* _playButton;
-    UIButton* _nextButton;
-    
-    UIImage* _nowPlayingArtwork;
-    
-    AirFloatServerController* _serverController;
+    NSString* _previousPlayedAlbum;
     
 }
 
-@property (nonatomic, retain) IBOutlet UISwitch* serverSwitch;
-@property (nonatomic, retain) IBOutlet UIImageView* statusLightImage;
-@property (nonatomic, retain) IBOutlet UIImageView* noWifiImage;
-@property (nonatomic, retain) IBOutlet UILabel *noWifiLabel;
-@property (nonatomic, retain) IBOutlet UIButton* prevButton;
-@property (nonatomic, retain) IBOutlet UIButton* playButton;
-@property (nonatomic, retain) IBOutlet UIButton* nextButton;
-@property (nonatomic, retain) IBOutlet UIView *nowPlayingView;
-@property (nonatomic, retain) IBOutlet UIImageView *artworkImageView;
-@property (nonatomic, retain) IBOutlet UILabel *artistLabel;
-@property (nonatomic, retain) IBOutlet UILabel *albumLabel;
-@property (nonatomic, retain) IBOutlet UILabel *trackLabel;
-@property (nonatomic, retain) IBOutlet UIView *displayOnView;
-@property (nonatomic, retain) IBOutlet UIView *displayOffView;
+@property (retain, nonatomic) IBOutlet UIView *infoViews;
+@property (retain, nonatomic) IBOutlet UILabel *applicationStatusLabel;
+@property (retain, nonatomic) IBOutlet UILabel *trackTitleLabel;
+@property (retain, nonatomic) IBOutlet UILabel *artistNameLabel;
+@property (retain, nonatomic) IBOutlet AirFloatImageView *artworkImageView;
+@property (retain, nonatomic) IBOutlet AirFloatImageView *flippedArtworkImageView;
+@property (retain, nonatomic) IBOutlet UIButton *playButton;
+@property (retain, nonatomic) IBOutlet UIButton *nextButton;
+@property (retain, nonatomic) IBOutlet UIButton *prevButton;
 
-- (IBAction)serverSwitchValueChanged:(id)sender;
-- (IBAction)prevButtonPresset:(id)sender;
-- (IBAction)playButtonPresset:(id)sender;
-- (IBAction)nextButtonPresset:(id)sender;
+- (IBAction)infoViewTabGestureRecognized:(id)sender;
+- (IBAction)playButtonTouchUpInside:(id)sender;
+- (IBAction)nextButtonTouchUpInside:(id)sender;
+- (IBAction)prevButtonTouchUpInside:(id)sender;
 
 @end

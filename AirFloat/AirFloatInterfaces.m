@@ -15,7 +15,9 @@
 
 #import "AirFloatInterfaces.h"
 
-NSDictionary* allInterfaces() {
+@implementation AirFloatInterfaces
+
++ (NSDictionary*)interfaces {
     
     NSMutableDictionary* ret = [[NSMutableDictionary alloc] init];
     
@@ -67,3 +69,23 @@ NSDictionary* allInterfaces() {
     return [ret autorelease];
     
 }
+
++ (NSDictionary*)wifiInterface {
+    
+    NSDictionary* ifs = [self interfaces];
+    
+    for (NSString* key in [ifs allKeys]) {
+        
+        if ([key length] >= 3 && [[key substringToIndex:2] isEqualToString:@"en"] &&
+            [[key substringFromIndex:2] integerValue] < 3 &&
+            [[ifs objectForKey:key] objectForKey:@"address"] != nil) {
+            return [ifs objectForKey:key];
+        }
+        
+    }
+    
+    return nil;
+    
+}
+
+@end

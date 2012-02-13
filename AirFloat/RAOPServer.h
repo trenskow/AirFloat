@@ -15,6 +15,7 @@
 class RAOPServer;
 class RAOPConnection;
 
+typedef void(*simpleServerClbk)(RAOPServer* server, void* ctx);
 typedef void(*connectionCreatedClbk)(RAOPServer* server, RAOPConnection* newConnection, void* ctx);
 
 class RAOPServer {
@@ -31,7 +32,8 @@ public:
     
     bool isRunning();
     
-    void setConnectionCallback(connectionCreatedClbk clbk, void* ctx);
+    static const char* clientConnectedNotificationName;
+    static const char* localhostConnectedErrorNotificationName;
     
 private:
     void _setup();
@@ -44,9 +46,6 @@ private:
     
     Socket* _socket;
     SocketEndPoint* _localEndPoint;
-    
-    connectionCreatedClbk _connCreatedClbk;
-    void* _connCreatedCtx;
     
 };
 

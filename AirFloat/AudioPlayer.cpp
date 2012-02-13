@@ -12,11 +12,16 @@
 #include "CAXException.h"
 #include "Log.h"
 
+#include "AppleLosslessSoftwareAudioConverter.h"
+#include "AppleLosslessAudioConverter.h"
+
 #include "AudioPlayer.h"
 
+#ifndef MIN
 #define MIN(x,y) (x < y ? x : y)
-#define SILENT_PACKET_SIZE (_srcFramesPerPacket * _audio.outDesc.mBytesPerFrame * 10)
-#define MAX_PACKET_SIZE ((double)SILENT_PACKET_SIZE * 1.2)
+#endif
+#define SILENT_PACKET_SIZE (_srcFramesPerPacket * _audio.outDesc.mBytesPerFrame * 2)
+#define MAX_PACKET_SIZE ((double)SILENT_PACKET_SIZE * 1.1)
 #define FROM_CLIENT_TIME(x) (x + _clientServerDifference)
 #define TO_CLIENT_TIME(x) (x - _clientServerDifference)
 #define FROM_DEVICE_TIME(x) (CAHostTimeBase::ConvertToNanos(x) / 1000000000.0)
@@ -60,12 +65,12 @@ AudioPlayer::AudioPlayer(int* fmts, int fmtsSize) {
     bzero(_clientServerDifferenceHistory, sizeof(double) * CLIENT_SERVER_DIFFERENCE_BACKLOG);
     _clientServerDifferenceHistoryCount = 0;
         
-    _audio.outDesc = _audio.losslessConverter->GetDestDescription();
+    _audio.outDesc = _audio.losslessConverter->getDestDescription();
 
     _audioQueue = new AudioQueue(fmts[0], _audio.outDesc.mBytesPerFrame, _audio.outDesc.mSampleRate);
     
     XThrowIfError(
-                  AudioQueueNewOutput(&_audio.outDesc, AudioPlayer::_audioQueueCallbackHelper, this, NULL, NULL, 0, &_audio.queue);
+                  AudioQueueNewOutput(&_audio.outDesc, AudioPlayer::_audioOutputCallbackHelper, this, NULL, NULL, 0, &_audio.queue);
                   , "AudioQueueNewOutput");
     
     XThrowIfError(
@@ -74,12 +79,14 @@ AudioPlayer::AudioPlayer(int* fmts, int fmtsSize) {
     
     for (int i = 0 ; i < BUFFER_COUNT ; i++) {
         AudioQueueAllocateBuffer(_audio.queue, MAX_PACKET_SIZE, &_audio.buffers[i]);
-        _audio.buffers[i]->mAudioDataByteSize = MAX_PACKET_SIZE;
+        _audio.buffers[i]->mAudioDataByteSize = SILENT_PACKET_SIZE;
         bzero(_audio.buffers[i]->mAudioData, MAX_PACKET_SIZE);
         AudioQueueEnqueueBuffer(_audio.queue, _audio.buffers[i], 0, NULL);
     }
     
-    pthread_mutex_init(&_timeMutex, NULL);
+    _preFlushVolume = 1.0;
+    _flushedSeq = -1;
+    _speed = kAudioPlayerSpeedNormal;
     
 }
 
@@ -98,8 +105,6 @@ AudioPlayer::~AudioPlayer() {
     delete _audio.speedUpConverter;
     delete _audio.slowDownConverter;
     
-    pthread_mutex_destroy(&_timeMutex);
-    
 }
 
 void AudioPlayer::start() {
@@ -113,28 +118,37 @@ void AudioPlayer::start() {
     
 }
 
-void AudioPlayer::flush() {
+void AudioPlayer::flush(int lastSeq) {
     
-    pthread_mutex_lock(&_timeMutex);
+    _timeMutex.lock();
+    
+    _packetMutex.lock();
     
     _audioQueue->_flush();
-    AudioQueueFlush(_audio.queue);
+    _flushedSeq = lastSeq;
+    
+    _packetMutex.unlock();
+    
+    AudioQueueSetParameter(_audio.queue, kAudioQueueParam_Volume, 0.0);
+    
     _outputIsHomed = false;
     _nextPacketTime = 0;
+    _speed = kAudioPlayerSpeedNormal;
     
-    pthread_mutex_unlock(&_timeMutex);
+    _timeMutex.unlock();
         
 }
 
 void AudioPlayer::setVolume(double volume) {
     
-    AudioQueueSetParameter(_audio.queue, kAudioQueueParam_Volume, volume);
+    _preFlushVolume = volume;
+    AudioQueueSetParameter(_audio.queue, kAudioQueueParam_Volume, _preFlushVolume);
     
 }
 
 void AudioPlayer::setClientTime(double time) {
     
-    pthread_mutex_lock(&_timeMutex);
+    _timeMutex.lock();
     
     AudioTimeStamp timeStamp;
     bzero(&timeStamp, sizeof(AudioTimeStamp));
@@ -152,7 +166,7 @@ void AudioPlayer::setClientTime(double time) {
     
     log(LOG_INFO, "Time difference: %1.5f", _clientServerDifference);
     
-    pthread_mutex_unlock(&_timeMutex);
+    _timeMutex.unlock();
     
 }
 
@@ -162,32 +176,32 @@ AudioQueue* AudioPlayer::getAudioQueue() {
     
 }
 
-void AudioPlayer::_audioQueueCallback(AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
+void AudioPlayer::_audioOutputCallback(AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
     
     UInt32 size = sizeof(UInt32);
     UInt32 isRunning = 0;
     AudioQueueGetProperty(_audio.queue, kAudioQueueProperty_IsRunning, &isRunning, &size);
     
-    if (!isRunning) {
-        log(LOG_INFO, "Queue is not running");
+    if (!isRunning)
         return;
-    }
     
-    pthread_mutex_lock(&_timeMutex);
+    _timeMutex.lock();
     
     inBuffer->mAudioDataByteSize = SILENT_PACKET_SIZE;
     bzero(inBuffer->mAudioData, SILENT_PACKET_SIZE);
     
     double time = 0;
     uint32_t sampleTime = 0;
+    bool hasPacket;
     
-    if (_nextPacketTime > 0 && _audioQueue->hasAvailablePacket()) {
+    if (_nextPacketTime > 0 && (hasPacket = _audioQueue->hasAvailablePacket())) {
         
         if (!_outputIsHomed) {
             
-            time = _audioQueue->getPacketTime();
-            
-            double timeToStart = (FROM_CLIENT_TIME(time) - _nextPacketTime) + .2;
+            double timeToStart;
+            while ((timeToStart = (FROM_CLIENT_TIME((time = _audioQueue->getPacketTime())) - _nextPacketTime)) < 0)
+                _audioQueue->discardPacket();
+
             inBuffer->mAudioDataByteSize = MIN((timeToStart * _audio.outDesc.mSampleRate * _audio.outDesc.mBytesPerPacket), SILENT_PACKET_SIZE);
             
             if (timeToStart - ((_srcFramesPerPacket * 2) / _audio.outDesc.mSampleRate) <= 0) {
@@ -199,41 +213,36 @@ void AudioPlayer::_audioQueueCallback(AudioQueueRef inAQ, AudioQueueBufferRef in
 
         } else {
             
-            if (_audioQueue->hasAvailablePacket()) {
+            AudioQueueSetParameter(_audio.queue, kAudioQueueParam_Volume, _preFlushVolume);
+            
+            inBuffer->mAudioDataByteSize = inBuffer->mAudioDataBytesCapacity;
+            _audioQueue->getPacket(inBuffer->mAudioData, (uint32_t*)&inBuffer->mAudioDataByteSize, &time, &sampleTime);
+            
+            if (_speed == kAudioPlayerSpeedSpeedUp || _speed == kAudioPlayerSpeedSlowDown) {
                 
-                inBuffer->mAudioDataByteSize = inBuffer->mAudioDataBytesCapacity;
-                _audioQueue->getPacket(inBuffer->mAudioData, (int*)&inBuffer->mAudioDataByteSize, &time, &sampleTime);
-                
-                if (_speed == kAudioPlayerSpeedSpeedUp || _speed == kAudioPlayerSpeedSlowDown) {
-                    
-                    AudioConverter* audioConverter = (_speed == kAudioPlayerSpeedSpeedUp ? _audio.speedUpConverter : _audio.slowDownConverter);
-                    
-                    int resampledSize = audioConverter->CalculateOutput(inBuffer->mAudioDataByteSize);
-                    
-                    log(LOG_INFO, "resample");
-                    
-                    /*
-                     int bufferSize = MAX_PACKET_SIZE;
-                     char buffer[bufferSize];
-                     bzero(buffer, bufferSize);
-                     
-                     if (_speed == kAudioPlayerSpeedSpeedUp)
-                     inBuffer->mAudioDataByteSize -= 70;
-                     else
-                     inBuffer->mAudioDataByteSize += 70;
-                     
-                     assert(inBuffer->mAudioDataBytesCapacity >= bufferSize);
-                     
-                     inBuffer->mAudioDataByteSize = bufferSize;
-                     memcpy(inBuffer->mAudioData, buffer, bufferSize);
-                     */
-                    
-                }
+                /*
+                 AudioConverter* audioConverter = (_speed == kAudioPlayerSpeedSpeedUp ? _audio.speedUpConverter : _audio.slowDownConverter);
+                 
+                 int bufferSize = MAX_PACKET_SIZE;
+                 char buffer[bufferSize];
+                 bzero(buffer, bufferSize);
+                 
+                 audioConverter->Convert(inBuffer->mAudioData, inBuffer->mAudioDataByteSize, buffer, &bufferSize);
+                 
+                 assert(inBuffer->mAudioDataBytesCapacity >= bufferSize);
+                 
+                 inBuffer->mAudioDataByteSize = bufferSize;
+                 memcpy(inBuffer->mAudioData, buffer, bufferSize);
+                 */
                 
             }
-            
+                
         }
         
+    } else if (_nextPacketTime > 0 && !hasPacket && _outputIsHomed) {
+        _outputIsHomed = false;
+        _speed = kAudioPlayerSpeedNormal;
+        log(LOG_INFO, "Output lost synchronization");
     }
     
     AudioTimeStamp timeStamp;
@@ -245,6 +254,10 @@ void AudioPlayer::_audioQueueCallback(AudioQueueRef inAQ, AudioQueueBufferRef in
         
         if (time > 0 && _outputIsHomed) {
             
+#if defined (DEBUG)
+            AudioPlayerSpeed oldSpeed = _speed;
+#endif
+            
             _speed = kAudioPlayerSpeedNormal;
 
             double audioDelay = (CAHostTimeBase::ConvertToNanos(timeStamp.mHostTime) / 1000000000.0) - (time + _clientServerDifference);
@@ -253,34 +266,59 @@ void AudioPlayer::_audioQueueCallback(AudioQueueRef inAQ, AudioQueueBufferRef in
             else if (audioDelay < -ACCEPTABLE_DELAY)
                 _speed = kAudioPlayerSpeedSlowDown;
             
-            log(LOG_INFO, "Audio difference: %1.5f (Speed is %s)", audioDelay, strspeed(_speed));
+#if defined (DEBUG)
+            if (_speed != oldSpeed)
+                log(LOG_INFO, "Audio difference: %1.5f (Speed is %s)", audioDelay, strspeed(_speed));
+#endif
 
         }
         
     } else
         log(LOG_ERROR, "Cannot enqueue audio buffer");
     
-    pthread_mutex_unlock(&_timeMutex);
+    _timeMutex.unlock();
     
 }
 
-void AudioPlayer::_audioQueueCallbackHelper(void* aqData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
+void AudioPlayer::_audioOutputCallbackHelper(void* aqData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
     
     assert(aqData != NULL);
     
-    ((AudioPlayer*)aqData)->_audioQueueCallback(inAQ, inBuffer);
+    ((AudioPlayer*)aqData)->_audioOutputCallback(inAQ, inBuffer);
     
 }
 
-int AudioPlayer::addAudio(void* buffer, int size, int seqNo, uint32_t sampleTime) {
+int AudioPlayer::addAudio(void* buffer, uint32_t size, int seqNo, uint32_t sampleTime) {
     
-    int outsize = _srcFramesPerPacket * _audio.outDesc.mBytesPerFrame;
-    char rawBuffer[outsize];
+    _packetMutex.lock();
+    if (seqNo <= _flushedSeq) {
+        log(LOG_INFO, "Audio packet (seq %d) ignored", seqNo);
+        _packetMutex.unlock();
+        return 0;
+    } else
+        _flushedSeq = -1;
+    _packetMutex.unlock();
     
-    _audio.losslessConverter->Convert(buffer, size, rawBuffer, &outsize);
+    int ret = 0;
+    
+    uint32_t outsize = _srcFramesPerPacket * _audio.outDesc.mBytesPerFrame;
+    void* rawBuffer = malloc(outsize);
+    
+    _audio.losslessConverter->convert(buffer, size, rawBuffer, &outsize);
     if (outsize == 0)
         log(LOG_ERROR, "DECODING ERROR!");
     
-    return _audioQueue->_addAudioPacket(rawBuffer, outsize, seqNo, sampleTime);
+    if (size > 0)
+        ret = _audioQueue->_addAudioPacket(rawBuffer, outsize, seqNo, sampleTime);
+    
+    free(rawBuffer);
+    
+    return ret;
+    
+}
+
+double AudioPlayer::getSampleRate() {
+    
+    return _audio.outDesc.mSampleRate;
     
 }

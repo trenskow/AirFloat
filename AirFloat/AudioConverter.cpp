@@ -9,7 +9,7 @@
 #include "Log.h"
 #include "AudioConverter.h"
 
-AudioConverter::AudioConverter(int srcSampleRate, int destSampleRate) {
+AudioConverter::AudioConverter(double srcSampleRate, double destSampleRate) {
     
     assert(srcSampleRate > 0 && destSampleRate > 0);
     
@@ -29,25 +29,25 @@ AudioConverter::~AudioConverter() {
     
 }
 
-AudioStreamBasicDescription AudioConverter::GetDestDescription() {
+AudioStreamBasicDescription AudioConverter::getDestDescription() {
     
     return _destDesc;
     
 }
 
-void AudioConverter::_setupAudioDescription(AudioStreamBasicDescription* desc, int sampleRate) {
+void AudioConverter::_setupAudioDescription(AudioStreamBasicDescription* desc, double sampleRate) {
     
     assert(desc != NULL && sampleRate > 0);
     
     bzero(desc, sizeof(AudioStreamBasicDescription));
     desc->mFormatID = kAudioFormatLinearPCM;
-    desc->mFormatFlags = kAudioFormatFlagsCanonical;
+    desc->mFormatFlags = kAudioFormatFlagIsFloat;
     desc->mSampleRate = sampleRate;
     desc->mChannelsPerFrame = 2;
     desc->mFramesPerPacket = 1;
-    desc->mBitsPerChannel = sizeof(AudioSampleType) * 8;
+    desc->mBitsPerChannel = sizeof(float) * 8;
     desc->mBytesPerFrame = desc->mChannelsPerFrame * (desc->mBitsPerChannel / 8);
-    desc->mBytesPerPacket = desc->mBytesPerFrame * desc->mFramesPerPacket;
+    desc->mBytesPerPacket = desc->mBytesPerFrame;
     
 }
 
@@ -68,21 +68,20 @@ OSStatus AudioConverter::_audioConverterComplexInputDataProc (AudioConverterRef 
     
 }
 
-void AudioConverter::Convert(void* srcBuffer, int srcSize, void* destBuffer, int* destSize) {
+void AudioConverter::convert(void* srcBuffer, uint32_t srcSize, void* destBuffer, uint32_t* destSize) {
     
     assert(srcBuffer != NULL && srcSize > 0 && destBuffer != NULL && destSize != NULL && *destSize > 0);
     
-    double sampleDiff = 1.0;
+    _decoderMutex.lock();
     
     if (!_converter) {
         if (noErr != AudioConverterNew(&_srcDesc, &_destDesc, &_converter))
             throw "Cannot create converter";
         else if (_srcDesc.mSampleRate != _destDesc.mSampleRate) {
-            int audioConverterQaulity = kAudioConverterSampleRateConverterComplexity_Mastering;
-            AudioConverterSetProperty(_converter, kAudioConverterSampleRateConverterComplexity, sizeof(int), &audioConverterQaulity);
-            Float64 outputSampleRate = _destDesc.mSampleRate;
-            AudioConverterSetProperty(_converter, kAudioConverterEncodeAdjustableSampleRate, sizeof(Float64), &outputSampleRate);
-            sampleDiff = _destDesc.mSampleRate / _srcDesc.mSampleRate;
+            int inValue = kAudioConverterSampleRateConverterComplexity_Mastering;
+            AudioConverterSetProperty(_converter, kAudioConverterSampleRateConverterComplexity, sizeof(int), &inValue);
+            inValue = kAudioConverterQuality_Max;
+            AudioConverterSetProperty(_converter, kAudioConverterSampleRateConverterQuality, sizeof(int), &inValue);
         }
     }
     
@@ -118,9 +117,11 @@ void AudioConverter::Convert(void* srcBuffer, int srcSize, void* destBuffer, int
             log(LOG_ERROR, "Converter did not change packet");
     }
     
+    _decoderMutex.unlock();
+    
 }
 
-int AudioConverter::CalculateOutput(int inputSize) {
+int AudioConverter::calculateOutput(int inputSize) {
     
     UInt32 size = sizeof(UInt32);
     UInt32 inSize = inputSize;

@@ -16,7 +16,7 @@ class AppleLosslessAudioConverter : public AudioConverter {
 public:
     AppleLosslessAudioConverter(int* fmts, int fmtsSize);
     
-    virtual void Convert(void* srcBuffer, int srcSize, void* destBuffer, int* destSize);
+    virtual void convert(void* srcBuffer, uint32_t srcSize, void* destBuffer, uint32_t* destSize);
 
 protected:
     static OSStatus _audioConverterComplexInputDataProc (AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription  **outDataPacketDescription, void *inUserData);

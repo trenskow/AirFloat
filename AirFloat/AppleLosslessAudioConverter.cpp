@@ -113,9 +113,11 @@ AppleLosslessAudioConverter::AppleLosslessAudioConverter(int* fmts, int fmtsSize
     
 }
 
-void AppleLosslessAudioConverter::Convert(void* srcBuffer, int srcSize, void* destBuffer, int* destSize) {
+void AppleLosslessAudioConverter::convert(void* srcBuffer, uint32_t srcSize, void* destBuffer, uint32_t* destSize) {
     
     assert(srcBuffer != NULL && srcSize > 0 && destBuffer != NULL && destSize != NULL && *destSize > 0);
+    
+    _decoderMutex.lock();
     
     UInt32 outSize = _destDesc.mBytesPerFrame * _srcDesc.mFramesPerPacket;
 
@@ -137,6 +139,8 @@ void AppleLosslessAudioConverter::Convert(void* srcBuffer, int srcSize, void* de
     
     UInt32 ioOutputDataPackets = outSize / _destDesc.mBytesPerPacket;
     OSStatus err = AudioConverterFillComplexBuffer(_converter, AudioConverter::_audioConverterComplexInputDataProc, this, &ioOutputDataPackets, &outBufferList, NULL);
-    *destSize = (err == noErr ? ioOutputDataPackets * _destDesc.mBytesPerPacket : 0);
+    *destSize = (err == noErr ? _srcDesc.mFramesPerPacket * _destDesc.mBytesPerFrame : 0);
+    
+    _decoderMutex.unlock();
     
 }

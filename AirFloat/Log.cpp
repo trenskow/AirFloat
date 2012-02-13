@@ -18,6 +18,7 @@ static pthread_t __logThread;
 
 void log(int level, const char* message, ...) {
     
+#if defined (LOG_SERVER)
     assert((level == LOG_INFO || level == LOG_ERROR) && message != NULL);
     
     if (__logThreadLocked && !pthread_equal(__logThread, pthread_self()))
@@ -30,6 +31,21 @@ void log(int level, const char* message, ...) {
     va_start(args, message);
     vprintf(msgnl, args);
     va_end(args);
+#endif
+    
+}
+
+void log_data(int level, const char* data, uint32_t size) {
+    
+#if defined (LOG_SERVER)
+    assert((level == LOG_INFO || level == LOG_ERROR) && data != NULL && size > 0);
+    
+    char msgnl[size + 3];
+    memcpy(msgnl, data, size);
+    memcpy(&msgnl[size], "\n", 2);
+    
+    printf("%s", msgnl);
+#endif
     
 }
 
