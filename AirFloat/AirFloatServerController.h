@@ -28,6 +28,8 @@
     
     AirFloatNotificationsHub* _notificationHub;
     
+    NSDate* _lastLocalhostErrorNoticationDate;
+    
     uint32_t _connectionCount;
     BOOL _recording;
     
