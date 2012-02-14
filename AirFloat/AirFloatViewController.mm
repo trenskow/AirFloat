@@ -46,15 +46,6 @@
 
 #pragma mark Allocation / Deallocation / Load / Unload
 
-- (id)init {
-    
-    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
-        return (self = [self initWithNibName:@"AirFloatViewController~iPad" bundle:nil]);
-    
-    return (self = [self initWithNibName:@"AirFloatViewController" bundle:nil]);
-    
-}
-
 - (void)viewDidLoad {
     
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
