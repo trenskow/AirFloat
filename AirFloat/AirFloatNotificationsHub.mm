@@ -51,9 +51,14 @@ static uint32_t _airFloatNotificationBridgeCount = sizeof(_airFloatNotificationB
 
 static void notificationCallback(void* sender, const char* name, void* notificationInfo, void* callbackContext) {
     
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    dispatch_block_t routeBlock = ^{
         [(AirFloatNotificationsHub*)callbackContext _notificationReceived:sender name:name notificationInfo:notificationInfo];
-    });
+    };
+    
+    if (notificationInfo == NULL)
+        dispatch_async(dispatch_get_main_queue(), routeBlock);
+    else
+        dispatch_sync(dispatch_get_main_queue(), routeBlock);
     
 }
 
