@@ -85,9 +85,7 @@ void RAOPServer::_serverLoop() {
         newSocket->GetLocalEndPoint()->getHost(localip, 50);
         newSocket->GetRemoteEndPoint()->getHost(remoteip, 50);
         
-#if !defined (DEBUG)
         if (strcmp(localip, remoteip) != 0) {
-#endif
             log(LOG_INFO, "Accepted connection from %s (%s)", remoteip, (IN6_IS_ADDR_V4MAPPED(&((struct sockaddr_in6*)newSocket->GetRemoteEndPoint()->getSocketAddress())->sin6_addr) ? "IPv4in6" : "IPv6"));
             
             RAOPConnection* connection = new RAOPConnection(newSocket);
@@ -96,13 +94,11 @@ void RAOPServer::_serverLoop() {
             
             NotificationCenter::defaultCenter()->postNotification(RAOPServer::clientConnectedNotificationName, this, connection);
             
-#if !defined (DEBUG)
         } else {
             newSocket->Close();
             log(LOG_ERROR, "Refused connection from localhost.");
-            NotificationCenter::defaultCenter()->postNotification(RAOPServer::localhostConnectedErrorNoticationName, this, NULL);
+            NotificationCenter::defaultCenter()->postNotification(RAOPServer::localhostConnectedErrorNotificationName, this, NULL);
         }
-#endif
         
     }
     
