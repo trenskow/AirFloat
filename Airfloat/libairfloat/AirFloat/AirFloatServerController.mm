@@ -13,6 +13,7 @@
 
 @interface  AirFloatServerController (Private)
 
+- (void)_localhostConnectedError;
 - (void)_updateServerStatus;
 - (void)_recordingStarted;
 - (void)_recordingEnded;
@@ -43,6 +44,7 @@
 
 - (void)dealloc {
     
+    [_lastLocalhostErrorNoticationDate release];    
     [_bonjour release];
     [_dacpBrowser release];
     [_notificationHub release];
@@ -70,6 +72,7 @@
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_recordingEnded) name:AirFloatRecordingEndedNotification object:nil];
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_clientConnected) name:AirFloatClientConnectedNotification object:nil];
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_clientDisconnected) name:AirFloatClientDisconnectedNotification object:nil];
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_localhostConnectedError) name:AirFloatLocalhostConnectedErrorNotification object:nil];
             
             [self _updateServerStatus];
             
@@ -145,6 +148,27 @@
 }
 
 #pragma mark Private Methods
+
+- (void)_localhostConnectedError {
+    
+    if (!_lastLocalhostErrorNoticationDate || [[NSDate date] timeIntervalSinceDate:_lastLocalhostErrorNoticationDate] > 2.0) {
+        
+        UILocalNotification* localNotification = [[UILocalNotification alloc] init];
+        
+        localNotification.fireDate = [NSDate date];
+        localNotification.alertBody = [NSString stringWithFormat:@"Cannot stream audio from the %@ itself.", [UIDevice currentDevice].model];
+        localNotification.soundName = UILocalNotificationDefaultSoundName;
+        
+        [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
+        
+        [localNotification release];
+        
+        [_lastLocalhostErrorNoticationDate release];
+        _lastLocalhostErrorNoticationDate = [[NSDate date] retain];
+        
+    }
+    
+}
 
 - (void)_updateServerStatus {
     
