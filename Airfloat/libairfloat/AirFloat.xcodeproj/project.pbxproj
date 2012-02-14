@@ -40,6 +40,7 @@
 		A10392D614E9B58400DB356F /* BarButtonHighlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A10392D214E9B58400DB356F /* BarButtonHighlighted@2x.png */; };
 		A10392DA14E9B6C400DB356F /* AirFloatBarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A10392D914E9B6C400DB356F /* AirFloatBarButton.m */; };
 		A10392DD14E9B8F100DB356F /* libTestFlight.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A10392DB14E9B8F100DB356F /* libTestFlight.a */; };
+		A10392E214EA4F4500DB356F /* AirFloatGradientView.m in Sources */ = {isa = PBXBuildFile; fileRef = A10392E114EA4F4500DB356F /* AirFloatGradientView.m */; };
 		A10EB41014E81CFC00615CDB /* AirFloatDACPBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = A10EB40F14E81CFC00615CDB /* AirFloatDACPBrowser.m */; };
 		A10EB41E14E8374F00615CDB /* Next.png in Resources */ = {isa = PBXBuildFile; fileRef = A10EB41614E8374F00615CDB /* Next.png */; };
 		A10EB41F14E8374F00615CDB /* Next@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A10EB41714E8374F00615CDB /* Next@2x.png */; };
@@ -55,8 +56,6 @@
 		A10ECCAC14E4F95000C1BFAA /* ArtworkFalloff@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A10ECCAA14E4F95000C1BFAA /* ArtworkFalloff@2x.png */; };
 		A1325BB414C84A19005AFE0E /* CAStreamBasicDescription.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1325BB014C84A19005AFE0E /* CAStreamBasicDescription.cpp */; };
 		A1325BB514C84A19005AFE0E /* CAXException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1325BB214C84A19005AFE0E /* CAXException.cpp */; };
-		A1389E0514E416F7004FE040 /* Background.png in Resources */ = {isa = PBXBuildFile; fileRef = A1389E0314E416F7004FE040 /* Background.png */; };
-		A1389E0614E416F7004FE040 /* Background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1389E0414E416F7004FE040 /* Background@2x.png */; };
 		A1389E0914E417E6004FE040 /* TopBar.png in Resources */ = {isa = PBXBuildFile; fileRef = A1389E0714E417E6004FE040 /* TopBar.png */; };
 		A1389E0A14E417E6004FE040 /* TopBar@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1389E0814E417E6004FE040 /* TopBar@2x.png */; };
 		A1389E0D14E41A87004FE040 /* NoArtwork.png in Resources */ = {isa = PBXBuildFile; fileRef = A1389E0B14E41A87004FE040 /* NoArtwork.png */; };
@@ -67,7 +66,7 @@
 		A1389E1F14E43684004FE040 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1389E1E14E43683004FE040 /* SystemConfiguration.framework */; };
 		A1389E2214E43771004FE040 /* AirFloatNotificationsHub.mm in Sources */ = {isa = PBXBuildFile; fileRef = A1389E2114E43770004FE040 /* AirFloatNotificationsHub.mm */; };
 		A149208A14E68B4600849DC3 /* UIView+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A149208914E68B4600849DC3 /* UIView+AirFloatAdditions.m */; };
-		A149208D14E7096600849DC3 /* AirFloatGradiantMaskedView.m in Sources */ = {isa = PBXBuildFile; fileRef = A149208C14E7096500849DC3 /* AirFloatGradiantMaskedView.m */; };
+		A149208D14E7096600849DC3 /* AirFloatGradientMaskedView.m in Sources */ = {isa = PBXBuildFile; fileRef = A149208C14E7096500849DC3 /* AirFloatGradientMaskedView.m */; };
 		A149209314E7170800849DC3 /* AirFloatDACPClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = A149209214E7170800849DC3 /* AirFloatDACPClient.mm */; };
 		A149209814E7C5C700849DC3 /* DMAPParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A149209614E7C5C500849DC3 /* DMAPParser.cpp */; };
 		A18D7ADB14C9A4C900603A0C /* CAHostTimeBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A18D7AD914C9A4C900603A0C /* CAHostTimeBase.cpp */; };
@@ -87,8 +86,6 @@
 		A1E21F9214CAF0C400FEE45B /* AudioConverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1E21F9114CAF0C400FEE45B /* AudioConverter.cpp */; };
 		A1E21F9914CAF24300FEE45B /* AppleLosslessAudioConverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1E21F9814CAF24300FEE45B /* AppleLosslessAudioConverter.cpp */; };
 		A1E21FA214CB15EA00FEE45B /* AudioPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1E21FA114CB15EA00FEE45B /* AudioPlayer.cpp */; };
-		A1EC73EC14D2A08B00C5DE5D /* MainWindow~iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = A1EC73EA14D2A08B00C5DE5D /* MainWindow~iPad.xib */; };
-		A1EC73EE14D2A1D300C5DE5D /* AirFloatViewController~iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = A1EC73ED14D2A1D300C5DE5D /* AirFloatViewController~iPad.xib */; };
 		A1F31F9B14DFE524003EED03 /* UIApplication+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A1F31F9A14DFE524003EED03 /* UIApplication+AirFloatAdditions.m */; };
 /* End PBXBuildFile section */
 
@@ -144,6 +141,8 @@
 		A10392D914E9B6C400DB356F /* AirFloatBarButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFloatBarButton.m; sourceTree = "<group>"; };
 		A10392DB14E9B8F100DB356F /* libTestFlight.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTestFlight.a; sourceTree = "<group>"; };
 		A10392DC14E9B8F100DB356F /* TestFlight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestFlight.h; sourceTree = "<group>"; };
+		A10392E014EA4F4500DB356F /* AirFloatGradientView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFloatGradientView.h; sourceTree = "<group>"; };
+		A10392E114EA4F4500DB356F /* AirFloatGradientView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFloatGradientView.m; sourceTree = "<group>"; };
 		A10EB40E14E81CFC00615CDB /* AirFloatDACPBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFloatDACPBrowser.h; sourceTree = "<group>"; };
 		A10EB40F14E81CFC00615CDB /* AirFloatDACPBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFloatDACPBrowser.m; sourceTree = "<group>"; };
 		A10EB41614E8374F00615CDB /* Next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Next.png; sourceTree = "<group>"; };
@@ -165,8 +164,6 @@
 		A1325BB114C84A19005AFE0E /* CAStreamBasicDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAStreamBasicDescription.h; sourceTree = "<group>"; };
 		A1325BB214C84A19005AFE0E /* CAXException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CAXException.cpp; sourceTree = "<group>"; };
 		A1325BB314C84A19005AFE0E /* CAXException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAXException.h; sourceTree = "<group>"; };
-		A1389E0314E416F7004FE040 /* Background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Background.png; sourceTree = "<group>"; };
-		A1389E0414E416F7004FE040 /* Background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Background@2x.png"; sourceTree = "<group>"; };
 		A1389E0714E417E6004FE040 /* TopBar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = TopBar.png; sourceTree = "<group>"; };
 		A1389E0814E417E6004FE040 /* TopBar@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TopBar@2x.png"; sourceTree = "<group>"; };
 		A1389E0B14E41A87004FE040 /* NoArtwork.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NoArtwork.png; sourceTree = "<group>"; };
@@ -181,8 +178,8 @@
 		A1389E2114E43770004FE040 /* AirFloatNotificationsHub.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AirFloatNotificationsHub.mm; sourceTree = "<group>"; };
 		A149208814E68B4600849DC3 /* UIView+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+AirFloatAdditions.h"; sourceTree = "<group>"; };
 		A149208914E68B4600849DC3 /* UIView+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+AirFloatAdditions.m"; sourceTree = "<group>"; };
-		A149208B14E7096500849DC3 /* AirFloatGradiantMaskedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFloatGradiantMaskedView.h; sourceTree = "<group>"; };
-		A149208C14E7096500849DC3 /* AirFloatGradiantMaskedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFloatGradiantMaskedView.m; sourceTree = "<group>"; };
+		A149208B14E7096500849DC3 /* AirFloatGradientMaskedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFloatGradientMaskedView.h; sourceTree = "<group>"; };
+		A149208C14E7096500849DC3 /* AirFloatGradientMaskedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFloatGradientMaskedView.m; sourceTree = "<group>"; };
 		A149209114E7170800849DC3 /* AirFloatDACPClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFloatDACPClient.h; sourceTree = "<group>"; };
 		A149209214E7170800849DC3 /* AirFloatDACPClient.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AirFloatDACPClient.mm; sourceTree = "<group>"; };
 		A149209614E7C5C500849DC3 /* DMAPParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DMAPParser.cpp; sourceTree = "<group>"; };
@@ -222,8 +219,6 @@
 		A1E21F9A14CAF24E00FEE45B /* AppleLosslessAudioConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleLosslessAudioConverter.h; sourceTree = "<group>"; };
 		A1E21FA014CB15E100FEE45B /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
 		A1E21FA114CB15EA00FEE45B /* AudioPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioPlayer.cpp; sourceTree = "<group>"; };
-		A1EC73EB14D2A08B00C5DE5D /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = "iPad/en.lproj/MainWindow~iPad.xib"; sourceTree = "<group>"; };
-		A1EC73ED14D2A1D300C5DE5D /* AirFloatViewController~iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "AirFloatViewController~iPad.xib"; sourceTree = "<group>"; };
 		A1F31F9914DFE524003EED03 /* UIApplication+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplication+AirFloatAdditions.h"; sourceTree = "<group>"; };
 		A1F31F9A14DFE524003EED03 /* UIApplication+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIApplication+AirFloatAdditions.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -330,14 +325,10 @@
 				A10ECCAA14E4F95000C1BFAA /* ArtworkFalloff@2x.png */,
 				A1389E0714E417E6004FE040 /* TopBar.png */,
 				A1389E0814E417E6004FE040 /* TopBar@2x.png */,
-				A1389E0314E416F7004FE040 /* Background.png */,
-				A1389E0414E416F7004FE040 /* Background@2x.png */,
 				4898FA7D13CDB6C2006EC97E /* Icon.png */,
 				4898FA7B13CDB6B9006EC97E /* Icon@2x.png */,
 				4898FA0A13CDAAD1006EC97E /* AirFloatViewController.xib */,
-				A1EC73ED14D2A1D300C5DE5D /* AirFloatViewController~iPad.xib */,
 				4898FA0413CDAAD1006EC97E /* MainWindow.xib */,
-				A1EC73EA14D2A08B00C5DE5D /* MainWindow~iPad.xib */,
 				4898F9FA13CDAAD1006EC97E /* AirFloat-Info.plist */,
 				4898F9FB13CDAAD1006EC97E /* InfoPlist.strings */,
 				4898F9FE13CDAAD1006EC97E /* AirFloat-Prefix.pch */,
@@ -396,7 +387,7 @@
 				4898FA0213CDAAD1006EC97E /* AirFloatAppDelegate.mm */,
 				A1389E2314E4394C004FE040 /* Logic */,
 				A1B3E3DE14CE09A300379E8C /* Custom */,
-				A1389E1314E422E6004FE040 /* Views */,
+				A1389E1314E422E6004FE040 /* View Controllers */,
 				A1389E1214E422D4004FE040 /* Network Services */,
 				4898F9F913CDAAD1006EC97E /* Supporting Files */,
 			);
@@ -417,13 +408,13 @@
 			name = "Network Services";
 			sourceTree = "<group>";
 		};
-		A1389E1314E422E6004FE040 /* Views */ = {
+		A1389E1314E422E6004FE040 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
 				4898FA0713CDAAD1006EC97E /* AirFloatViewController.h */,
 				4898FA0813CDAAD1006EC97E /* AirFloatViewController.mm */,
 			);
-			name = Views;
+			name = "View Controllers";
 			sourceTree = "<group>";
 		};
 		A1389E2314E4394C004FE040 /* Logic */ = {
@@ -476,10 +467,12 @@
 				A10ECCA614E4F7FE00C1BFAA /* Categories */,
 				A10ECCA014E4F70000C1BFAA /* AirFloatImageView.h */,
 				A10ECCA114E4F70000C1BFAA /* AirFloatImageView.m */,
-				A149208B14E7096500849DC3 /* AirFloatGradiantMaskedView.h */,
-				A149208C14E7096500849DC3 /* AirFloatGradiantMaskedView.m */,
+				A149208B14E7096500849DC3 /* AirFloatGradientMaskedView.h */,
+				A149208C14E7096500849DC3 /* AirFloatGradientMaskedView.m */,
 				A10392D814E9B6C400DB356F /* AirFloatBarButton.h */,
 				A10392D914E9B6C400DB356F /* AirFloatBarButton.m */,
+				A10392E014EA4F4500DB356F /* AirFloatGradientView.h */,
+				A10392E114EA4F4500DB356F /* AirFloatGradientView.m */,
 			);
 			name = Custom;
 			sourceTree = "<group>";
@@ -623,11 +616,7 @@
 				4898FA7C13CDB6B9006EC97E /* Icon@2x.png in Resources */,
 				4898FA7E13CDB6C2006EC97E /* Icon.png in Resources */,
 				48B49EDA13D216EC00AB67D1 /* Settings.bundle in Resources */,
-				A1EC73EC14D2A08B00C5DE5D /* MainWindow~iPad.xib in Resources */,
-				A1EC73EE14D2A1D300C5DE5D /* AirFloatViewController~iPad.xib in Resources */,
 				A1C10DF914DEA47800963085 /* openssl in Resources */,
-				A1389E0514E416F7004FE040 /* Background.png in Resources */,
-				A1389E0614E416F7004FE040 /* Background@2x.png in Resources */,
 				A1389E0914E417E6004FE040 /* TopBar.png in Resources */,
 				A1389E0A14E417E6004FE040 /* TopBar@2x.png in Resources */,
 				A1389E0D14E41A87004FE040 /* NoArtwork.png in Resources */,
@@ -693,11 +682,12 @@
 				A1389E2214E43771004FE040 /* AirFloatNotificationsHub.mm in Sources */,
 				A10ECCA214E4F70000C1BFAA /* AirFloatImageView.m in Sources */,
 				A149208A14E68B4600849DC3 /* UIView+AirFloatAdditions.m in Sources */,
-				A149208D14E7096600849DC3 /* AirFloatGradiantMaskedView.m in Sources */,
+				A149208D14E7096600849DC3 /* AirFloatGradientMaskedView.m in Sources */,
 				A149209314E7170800849DC3 /* AirFloatDACPClient.mm in Sources */,
 				A149209814E7C5C700849DC3 /* DMAPParser.cpp in Sources */,
 				A10EB41014E81CFC00615CDB /* AirFloatDACPBrowser.m in Sources */,
 				A10392DA14E9B6C400DB356F /* AirFloatBarButton.m in Sources */,
+				A10392E214EA4F4500DB356F /* AirFloatGradientView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -726,14 +716,6 @@
 				4898FA0B13CDAAD1006EC97E /* en */,
 			);
 			name = AirFloatViewController.xib;
-			sourceTree = "<group>";
-		};
-		A1EC73EA14D2A08B00C5DE5D /* MainWindow~iPad.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A1EC73EB14D2A08B00C5DE5D /* en */,
-			);
-			name = "MainWindow~iPad.xib";
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -809,7 +791,7 @@
 				);
 				OTHER_CFLAGS = "-DDEBUG";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -831,7 +813,7 @@
 					"\"$(SRCROOT)\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};
@@ -886,7 +868,7 @@
 					"-DDEBUG",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
 			name = "Debug (Server Logs)";
