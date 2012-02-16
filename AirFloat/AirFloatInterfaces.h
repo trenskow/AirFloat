@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface AirFloatInterfaces
+@interface AirFloatInterfaces : NSObject
 
 + (NSDictionary*)interfaces;
 + (NSDictionary*)wifiInterface;
