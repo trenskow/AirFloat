@@ -20,7 +20,7 @@ SocketEndPoint::SocketEndPoint() {
     
 }
 
-SocketEndPoint::SocketEndPoint(const char* host, unsigned short port, unsigned int scopeId) {
+SocketEndPoint::SocketEndPoint(const char* host, uint16_t port, unsigned int scopeId) {
     
     setup(host, port, scopeId);
     
@@ -39,7 +39,7 @@ SocketEndPoint& SocketEndPoint::operator=(SocketEndPoint &ep) {
     
 }
 
-void SocketEndPoint::setup(const char* host, unsigned short port, unsigned int scopeId) {
+void SocketEndPoint::setup(const char* host, uint16_t port, unsigned int scopeId) {
     
     assert(port > 0);
     
@@ -59,7 +59,7 @@ void SocketEndPoint::setup(const char* host, unsigned short port, unsigned int s
     
 }
 
-void SocketEndPoint::setupIPv6(unsigned short port, unsigned int scopeId) {
+void SocketEndPoint::setupIPv6(uint16_t port, unsigned int scopeId) {
     
     struct sockaddr_in6 addr6;
     memset(&addr6, 0, sizeof(addr6));
@@ -97,7 +97,7 @@ bool SocketEndPoint::getHost(char* buffer, long size) {
     
 }
 
-unsigned short SocketEndPoint::port() {
+uint16_t SocketEndPoint::getPort() {
     
     return ntohs(_ep.sin6_port);
     

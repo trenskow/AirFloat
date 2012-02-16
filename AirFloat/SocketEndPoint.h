@@ -19,16 +19,16 @@ class SocketEndPoint {
     
 public:
     SocketEndPoint();
-    SocketEndPoint(const char* host, unsigned short port, unsigned int scopeId = 0);
+    SocketEndPoint(const char* host, uint16_t port, unsigned int scopeId = 0);
     SocketEndPoint(struct sockaddr* addr);
     
     SocketEndPoint& operator=(SocketEndPoint &ep);
     
-    void setup(const char* host, unsigned short port, unsigned int scopeId = 0);
-    void setupIPv6(unsigned short port, unsigned int scopeId = 0);
+    void setup(const char* host, uint16_t port, unsigned int scopeId = 0);
+    void setupIPv6(uint16_t port, unsigned int scopeId = 0);
     bool isHost(const char* host);
     bool getHost(char* buffer, long size);
-    unsigned short port();    
+    uint16_t getPort();
     unsigned int getScopeId();
     
     struct sockaddr* getSocketAddress();
