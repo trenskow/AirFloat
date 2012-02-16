@@ -8,7 +8,6 @@
 
 #import "TestFlight.h"
 
-#import "UIView+AirFloatAdditions.h"
 #import "AirFloatAppDelegate.h"
 #import "AirFloatViewController.h"
 #import <AudioToolbox/AudioToolbox.h>
