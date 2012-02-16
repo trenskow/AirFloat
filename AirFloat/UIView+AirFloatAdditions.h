@@ -2,7 +2,7 @@
 //  UIView+AirFloatAdditions.h
 //  AirFloat
 //
-//  Created by Kristian Trenskow on 2/11/12.
+//  Created by Kristian Trenskow on 2/14/12.
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
@@ -10,8 +10,7 @@
 
 @interface UIView (AirFloatAdditions)
 
-+ (void)airFloatBeginAnimations:(NSString *)animationID context:(void *)context;
-+ (void)airFloatCommitAnimations;
-+ (BOOL)airFloatIsAnimating;
+- (void)addTapGestureRecognizerWithTarget:(id)target action:(SEL)selector;
+- (void)addSwipeGestureRecognizerWithDirection:(UISwipeGestureRecognizerDirection)direction andTarget:(id)target action:(SEL)selector;
 
 @end

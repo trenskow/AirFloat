@@ -2,35 +2,25 @@
 //  UIView+AirFloatAdditions.m
 //  AirFloat
 //
-//  Created by Kristian Trenskow on 2/11/12.
+//  Created by Kristian Trenskow on 2/14/12.
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#import <objc/runtime.h>
-#import <objc/message.h>
 #import "UIView+AirFloatAdditions.h"
-
-static BOOL __isAnimating;
 
 @implementation UIView (AirFloatAdditions)
 
-+ (void)airFloatBeginAnimations:(NSString *)animationID context:(void *)context {
+- (void)addTapGestureRecognizerWithTarget:(id)target action:(SEL)selector {
     
-    __isAnimating = YES;
-    [self beginAnimations:animationID context:NULL];
-    
-}
-
-+ (void)airFloatCommitAnimations {
-    
-    __isAnimating = NO;
-    [self commitAnimations];
+    [self addGestureRecognizer:[[[UITapGestureRecognizer alloc] initWithTarget:target action:selector] autorelease]];
     
 }
 
-+ (BOOL)airFloatIsAnimating {
+- (void)addSwipeGestureRecognizerWithDirection:(UISwipeGestureRecognizerDirection)direction andTarget:(id)target action:(SEL)selector {
     
-    return __isAnimating;
+    UISwipeGestureRecognizer* swipeGestureRecognizer = [[[UISwipeGestureRecognizer alloc] initWithTarget:target action:selector] autorelease];
+    swipeGestureRecognizer.direction = direction;
+    [self addGestureRecognizer:swipeGestureRecognizer];
     
 }
 
