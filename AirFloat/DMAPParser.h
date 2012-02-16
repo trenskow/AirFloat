@@ -39,7 +39,7 @@ public:
     static const DMAPAtomType const atomTypes[];
     static const uint32_t atomTypeCount;
     
-    DMAPParser(void* buffer, uint32_t size);
+    DMAPParser(const void* buffer, uint32_t size);
     ~DMAPParser();
     
     static DMAPType typeForTag(uint32_t tag);

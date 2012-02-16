@@ -176,7 +176,7 @@ const DMAPAtomType const DMAPParser::atomTypes[] = {
 
 const uint32_t DMAPParser::atomTypeCount = sizeof(DMAPParser::atomTypes) / sizeof(DMAPAtomType);
 
-DMAPParser::DMAPParser(void* buffer, uint32_t size) {
+DMAPParser::DMAPParser(const void* buffer, uint32_t size) {
     
     log_data(LOG_INFO, (char*)buffer, size);
     
@@ -189,8 +189,8 @@ DMAPParser::DMAPParser(void* buffer, uint32_t size) {
     while (length > 0) {
         
         char* name = mBuffer;
-        int frameSize = htonl(*((uint32_t*)&mBuffer[4]));
-        uint32_t tag = htonl(*((uint32_t*)mBuffer));
+        int frameSize = ntohl(*((uint32_t*)&mBuffer[4]));
+        uint32_t tag = ntohl(*((uint32_t*)mBuffer));
         mBuffer += 8;
         length -= 8;
         
