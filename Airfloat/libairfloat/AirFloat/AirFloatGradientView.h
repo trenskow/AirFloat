@@ -8,9 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
-@interface AirFloatGradientView : UIView
+@interface AirFloatGradientView : UIView {
+    
+    NSArray* _backgroundGradientColors;
+    NSArray* _backgroundGradientColorLocations;
+    
+}
 
-- (NSArray*)backgroundGradientColors;
-- (NSArray*)backgroundGradientColorLocations;
+@property (nonatomic,retain) NSArray* backgroundGradientColors;
+@property (nonatomic,retain) NSArray* backgroundGradientColorLocations;
 
 @end
