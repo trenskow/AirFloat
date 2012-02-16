@@ -17,6 +17,7 @@
 
 #include "NotificationCenter.h"
 #include "Log.h"
+#include "WebConnection.h"
 #include "RAOPConnection.h"
 #include "RAOPServer.h"
 
@@ -25,132 +26,72 @@ const char* RAOPServer::localhostConnectedErrorNotificationName = "serverLocalho
 
 RAOPServer::RAOPServer(const char* host, int port) {
     
-    _setup();
-    
-    _localEndPoint = new SocketEndPoint(host, port);
+    _server = new WebServer(host, port);
+    _server->setAcceptConnectionCallback(RAOPServer::_acceptConnectionCallback, this);
     
 }
 
 RAOPServer::RAOPServer(int port) {
     
-    _setup();
-    
-    _localEndPoint = new SocketEndPoint();
-    _localEndPoint->setupIPv6(port);
-    
-}
-
-RAOPServer::RAOPServer() {
-    
-    _setup();
-    
-    _localEndPoint = new SocketEndPoint();
-    _localEndPoint->setupIPv6(5000);
-    
+    _server = new WebServer(port);
+    _server->setAcceptConnectionCallback(RAOPServer::_acceptConnectionCallback, this);
+        
 }
 
 RAOPServer::~RAOPServer() {
     
-    delete _localEndPoint;
-    
-}
-
-void RAOPServer::_setup() {
-    
-    _isRunning = false;
-    
-}
-
-void* RAOPServer::_serverLoopKickStarter(void* t) {
-    
-    pthread_setname_np("Server Socket");
-    ((RAOPServer*)t)->_serverLoop();
-    pthread_exit(0);
-    
-}
-
-void RAOPServer::_serverLoop() {
-    
-    _isRunning = true;
-    
-    for (;;) {
-
-        Socket* newSocket = _socket->Accept();
-        if (newSocket == NULL) {
-            break;
-        }
-        
-        char localip[50];
-        char remoteip[50];
-        newSocket->GetLocalEndPoint()->getHost(localip, 50);
-        newSocket->GetRemoteEndPoint()->getHost(remoteip, 50);
-        
-        if (strcmp(localip, remoteip) != 0) {
-            log(LOG_INFO, "Accepted connection from %s (%s)", remoteip, (IN6_IS_ADDR_V4MAPPED(&((struct sockaddr_in6*)newSocket->GetRemoteEndPoint()->getSocketAddress())->sin6_addr) ? "IPv4in6" : "IPv6"));
-            
-            RAOPConnection* connection = new RAOPConnection(newSocket);
-            
-            connection->_takeOver();
-            
-            NotificationCenter::defaultCenter()->postNotification(RAOPServer::clientConnectedNotificationName, this, connection);
-            
-        } else {
-            newSocket->Close();
-            log(LOG_ERROR, "Refused connection from localhost.");
-            NotificationCenter::defaultCenter()->postNotification(RAOPServer::localhostConnectedErrorNotificationName, this, NULL);
-        }
-        
-    }
-    
-    _isRunning = false;
+    delete _server;
     
 }
 
 bool RAOPServer::startServer() {
     
-    _socket = new Socket(false);
-    
-    if (_socket != NULL) {
-        
-        if (_socket->Bind(_localEndPoint))
-            if (_socket->Listen()) {
-                
-                pthread_create(&_serverLoopThread, NULL, _serverLoopKickStarter, this);
-                log(LOG_INFO, "Server started");
-                return true;
-                
-            } else
-                log(LOG_ERROR, "Unable to listen on socket");
-        
-        else
-            log(LOG_ERROR, "Unable to bind socket");
-        
-        
-    } else
-        log(LOG_ERROR, "Unable to create socket");
-    
-    return false;
+    return _server->startServer();
     
 }
 
 void RAOPServer::waitServer() {
     
-    pthread_join(_serverLoopThread, NULL);
-    
+    _server->waitServer();
+        
 }
 
 void RAOPServer::stopServer() {
     
-    delete _socket;
-
-    pthread_join(_serverLoopThread, NULL);
-    
-    log(LOG_INFO, "Server stopped");
+    _server->startServer();
     
 }
 
 bool RAOPServer::isRunning() {
     
-    return _isRunning;
+    return _server->isRunning();
+    
+}
+
+bool RAOPServer::_acceptConnectionCallback(WebConnection* newConnection, void* ctx) {
+    
+    char localIp[50];
+    char remoteIp[50];
+    
+    newConnection->getLocalEndPoint()->getHost(localIp, 50);
+    newConnection->getRemoteEndPoint()->getHost(remoteIp, 50);
+
+//    if (strcmp(localIp, remoteIp) == 0) {
+        
+//        log(LOG_ERROR, "Refused connection from localhost.");
+//        NotificationCenter::defaultCenter()->postNotification(RAOPServer::localhostConnectedErrorNotificationName, ctx, NULL);
+        
+//        return false;
+        
+//    } else {
+        
+        RAOPConnection* newRAOPConnection = new RAOPConnection(newConnection);
+        
+        NotificationCenter::defaultCenter()->postNotification(RAOPServer::clientConnectedNotificationName, ctx, newRAOPConnection); // <-- NULL = connection
+        
+        return true;
+        
+//    }
+
     
 }

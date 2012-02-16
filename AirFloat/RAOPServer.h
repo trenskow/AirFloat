@@ -10,20 +10,15 @@
 #define __RAOPSERVER_H
 
 #include <pthread.h>
-#include "Socket.h"
+#include "WebServer.h"
 
-class RAOPServer;
-class RAOPConnection;
-
-typedef void(*simpleServerClbk)(RAOPServer* server, void* ctx);
-typedef void(*connectionCreatedClbk)(RAOPServer* server, RAOPConnection* newConnection, void* ctx);
+class WebConnection;
 
 class RAOPServer {
     
 public:
     RAOPServer(const char* host, int port);
     RAOPServer(int port);
-    RAOPServer();
     ~RAOPServer();
 
     bool startServer();
@@ -36,16 +31,10 @@ public:
     static const char* localhostConnectedErrorNotificationName;
     
 private:
-    void _setup();
-    static void* _serverLoopKickStarter(void* t);
-    void _serverLoop();
     
-    bool _isRunning;
+    static bool _acceptConnectionCallback(WebConnection* newConnection, void* ctx);
     
-    pthread_t _serverLoopThread;
-    
-    Socket* _socket;
-    SocketEndPoint* _localEndPoint;
+    WebServer* _server;
     
 };
 

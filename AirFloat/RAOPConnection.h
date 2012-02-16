@@ -17,7 +17,6 @@
 #define DACPID_MAXLENGTH 200
 #define ACTIVEREMOTE_MAXLENGTH 50
 #define SESSION_MAXLENGTH 50
-#define READ_SIZE 16384
 
 typedef enum {
     kRAOPConnectionAudio_RouteAirPlay = 0,
@@ -26,7 +25,7 @@ typedef enum {
 } RAOPConnectionAudioRoute;
 
 typedef struct {
-    void* content;
+    const void* content;
     uint32_t contentLength;
     const char* contentType;
 } RAOPConnectionClientUpdatedMetadataNotificationInfo;
@@ -36,15 +35,18 @@ typedef struct {
     double total;
 } RAOPConnectionClientUpdatedProgressNotificationInfo;
 
-class RAOPConnection;
-class RAOPHeader;
+#include "WebTools.h"
 
-class RAOPConnection {
+class WebConnection;
+class WebRequest;
+class RAOPConnection;
+
+class RAOPConnection : public WebTools {
 
     friend class RAOPServer;
     
 public:
-    RAOPConnection(Socket* sock);
+    RAOPConnection(WebConnection* connection);
     ~RAOPConnection();
     
     RTPReceiver* getRTPReceiver();
@@ -64,18 +66,17 @@ public:
     static const char* clientUpdatedProgressNotificationName;
     
 private:
-    void _takeOver();
     void _appleResponse(const char* challenge, long length, char* response, long* resLength);
     bool _checkAuthentication(const char* method, const char* uri, const char* authenticationParameter);
-    bool _processData(const char* cmd, const char* path, RAOPHeader* headers, unsigned char* content, long contentLength);
-    static void* _connectionLoopKickStarter(void* t);
-    void _connectionLoop();
+    
+    void _processRequestCallback(WebConnection* connection, WebRequest* request);
+    static void _processRequestCallbackHelper(WebConnection* connection, WebRequest* request, void* ctx);
+    void _connectionClosedCallback(WebConnection* connection);
+    static void _connectionClosedCallbackHelper(WebConnection* connection, void* ctx);
+    
     RAOPConnectionAudioRoute _getAudioRoute();
     
-    long _convertNewLines(unsigned char* buffer, long length);
-    pthread_t _connectionLoopThread;
-    
-    Socket* _sock;
+    WebConnection* _connection;
     
     RTPReceiver* _rtp;
     
