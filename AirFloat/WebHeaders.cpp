@@ -44,39 +44,52 @@ const char* WebHeaders::valueForName(const char* name) {
 void WebHeaders::addValue(const char* name, const char* format, ...) {
     
     assert(name != NULL && format != NULL);
-
+    
     char value[1000];
     
     va_list args;
     va_start(args, format);
     vsnprintf(value, 1000, format, args);
     va_end(args);
-        
-    uint32_t nameLen = strlen(name);
-    uint32_t valueLen = strlen(value);
-    uint32_t totalLen = nameLen + valueLen;
+    
+    for (uint32_t i = 0 ; i < _headerCount ; i++)
+        if (strcmp(_headers[i].name, name) == 0) {
+            _setValue(&_headers[i], name, value);
+            return;
+        }
     
     header newHeader;
-    newHeader.length = totalLen;
-    newHeader.name = (char*)malloc(totalLen + 2);
-    strcpy(newHeader.name, name);
-    newHeader.value = &newHeader.name[nameLen + 1];
-    strcpy(newHeader.value, value);
+    bzero(&newHeader, sizeof(header));
+    _setValue(&newHeader, name, value);
     
     _headers = (header*)realloc(_headers, sizeof(header) * (_headerCount + 1));
     _headers[_headerCount] = newHeader;
     
     _headerCount++;
-        
+    
+}
+
+uint32_t WebHeaders::getCount() {
+    
+    return _headerCount;
+    
+}
+
+const char* WebHeaders::getNameAtIndex(uint32_t index) {
+    
+    assert(index < _headerCount);
+    
+    return _headers[index].name;
+    
 }
 
 uint32_t WebHeaders::getTotalLength() {
     
     uint32_t ret = 0;
     for (uint32_t i = 0 ; i < _headerCount ; i++)
-        ret += _headers[i].length + 4;
+        ret += strlen(_headers[i].name) + strlen(_headers[i].value) + 4;
     
-    return ret + 5;
+    return ret + 2;
     
 }
 
@@ -87,11 +100,11 @@ uint32_t WebHeaders::getContent(void* buffer, uint32_t size) {
     
     for (uint32_t i = 0 ; i < _headerCount ; i++) {
         
-        if (size - writePos < _headers[i].length + 5)
-            break;
-        
         uint32_t nameLen = strlen(_headers[i].name);
         uint32_t valueLen = strlen(_headers[i].value);
+                
+        if (size - writePos < nameLen + valueLen + 4)
+            break;
         
         memcpy(&writeBuf[writePos], _headers[i].name, nameLen);
         writePos += nameLen;
@@ -99,14 +112,14 @@ uint32_t WebHeaders::getContent(void* buffer, uint32_t size) {
         writePos += 2;
         memcpy(&writeBuf[writePos], _headers[i].value, valueLen);
         writePos += valueLen;
-        memcpy(&writeBuf[writePos], "\r\n", 3);
+        memcpy(&writeBuf[writePos], "\r\n", 2);
         writePos += 2;
         
     }
     
-    if (size - writePos >= 3) {
-        memcpy(&writeBuf[writePos], "\r\n", 3);
-        writePos += 3;
+    if (size - writePos >= 2) {
+        memcpy(&writeBuf[writePos], "\r\n", 2);
+        writePos += 2;
     }
     
     return writePos;
@@ -136,8 +149,6 @@ uint32_t WebHeaders::_parseHeaders(char* buffer, uint32_t length) {
                     break;
                 }
             
-            _headers[_headerCount].length = lineLength - 1;
-            
             _headerCount++;
             lineStart = &buffer[i + 1];
             
@@ -150,4 +161,19 @@ uint32_t WebHeaders::_parseHeaders(char* buffer, uint32_t length) {
     
     return i + 1;
     
+}
+
+void WebHeaders::_setValue(header* header, const char* name, const char* value) {
+    
+    if (header->name != NULL)
+        free(header->name);
+    
+    uint32_t namelen = strlen(name);
+    uint32_t valuelen = strlen(value);
+    
+    header->name = (char*)malloc(namelen + valuelen + 2);
+    strcpy(header->name, name);
+    header->value = &header->name[namelen + 1];
+    strcpy(header->value, value);
+        
 }
