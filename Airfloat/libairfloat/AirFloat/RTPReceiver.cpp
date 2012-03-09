@@ -136,11 +136,11 @@ RTPPacket readHeader(const unsigned char* buffer, long length) {
     
 }
 
-RTPReceiver::RTPReceiver(const char* localHost, const char* remoteHost, const unsigned char aesKey[16], const unsigned char aesIv[16], RAOPConnection* connection, int* fmtp, int fmtpLen) {
+RTPReceiver::RTPReceiver(const unsigned char aesKey[16], const unsigned char aesIv[16], RAOPConnection* connection, int* fmtp, int fmtpLen) {
     
-    assert(localHost != NULL && remoteHost != NULL && connection != NULL && fmtp != NULL);
+    assert(connection != NULL && fmtp != NULL);
     
-    _setup(localHost, remoteHost, connection, fmtp, fmtpLen);
+    _setup(connection, fmtp, fmtpLen);
     
     memcpy(_aesKey, aesKey, 16);
     memcpy(_aesIv, aesIv, 16);
@@ -152,9 +152,9 @@ RTPReceiver::RTPReceiver(const char* localHost, const char* remoteHost, const un
     
 }
 
-RTPReceiver::RTPReceiver(const char* localHost, const char* remoteHost, RAOPConnection* connection, int* fmtp, int fmtpLen) {
+RTPReceiver::RTPReceiver(RAOPConnection* connection, int* fmtp, int fmtpLen) {
     
-    _setup(localHost, remoteHost, connection, fmtp, fmtpLen);
+    _setup(connection, fmtp, fmtpLen);
     
 }
 
@@ -165,24 +165,14 @@ RTPReceiver::~RTPReceiver() {
     _connection = NULL;
     stop();    
     
-    free(_localHost);
-    free(_remoteHost);
-    
 }
 
-void RTPReceiver::_setup(const char* localHost, const char* remoteHost, RAOPConnection* connection, int* fmtp, int fmtpLen) {
+void RTPReceiver::_setup(RAOPConnection* connection, int* fmtp, int fmtpLen) {
     
-    assert(localHost != NULL && remoteHost != NULL && connection != NULL && fmtp != NULL);
+    assert(connection != NULL && fmtp != NULL);
 
     _serverSock = _timingSock = _controlSock = 0;
-    
-    _localHost = (char*)malloc(strlen(localHost)+1);
-    _remoteHost = (char*)malloc(strlen(remoteHost)+1);
-    
-    strcpy(_localHost, localHost);
-    strcpy(_remoteHost, remoteHost);
-        
-    _clientTimingPort = _clientControlPort = 0;
+    _remoteTimingEndPoint = _remoteControlEndPoint = NULL;
     
     for (int i = 0 ; i < 4 ; i++)
         _session[i] = (char)rand();
@@ -298,13 +288,11 @@ void RTPReceiver::_processTimingResponsePacket(RTPPacket* packet) {
     
 }
 
-void RTPReceiver::_sendPacket(const char* buffer, size_t len, unsigned short port, Socket* sock) {
+void RTPReceiver::_sendPacket(const char* buffer, size_t len, SocketEndPoint* remoteEndPoint, Socket* sock) {
     
-    assert(buffer != NULL && len > 0 && port != 0 && sock != NULL);
+    assert(buffer != NULL && len > 0 && remoteEndPoint != NULL && sock != NULL);
     
-    SocketEndPoint* ep = new SocketEndPoint(_remoteHost, port, _connection->getNetworkScopeId());
-    sock->SendTo(ep, buffer, len);
-    delete ep;
+    sock->SendTo(remoteEndPoint, buffer, len);
         
 }
 
@@ -322,7 +310,7 @@ void RTPReceiver::_sendTimingRequest() {
     double send_time = CACurrentMediaTime();
     pckt.send_time = doubleToNtpTime(send_time);
     
-    _sendPacket((char*)&pckt, RTPTimingPacketSize, _clientTimingPort, _timingSock);
+    _sendPacket((char*)&pckt, RTPTimingPacketSize, _remoteTimingEndPoint, _timingSock);
     
     log(LOG_INFO, "Timing synchronization request sent (@ %1.6f)", send_time);
     
@@ -341,7 +329,7 @@ void RTPReceiver::_sendResendRequest(unsigned short seqNum, unsigned short count
     pckt.seq_num = pckt.count = htons(count);
     pckt.missed_seq = htons(seqNum);
     
-    _sendPacket((char*)&pckt, RTPResendPacketSize, _clientControlPort, _controlSock);
+    _sendPacket((char*)&pckt, RTPResendPacketSize, _remoteControlEndPoint, _controlSock);
     
     log(LOG_INFO, "Requested packet resend (seq: %d / count %d)", seqNum, count);
     
@@ -462,7 +450,7 @@ void RTPReceiver::_streamLoop(Socket* sock) {
         unsigned char buffer[16384];
         long read = sock->Receive(buffer, 16384);
         
-        if (read > 0 && sock->GetRemoteEndPoint()->isHost(_remoteHost)) {
+        if (read > 0 && sock->GetRemoteEndPoint()->compareWithAddress(_connection->getRemoteEndPoint())) {
             
             RTPPacket packet = readHeader(buffer, read);
             
@@ -503,13 +491,14 @@ Socket* RTPReceiver::_setupSocket(unsigned short* port) {
         
         unsigned short p;
         for (p = 6000 ; p < 6100 ; p++) {
-            SocketEndPoint ep;
-            ep.setupIPv6(p);
-            if (ret->Bind(&ep)) {
+            SocketEndPoint* ep = _connection->getLocalEndPoint()->copy(p);
+            if (ret->Bind(ep)) {
+                delete ep;
                 SafeDR(port, p);
                 log(LOG_INFO, "Setup socket on port %u", p);
                 return ret;
-            }
+            } else
+                delete ep;
         }
         
         log(LOG_ERROR, "Unable to bind socket.");
@@ -532,13 +521,13 @@ unsigned short RTPReceiver::setup(unsigned short* timingPort, unsigned short* co
     if ((_serverSock = _setupSocket(&ret)) != NULL) {
         
         if (controlPort != NULL && controlPort > 0) {
-            _clientControlPort = *controlPort;
+            _remoteControlEndPoint = _connection->getRemoteEndPoint()->copy(*controlPort);
             log(LOG_INFO, "Setting up control socket");
             _controlSock = _setupSocket(controlPort);
         }
         
         if (timingPort != NULL && timingPort > 0) {
-            _clientTimingPort = *timingPort;
+            _remoteTimingEndPoint = _connection->getRemoteEndPoint()->copy(*timingPort);
             log(LOG_INFO, "Setting up timing socket");
             _timingSock = _setupSocket(timingPort);
         }
@@ -590,10 +579,12 @@ void RTPReceiver::start(unsigned short startSeq) {
         log(LOG_INFO, "Waiting for synchronization");
         
         _timerMutex.lock();
-        _timerCond.timedWait(&_timerMutex, 4000);
+        if (_timerCond.timedWait(&_timerMutex, 4000))
+            log(LOG_INFO, "Synchronization incomplete");
+        else
+            log(LOG_INFO, "Synchronization complete");
         _timerMutex.unlock();
         
-        log(LOG_INFO, "Synchronization complete");
         
     } else
         log(LOG_ERROR, "RTP receiver was not setup before start");
@@ -620,9 +611,12 @@ void RTPReceiver::stop() {
         delete _controlSock;
     }
     
+    delete _remoteTimingEndPoint;
+    delete _remoteControlEndPoint;
+    
     _serverSock = _timingSock = _controlSock = NULL;
     _serverSockThread = _timingSockThread = _controlSockThread = NULL;
-    _clientTimingPort = _clientControlPort = 0;
+    _remoteTimingEndPoint = _remoteControlEndPoint = NULL;
     
     __globalMutex.lock();
     __globalReceiver = NULL;
