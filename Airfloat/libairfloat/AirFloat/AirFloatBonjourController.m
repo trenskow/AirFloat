@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
+#import "AirFloatAdditions.h"
 #import "AirFloatBonjourController.h"
 
 @implementation AirFloatBonjourController
@@ -14,7 +15,7 @@
     
     if ((self = [self init])) {
         
-        _service = [[NSNetService alloc] initWithDomain:@"local." type:@"_raop._tcp." name:[NSString stringWithFormat:@"%@@%@", macAddress, [UIDevice currentDevice].name] port:port];
+        _service = [[NSNetService alloc] initWithDomain:@"local." type:@"_raop._tcp." name:[NSString stringWithFormat:@"%@@AirFloat @ %@", macAddress, [UIDevice currentDevice].name] port:port];
         
         NSDictionary* txtRecord = [NSDictionary dictionaryWithObjectsAndKeys:
                                    @"1", @"txtvers",
@@ -33,7 +34,7 @@
                                    @"false", @"sm",
                                    @"2", @"ch",
                                    @"44100", @"sr",
-                                   ([[[NSUserDefaults standardUserDefaults] objectForKey:@"pw"] length] > 0 ? @"true" : @"false"), @"pw",
+                                   ([NSStandarUserDefaults boolForKey:@"AirFloatAuthenticationEnabled"] && [[NSStandarUserDefaults objectForKey:@"AirFloatPassword"] length] > 0 ? @"true" : @"false"), @"pw",
                                    nil];
         
         [_service setTXTRecordData:[NSNetService dataFromTXTRecordDictionary:txtRecord]];
