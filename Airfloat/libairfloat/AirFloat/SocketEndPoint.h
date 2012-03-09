@@ -1,43 +1,50 @@
 //
 //  SocketEndPoint.h
-//  AirFloatCF
+//  AirFloat
 //
-//  Created by Kristian Trenskow on 5/10/11.
-//  Copyright 2011 The Famous Software Company. All rights reserved.
+//  Created by Kristian Trenskow on 3/5/12.
+//  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
 #ifndef __SOCKETENDPOINT_H
 #define __SOCKETENDPOINT_H
 
-#include <netinet/in.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <stdint.h>
 
-class Socket;
+#if !defined (MIN)
+#define MIN(x,y) (x < y ? x : y)
+#endif
+
+typedef enum {
+    
+    kSocketEndPointTypeIPv4 = 1,
+    kSocketEndPointTypeIPv6 = 1 << 1
+    
+} SocketEndPointType;
 
 class SocketEndPoint {
     
-    friend class Socket;
-    
 public:
-    SocketEndPoint();
-    SocketEndPoint(const char* host, uint16_t port, unsigned int scopeId = 0);
-    SocketEndPoint(struct sockaddr* addr);
     
-    SocketEndPoint& operator=(SocketEndPoint &ep);
+    virtual ~SocketEndPoint() {}
     
-    void setup(const char* host, uint16_t port, unsigned int scopeId = 0);
-    void setupIPv6(uint16_t port, unsigned int scopeId = 0);
-    bool isHost(const char* host);
-    bool getHost(char* buffer, long size);
-    uint16_t getPort();
-    unsigned int getScopeId();
+    virtual bool isHost(const char* host) = 0;
+    virtual bool getHost(char* buffer, long size) = 0;
+    virtual uint16_t getPort() = 0;
     
-    struct sockaddr* getSocketAddress();
+    virtual bool compareWithAddress(struct sockaddr* endPoint) = 0;
+    virtual bool compareWithAddress(SocketEndPoint* endPoint) = 0;
     
-    static in6_addr IPv4AddressToIPv6Address(in_addr addr);
+    virtual struct sockaddr* getSocketAddress() = 0;
     
-private:
-        
-    struct sockaddr_in6 _ep;
+    virtual bool isIPv6() = 0;
+    
+    virtual SocketEndPoint* copy(uint16_t newPort = 0) = 0;
+    
+    static SocketEndPoint* createSocket(uint16_t port, SocketEndPointType socketType = kSocketEndPointTypeIPv4);
+    static SocketEndPoint* createSocket(struct sockaddr* addr);
     
 };
 
