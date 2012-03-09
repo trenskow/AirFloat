@@ -23,6 +23,8 @@ WebRequest::WebRequest(const char* command, const char* path, const char* protoc
     _response = new WebResponse();
     _headers = new WebHeaders();
     
+    _response->setStatus(404, "Not Found");
+    
 }
 
 WebRequest::~WebRequest() {
