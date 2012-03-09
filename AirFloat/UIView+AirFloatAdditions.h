@@ -10,7 +10,16 @@
 
 @interface UIView (AirFloatAdditions)
 
-- (void)addTapGestureRecognizerWithTarget:(id)target action:(SEL)selector;
-- (void)addSwipeGestureRecognizerWithDirection:(UISwipeGestureRecognizerDirection)direction andTarget:(id)target action:(SEL)selector;
+@property (nonatomic,assign) CGFloat x;
+@property (nonatomic,assign) CGFloat y;
+@property (nonatomic,assign) CGFloat width;
+@property (nonatomic,assign) CGFloat height;
+
++ (UIView*)viewWithFrame:(CGRect)rect;
+
+- (UITapGestureRecognizer*)addTapGestureRecognizerWithTarget:(id)target action:(SEL)selector;
+- (UISwipeGestureRecognizer*)addSwipeGestureRecognizerWithDirection:(UISwipeGestureRecognizerDirection)direction andTarget:(id)target action:(SEL)selector;
+
+- (void)shake;
 
 @end
