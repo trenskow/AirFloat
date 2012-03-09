@@ -55,6 +55,7 @@ private:
     Socket* _socket;
     
     WebServer* _server;
+    bool _shouldSelfDestroy;
     
     processRequestCallback _processRequestCallback;
     connectionClosedCallback _connectionClosedCallback;

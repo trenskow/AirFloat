@@ -24,6 +24,8 @@ WebConnection::WebConnection(Socket* socket, WebServer* server) {
     
     _isConnected = false;
     
+    _shouldSelfDestroy = false;
+    
     _processRequestCallback = NULL;
     _connectionClosedCallback = NULL;
     _callbackCtx = NULL;
@@ -253,6 +255,9 @@ void WebConnection::_connectionLoop() {
     
     if (_connectionClosedCallback != NULL)
         _connectionClosedCallback(this, _callbackCtx);
+    
+    if (_shouldSelfDestroy)
+        delete this;
     
 }
 
