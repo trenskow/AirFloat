@@ -6,12 +6,13 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#import "DMAPParser.h"
+#import "DMAP.h"
 #import "RAOPServer.h"
 #import "RAOPConnection.h"
 #import "AudioQueue.h"
 
 #import "NotificationCenter.h"
+#import "NSNotificationCenter+AirFloatAdditions.h"
 #import "AirFloatNotificationsHub.h"
 
 static struct AirFloatNotificationBridge {
@@ -20,7 +21,7 @@ static struct AirFloatNotificationBridge {
 } _airFloatNotificationBridge[5] = {
     
     {
-        RAOPServer::clientConnectedNotificationName,
+        RAOPConnection::clientConnectedNotificationName,
         AirFloatClientConnectedNotification
     },
     {
@@ -81,7 +82,7 @@ static void notificationCallback(void* sender, const char* name, void* notificat
     
 }
 
-#pragma mark Notification handling
+#pragma mark - Notification handling
 
 - (void)_notificationReceived:(void *)sender name:(const char *)name notificationInfo:(void *)notificationInfo {
     
@@ -89,20 +90,20 @@ static void notificationCallback(void* sender, const char* name, void* notificat
     
     for (uint32_t i = 0 ; i < _airFloatNotificationBridgeCount ; i++)
         if (strcmp(name, _airFloatNotificationBridge[i].raopName) == 0) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:_airFloatNotificationBridge[i].foundationName object:self];
+            [NSDefaultNotificationCenter postNotificationName:_airFloatNotificationBridge[i].foundationName object:self userInfo:infoDictionary];
             return;
         }
     
     if (strcmp(name, RAOPConnection::clientUpdatedTrackInfoNofificationName) == 0) {
 
-        DMAPParser* tags = (DMAPParser*)notificationInfo;
+        DMAP* tags = (DMAP*)notificationInfo;
         
         [infoDictionary addEntriesFromDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                  [NSString stringWithCString:tags->stringForIdentifier("dmap.itemname") encoding:NSUTF8StringEncoding], kAirFloatTrackInfoTrackTitleKey, 
-                                                  [NSString stringWithCString:tags->stringForIdentifier("daap.songartist") encoding:NSUTF8StringEncoding], kAirFloatTrackInfoArtistNameKey, 
-                                                  [NSString stringWithCString:tags->stringForIdentifier("daap.songalbum") encoding:NSUTF8StringEncoding], kAirFloatTrackInfoAlbumNameKey, nil]];
+                                                  [NSString stringWithCString:tags->stringForAtom("dmap.itemname") encoding:NSUTF8StringEncoding], kAirFloatTrackInfoTrackTitleKey, 
+                                                  [NSString stringWithCString:tags->stringForAtom("daap.songartist") encoding:NSUTF8StringEncoding], kAirFloatTrackInfoArtistNameKey, 
+                                                  [NSString stringWithCString:tags->stringForAtom("daap.songalbum") encoding:NSUTF8StringEncoding], kAirFloatTrackInfoAlbumNameKey, nil]];
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatTrackInfoUpdatedNotification object:self userInfo:infoDictionary];
+        [NSDefaultNotificationCenter postNotificationName:AirFloatTrackInfoUpdatedNotification object:self userInfo:infoDictionary];
 
         return;
         
@@ -115,7 +116,7 @@ static void notificationCallback(void* sender, const char* name, void* notificat
         
         [infoDictionary addEntriesFromDictionary:[NSDictionary dictionaryWithObjectsAndKeys:data, kAirFloatMetadataDataKey, contentType, kAirFloatMetadataContentType, nil]];
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:AirFloatMetadataUpdatedNotification object:self userInfo:infoDictionary];
+        [NSDefaultNotificationCenter postNotificationName:AirFloatMetadataUpdatedNotification object:self userInfo:infoDictionary];
         
     }
     
