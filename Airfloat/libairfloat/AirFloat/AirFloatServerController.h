@@ -3,42 +3,51 @@
 //  AirFloat
 //
 //  Created by Kristian Trenskow on 7/19/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 The Famous Software Company. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-#import "AirFloatDACPClient.h"
-#import "AirFloatDACPBrowser.h"
+#import "AirFloatDAAPClient.h"
+#import "AirFloatBonjourBrowser.h"
 #import "AirFloatNotificationsHub.h"
 #import "AirFloatInterfaces.h"
 #import "AirFloatReachability.h"
 #import "AirFloatBonjourController.h"
-#import "RAOPServer.h"
 
-#define AirFloatServerControllerDidChangeStatus @"AirFloatServerControllerDidChangeStatus"
-
-@interface AirFloatServerController : NSObject <NSNetServiceBrowserDelegate, NSNetServiceDelegate, AirFloatReachabilityDelegate, AirFloatDACPBrowserDelegate> {
+typedef enum {
     
-    RAOPServer* _server;
+    kAirFloatServerControllerNeedsWifiStatus = 0,
+    kAirFloatServerControllerReadyStatus,
+    kAirFloatServerControllerReceivingStatus
+    
+} AirFloatServerControllerStatus;
+
+#define AirFloatServerControllerDidChangeStatusNotification @"AirFloatServerControllerDidChangeStatusNotification"
+#define AirFloatServerControllerFailedFindingDAAPNoification @"AirFloatServerControllerFailedFindingDAAPNoification"
+
+@interface AirFloatServerController : NSObject <NSNetServiceBrowserDelegate, NSNetServiceDelegate, AirFloatReachabilityDelegate, AirFloatBonjourBrowserDelegate, AirFloatDAAPClientDelegate> {
+    
+    void* _server;
     
     AirFloatBonjourController* _bonjour;
     AirFloatReachability* _wifiReachability;
-    AirFloatDACPBrowser* _dacpBrowser;
-    AirFloatDACPClient* _dacpClient;
+    AirFloatBonjourBrowser* _bonjourBrowser;
+    AirFloatDAAPClient* _daapClient;
+    NSArray* _currentDAAPAddresses;
     
     AirFloatNotificationsHub* _notificationHub;
     
     NSDate* _lastLocalhostErrorNoticationDate;
     
-    uint32_t _connectionCount;
-    BOOL _recording;
-    
 }
 
-@property (readonly) AirFloatReachability* wifiReachability;
-@property (readonly) BOOL isRunning;
-@property (readonly) BOOL hasClientConnected;
-@property (readonly) BOOL isRecording;
+@property (nonatomic,readonly) AirFloatReachability* wifiReachability;
+@property (nonatomic,readonly) AirFloatServerControllerStatus status;
+@property (nonatomic,readonly) NSString* connectedHost;
+@property (nonatomic,readonly) NSString* connectedUserAgent;
+@property (nonatomic,readonly) NSArray* currentDAAPAddresses;
+
++ (AirFloatServerController*)sharedServerController;
 
 - (void)start;
 - (void)stop;
