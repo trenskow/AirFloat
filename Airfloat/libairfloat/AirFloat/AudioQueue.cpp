@@ -158,7 +158,7 @@ AudioPacket* AudioQueue::_addEmptyPacket() {
     
 }
 
-AudioPacket* AudioQueue::_popQueueFromHead() {
+AudioPacket* AudioQueue::_popQueueFromHead(bool keepQueueFilled) {
     
     AudioPacket* headPacket = _queueHead;
     
@@ -177,16 +177,35 @@ AudioPacket* AudioQueue::_popQueueFromHead() {
         
         _queueCount--;
         
-        if (_queueCount == 0) {
-            NotificationCenter::defaultCenter()->postNotification(AudioQueue::flushNotificationName, this, NULL);
-            log(LOG_INFO, "Queue was emptied");
-        }
+        if (_queueCount < 2 && keepQueueFilled)
+            while (_queueCount < 2)
+                _addEmptyPacket();
         
         return headPacket;
     
     }
     
     return NULL;    
+    
+}
+
+void AudioQueue::_flush() {
+    
+    _mutex.lock();
+    
+    while (_queueHead != NULL)
+        _disposePacket(_popQueueFromHead(false));
+    
+    _queueTail = NULL;
+    
+    _foldCount = 0;
+    _lastKnowSampleTime = _lastKnowSampleTimesTime = 0;
+    
+    _mutex.unlock();
+    
+    log(LOG_INFO, "Queue flushed");
+    
+    NotificationCenter::defaultCenter()->postNotification(AudioQueue::flushNotificationName, this, NULL);
     
 }
 
@@ -208,7 +227,7 @@ int AudioQueue::_handleSequenceOverflow(int seqNo) {
 
 double AudioQueue::_convertTime(uint32_t fromSampleTime, double fromTime, uint32_t toSampleTime) {
     
-    return fromTime + (((double)toSampleTime - (double)fromSampleTime) / _sampleRate);
+    return fromTime + (((double)toSampleTime - (double)fromSampleTime) / (double)_sampleRate);
     
 }
 
@@ -367,6 +386,10 @@ void AudioQueue::synchronize(uint32_t currentSampleTime, double currentTime, uin
     currentSampleTime -= 11025;
     
     if (_lastKnowSampleTime == 0 && _lastKnowSampleTimesTime == 0) {
+        
+        while (_queueHead && _queueHead->sampleTime < currentSampleTime)
+            _disposePacket(_popQueueFromHead());
+        
         log(LOG_INFO, "Queue was synced");
         NotificationCenter::defaultCenter()->postNotification(AudioQueue::syncNotificationName, this, NULL);
     }
@@ -413,26 +436,5 @@ int AudioQueue::getNextMissingWindow(int* seqNo) {
     _mutex.unlock();
     
     return MIN(ret, 30);
-    
-}
-
-void AudioQueue::_flush() {
-    
-    _mutex.lock();
-    
-    while (_queueHead != NULL)
-        _disposePacket(_popQueueFromHead());
-    
-    
-    _queueTail = NULL;
-    
-    _foldCount = 0;
-    _lastKnowSampleTime = _lastKnowSampleTimesTime = 0;
-    
-    _mutex.unlock();
-    
-    log(LOG_INFO, "Queue flushed");
-    
-    NotificationCenter::defaultCenter()->postNotification(AudioQueue::flushNotificationName, this, NULL);
     
 }

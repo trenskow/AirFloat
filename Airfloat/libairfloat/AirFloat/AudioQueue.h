@@ -42,9 +42,9 @@ private:
     void _disposePacket(AudioPacket* packet);
     void _addPacketToQueueTail(AudioPacket* packet);
     AudioPacket* _addEmptyPacket();
-    AudioPacket* _popQueueFromHead();
-    int _handleSequenceOverflow(int seqNo);
+    AudioPacket* _popQueueFromHead(bool keepQueueFilled = true);
     void _flush();
+    int _handleSequenceOverflow(int seqNo);
     
     double _convertTime(uint32_t fromSampleTime, double fromTime, uint32_t toSampleTime);
 
