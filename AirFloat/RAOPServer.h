@@ -17,8 +17,7 @@ class WebConnection;
 class RAOPServer {
     
 public:
-    RAOPServer(const char* host, int port);
-    RAOPServer(int port);
+    RAOPServer(uint16_t port);
     ~RAOPServer();
 
     bool startServer();
@@ -27,12 +26,16 @@ public:
     
     bool isRunning();
     
-    static const char* clientConnectedNotificationName;
+    SocketEndPoint* getLocalEndPoint();
+    uint32_t getConnectionCount();
+    
     static const char* localhostConnectedErrorNotificationName;
     
 private:
     
-    static bool _acceptConnectionCallback(WebConnection* newConnection, void* ctx);
+    static bool _acceptConnectionCallback(WebServer* server, WebConnection* newConnection, void* ctx);
+    
+    uint16_t _port;
     
     WebServer* _server;
     
