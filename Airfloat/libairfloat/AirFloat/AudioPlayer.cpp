@@ -192,15 +192,13 @@ void AudioPlayer::_audioOutputCallback(AudioQueueRef inAQ, AudioQueueBufferRef i
     
     double time = 0;
     uint32_t sampleTime = 0;
-    bool hasPacket;
+    bool hasPacket = _audioQueue->hasAvailablePacket();
     
-    if (_nextPacketTime > 0 && (hasPacket = _audioQueue->hasAvailablePacket())) {
+    if (_nextPacketTime > 0 && hasPacket) {
         
         if (!_outputIsHomed) {
             
-            double timeToStart;
-            while ((timeToStart = (FROM_CLIENT_TIME((time = _audioQueue->getPacketTime())) - _nextPacketTime)) < 0)
-                _audioQueue->discardPacket();
+            double timeToStart = (FROM_CLIENT_TIME((time = _audioQueue->getPacketTime())) - _nextPacketTime);
 
             inBuffer->mAudioDataByteSize = MIN((timeToStart * _audio.outDesc.mSampleRate * _audio.outDesc.mBytesPerPacket), SILENT_PACKET_SIZE);
             
@@ -239,7 +237,7 @@ void AudioPlayer::_audioOutputCallback(AudioQueueRef inAQ, AudioQueueBufferRef i
                 
         }
         
-    } else if (_nextPacketTime > 0 && !hasPacket && _outputIsHomed) {
+    } else if (_nextPacketTime > 0 && hasPacket == false && _outputIsHomed) {
         _outputIsHomed = false;
         _speed = kAudioPlayerSpeedNormal;
         log(LOG_INFO, "Output lost synchronization");
