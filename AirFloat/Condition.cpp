@@ -7,6 +7,7 @@
 //
 
 #include <sys/time.h>
+#include <errno.h>
 
 #include "Mutex.h"
 #include "Condition.h"
@@ -29,7 +30,7 @@ void Condition::wait(Mutex* mutex) {
     
 }
 
-void Condition::timedWait(Mutex* mutex, int milliseconds) {
+bool Condition::timedWait(Mutex* mutex, int milliseconds) {
     
     struct timeval tv;
     
@@ -43,7 +44,10 @@ void Condition::timedWait(Mutex* mutex, int milliseconds) {
     
     struct timespec req = {tv.tv_sec, (tv.tv_usec + micro) * 1000};
     
-    pthread_cond_timedwait(&_cond, &mutex->_mutex, &req);
+    if (pthread_cond_timedwait(&_cond, &mutex->_mutex, &req) == ETIMEDOUT)
+        return true;
+    
+    return false;
     
 }
 
