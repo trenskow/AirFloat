@@ -18,7 +18,7 @@
 			<key>Title</key>
 			<string>Enable Authentication</string>
 			<key>Key</key>
-			<string>authenticate</string>
+			<string>AirFloatAuthenticationEnabled</string>
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
@@ -32,13 +32,27 @@
 			<key>IsSecure</key>
 			<true/>
 			<key>Key</key>
-			<string>pw</string>
+			<string>AirFloatPassword</string>
 			<key>KeyboardType</key>
 			<string>Alphabet</string>
 			<key>Title</key>
 			<string>Password</string>
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Acknowledgements</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSChildPaneSpecifier</string>
+			<key>Title</key>
+			<string>Acknowledgements</string>
+			<key>File</key>
+			<string>Acknowledgements</string>
 		</dict>
 	</array>
 	<key>StringsTable</key>
