@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+#define UISharedApplication [UIApplication sharedApplication]
+
 @interface UIApplication (AirFloatAdditions)
 
 @property (readonly) NSString* applicationName;
