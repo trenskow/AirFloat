@@ -17,6 +17,7 @@
 #define DACPID_MAXLENGTH 200
 #define ACTIVEREMOTE_MAXLENGTH 50
 #define SESSION_MAXLENGTH 50
+#define USERAGENT_MAXLENGTH 256
 
 typedef enum {
     kRAOPConnectionAudio_RouteAirPlay = 0,
@@ -51,15 +52,21 @@ public:
     
     RTPReceiver* getRTPReceiver();
     
-    SocketEndPoint getRemoteEndPoint();
+    SocketEndPoint* getLocalEndPoint();
+    SocketEndPoint* getRemoteEndPoint();
     
     const char* getDacpId();
     const char* getActiveRemote();
     const char* getSessionId();
     
+    const char* getUserAgent();
+    
     unsigned int getNetworkScopeId();
     
+    bool isConnected();
+    
     static const char* recordingStartedNotificationName;
+    static const char* clientConnectedNotificationName;
     static const char* clientDisconnectedNotificationName;
     static const char* clientUpdatedTrackInfoNofificationName;
     static const char* clientUpdatedMetadataNotificationName;
@@ -87,6 +94,8 @@ private:
     char _dacpId[DACPID_MAXLENGTH];
     char _activeRemote[ACTIVEREMOTE_MAXLENGTH];
     char _sessionId[SESSION_MAXLENGTH];
+    
+    char _userAgent[USERAGENT_MAXLENGTH];
     
 };
 

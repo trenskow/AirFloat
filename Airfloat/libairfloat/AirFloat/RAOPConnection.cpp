@@ -25,7 +25,7 @@
 
 #include <AudioToolbox/AudioToolbox.h>
 
-#include "DMAPParser.h"
+#include "DMAP.h"
 #include "NotificationCenter.h"
 #include "Log.h"
 #include "Base64.h"
@@ -79,11 +79,12 @@ static char* addToBuffer(char* buffer, const char* format, ...) {
     
 }
 
-static char* interfaceForIp(struct sockaddr_in6* addr) {
+static char* interfaceForIp(struct sockaddr* addr) {
+    
+    static char ret[100];
     
     struct ifaddrs* if_addrs = NULL;
     struct ifaddrs* if_addr = NULL;
-    char* ret = NULL;
     
     if (0 == getifaddrs(&if_addrs)) {
         
@@ -91,21 +92,16 @@ static char* interfaceForIp(struct sockaddr_in6* addr) {
             
             unsigned char ip[16];
             memset(ip, 0, 16);
-            if (if_addr->ifa_addr->sa_family == AF_INET6 || if_addr->ifa_addr->sa_family == AF_INET) {
+            if (if_addr->ifa_addr->sa_family == addr->sa_family) {
                 
-                if (if_addr->ifa_addr->sa_family == AF_INET6)
-                    memcpy(ip, ((struct sockaddr_in6*)if_addr->ifa_addr)->sin6_addr.s6_addr, 16);
-                else {
+                if ((addr->sa_family == AF_INET && ((struct sockaddr_in*)addr)->sin_addr.s_addr == ((struct sockaddr_in*)if_addr->ifa_addr)->sin_addr.s_addr) 
+                    ||
+                    (addr->sa_family == AF_INET6 && memcmp(&((struct sockaddr_in6*)addr)->sin6_addr, &((struct sockaddr_in6*)if_addr->ifa_addr)->sin6_addr, 16) == 0))  {
                     
-                    ip[10] = ip[11] = 0xFF;
-                    memcpy(&ip[12], &((struct sockaddr_in*)if_addr->ifa_addr)->sin_addr.s_addr, 4);
-                    
-                }
-                
-                if (memcmp(addr->sin6_addr.s6_addr, ip, 16) == 0) {
-                    ret = (char*)malloc(strlen(if_addr->ifa_name) + 1);
                     strcpy(ret, if_addr->ifa_name);
-                    break;
+                    freeifaddrs(if_addrs);
+                    return ret;
+                    
                 }
                 
             }
@@ -116,16 +112,16 @@ static char* interfaceForIp(struct sockaddr_in6* addr) {
     
     freeifaddrs(if_addrs);
     
-    return ret;
+    return NULL;
     
 }
 
 static char* hwAddressForInterface(const char* interface) {
     
+    static char ret[6];
+    
     struct ifaddrs* if_addrs = NULL;
     struct ifaddrs* if_addr = NULL;
-    char* ret = (char*)malloc(6);
-    memset(ret, 0, 6);
     
     if (0 == getifaddrs(&if_addrs))        
         for (if_addr = if_addrs ; if_addr != NULL ; if_addr = if_addr->ifa_next) {
@@ -135,7 +131,8 @@ static char* hwAddressForInterface(const char* interface) {
                 struct sockaddr_dl* sdl = (struct sockaddr_dl*)if_addr->ifa_addr;
                 if (sdl->sdl_alen == 6) {
                     memcpy(ret, LLADDR(sdl), sdl->sdl_alen);
-                    break;
+                    freeifaddrs(if_addrs);
+                    return ret;
                 }
                 
             }
@@ -144,60 +141,7 @@ static char* hwAddressForInterface(const char* interface) {
     
     freeifaddrs(if_addrs);
     
-    if (0 == memcmp(ret, "\0\0\0\0\0\0", 6)) {
-        free(ret);
-        return NULL;
-    }
-    
-    return ret;
-    
-}
-
-static struct in_addr ipv4ForInterface(const char* interface) {
-    
-    struct ifaddrs* if_addrs = NULL;
-    struct ifaddrs* if_addr = NULL;
-    in_addr ret;
-    
-    if (0 == getifaddrs(&if_addrs))        
-        for (if_addr = if_addrs ; if_addr != NULL ; if_addr = if_addr->ifa_next) {
-            
-            if (if_addr->ifa_name != NULL && if_addr->ifa_addr->sa_family == AF_INET && strcmp(interface, if_addr->ifa_name) == 0) {
-                
-                memcpy(&ret, &((struct sockaddr_in*)if_addr->ifa_addr)->sin_addr, sizeof(struct in_addr));
-                break;
-                
-            }
-            
-        }
-    
-    freeifaddrs(if_addrs);
-    
-    return ret;                
-    
-}
-
-static struct in6_addr ipv6ForInterface(const char* interface) {
-    
-    struct ifaddrs* if_addrs = NULL;
-    struct ifaddrs* if_addr = NULL;
-    in6_addr ret;
-    
-    if (0 == getifaddrs(&if_addrs))
-        for (if_addr = if_addrs ; if_addr != NULL ; if_addr = if_addr->ifa_next) {
-            
-            if (if_addr->ifa_next != NULL && if_addr->ifa_addr->sa_family == AF_INET6 && strcmp(interface, if_addr->ifa_name) == 0) {
-                
-                memcpy(&ret, &((struct sockaddr_in6*)if_addr->ifa_addr)->sin6_addr, sizeof(struct in6_addr));
-                break;
-                
-            }
-            
-        }
-
-    freeifaddrs(if_addrs);
-    
-    return ret;
+    return NULL;
     
 }
 
@@ -210,30 +154,6 @@ static RSA* applePrivateKey() {
     log(LOG_INFO, "Apple key: %s", (RSA_check_key(rsa) ? "OK" : "Failed"));
     
     return rsa;
-    
-}
-
-static void binaryIP(struct in_addr localaddr, unsigned char* buf) {
-    
-    char ip[50];
-    inet_ntop(AF_INET, &localaddr.s_addr, ip, 50);
-    
-    char* parts[4] = { NULL, NULL, NULL, NULL };
-    parts[0] = ip;
-    int p = 1;
-    long l = strlen(ip);
-    for (int i = 0 ; i < l ; i++)
-        if (ip[i] == '.') {
-            if (p < 4)
-                parts[p++] = &ip[i+1];
-            ip[i] = '\0';
-        }
-    
-    for (int i = 0 ; i < 4 ; i++) {
-        int p;
-        sscanf(parts[i], "%d", &p);
-        buf[i] = (char)p;
-    }
     
 }
 
@@ -270,6 +190,7 @@ static void md5(const char* content, size_t length, unsigned char* md5) {
 }
 
 const char* RAOPConnection::recordingStartedNotificationName = "connectionRecordingStarted";
+const char* RAOPConnection::clientConnectedNotificationName = "connectionConnectionCreated";
 const char* RAOPConnection::clientDisconnectedNotificationName = "connectionClientDisconnected";
 const char* RAOPConnection::clientUpdatedMetadataNotificationName = "connectionClientUpdatedMetadata";
 const char* RAOPConnection::clientUpdatedProgressNotificationName = "connectionClientUpdatedProgress";
@@ -280,27 +201,24 @@ RAOPConnection::RAOPConnection(WebConnection* connection) {
     _connection = connection;
     
     _connection->setProcessRequestCallback(_processRequestCallbackHelper);
+    _connection->setConnectionClosed(_connectionClosedCallbackHelper);
     _connection->setCallbackCtx(this);
     
     _rtp = NULL;
     
     Boolean authenticateIsSet = false;
-    Boolean authenticate = CFPreferencesGetAppBooleanValue(CFSTR("authenticate"), kCFPreferencesCurrentApplication, &authenticateIsSet);
+    Boolean authenticate = CFPreferencesGetAppBooleanValue(CFSTR("AirFloatAuthenticationEnabled"), kCFPreferencesCurrentApplication, &authenticateIsSet);
     
     _authenticationEnabled = (authenticateIsSet != 0 && authenticate != 0);    
-    _password = (CFStringRef) CFPreferencesCopyAppValue(CFSTR("pw"), kCFPreferencesCurrentApplication);
+    _password = (CFStringRef) CFPreferencesCopyAppValue(CFSTR("AirFloatPassword"), kCFPreferencesCurrentApplication);
 
     memset(_digestNonce, 0, 33);
     
-    _dacpId[0] = _activeRemote[0] = _sessionId[0] = '\0';
+    _dacpId[0] = _activeRemote[0] = _sessionId[0] = _userAgent[0] = '\0';
     
-    _connection->setCallbackReady();
-        
 }
 
 RAOPConnection::~RAOPConnection() {
-    
-    delete _connection;
     
     if (_rtp != NULL) {
         delete _rtp;
@@ -320,9 +238,15 @@ RTPReceiver* RAOPConnection::getRTPReceiver() {
     
 }
 
-SocketEndPoint RAOPConnection::getRemoteEndPoint() {
+SocketEndPoint* RAOPConnection::getLocalEndPoint() {
     
-    return *_connection->getRemoteEndPoint();
+    return _connection->getLocalEndPoint();
+    
+}
+
+SocketEndPoint* RAOPConnection::getRemoteEndPoint() {
+    
+    return _connection->getRemoteEndPoint();
     
 }
 
@@ -334,7 +258,8 @@ void RAOPConnection::_appleResponse(const char* challenge, long length, char* re
     if (actualLength != 16)
         log(LOG_ERROR, "Apple-Challenge: Expected 16 bytes - got %d", actualLength);
     
-    char* interface = interfaceForIp((struct sockaddr_in6*)_connection->getLocalEndPoint()->getSocketAddress());
+    struct sockaddr* localEndPoint = (struct sockaddr*)_connection->getLocalEndPoint()->getSocketAddress();
+    char* interface = interfaceForIp(localEndPoint);
     
     if (interface != NULL) {
         
@@ -346,25 +271,18 @@ void RAOPConnection::_appleResponse(const char* challenge, long length, char* re
         
         if (hwid != NULL) {
             
-            if (!IN6_IS_ADDR_V4MAPPED(&((struct sockaddr_in6*)_connection->getRemoteEndPoint()->getSocketAddress())->sin6_addr)) {
+            if (localEndPoint->sa_family == AF_INET6) {
                 
                 responseSize = 48;
                 
-                struct in6_addr in6addr = ipv6ForInterface(interface);
-                
                 memcpy(aResponse, decodedChallenge, actualLength);
-                memcpy(&aResponse[actualLength], &in6addr, 16);
+                memcpy(&aResponse[actualLength], &((struct sockaddr_in6*)localEndPoint)->sin6_addr, 16);
                 memcpy(&aResponse[actualLength + 16], hwid, 6);
                 
             } else {
                 
-                struct in_addr ip4addr = ipv4ForInterface(interface);
-                
-                unsigned char ip4[4];
-                binaryIP(ip4addr, ip4);
-                
                 memcpy(aResponse, decodedChallenge, actualLength);
-                memcpy(&aResponse[actualLength], ip4, 4);
+                memcpy(&aResponse[actualLength], &((struct sockaddr_in*)localEndPoint)->sin_addr.s_addr, 4);
                 memcpy(&aResponse[actualLength + 4], hwid, 6);
                 
             }
@@ -389,11 +307,7 @@ void RAOPConnection::_appleResponse(const char* challenge, long length, char* re
             
             char* aEncryptedResponse;
             long aLen = base64_encode(encryptedResponse, size, &aEncryptedResponse);
-            while (aLen > 1 && aEncryptedResponse[aLen - 1] == '=') {
-                aEncryptedResponse[aLen - 1] = '\0';
-                aLen--;
-            }
-            
+
             if (response != NULL)
                 memcpy(response, aEncryptedResponse, aLen);
             if (resLength != NULL)
@@ -408,11 +322,9 @@ void RAOPConnection::_appleResponse(const char* challenge, long length, char* re
         }
         
         RSA_free(rsa);
-        free(hwid);
-        free(interface);
         
     } else {
-        log(LOG_ERROR, "Cound not fint interface for IP");
+        log(LOG_ERROR, "Could not find interface for IP");
         if (resLength != NULL)
             *resLength = 0;
     }
@@ -570,7 +482,11 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
         if (_sessionId[0] == '\0' && (sessionId = headers->valueForName("Session")) != NULL)
             strncpy(_sessionId, sessionId, SESSION_MAXLENGTH);
         
-        responseHeaders->addValue("Server", "AirTunes/104.29");
+        const char *userAgent;
+        if (_userAgent[0] == '\0' && (userAgent = headers->valueForName("User-Agent")) != NULL)
+            strncpy(_userAgent, userAgent, USERAGENT_MAXLENGTH);
+        
+        responseHeaders->addValue("Server", "AirTunes/105.1");
         responseHeaders->addValue("CSeq", "%d", cSeq);
         
         if (_checkAuthentication(cmd, path, headers->valueForName("Authorization"))) {
@@ -606,11 +522,6 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
                         for (long i = 0 ; i < fmtpLen ; i++)
                             if (fmtp[i] == ' ')
                                 fmtps[cfmtp++] = atoi(&fmtp[i +1]);
-                        
-                        char localHost[100];
-                        char remoteHost[100];
-                        _connection->getLocalEndPoint()->getHost(localHost, 100);
-                        _connection->getRemoteEndPoint()->getHost(remoteHost, 100);
                         
                         unsigned char aeskey[16];
                         unsigned char aesiv[16];
@@ -651,10 +562,10 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
                             
                             log(LOG_INFO, "AES initialization vector length: %d bits", size * 8);
                             
-                            _rtp = new RTPReceiver(localHost, remoteHost, aeskey, aesiv, this, fmtps, fmtpSize);
+                            _rtp = new RTPReceiver(aeskey, aesiv, this, fmtps, fmtpSize);
                             
                         } else // Stream is clear text
-                            _rtp = new RTPReceiver(localHost, remoteHost, this, fmtps, fmtpSize);
+                            _rtp = new RTPReceiver(this, fmtps, fmtpSize);
                         
                     } else
                         response->setStatus(400, "Bad Request");
@@ -716,6 +627,8 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
                             
                             log(LOG_INFO, "RTP receiver set up at port %d", port);
                             
+                            NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientConnectedNotificationName, this, NULL);
+                            
                         } else
                             log(LOG_ERROR, "RTP Receiver didn't start");
                         
@@ -745,7 +658,7 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
                 
                 NotificationCenter::defaultCenter()->postNotification(RAOPConnection::recordingStartedNotificationName, this, NULL);
                 
-                responseHeaders->addValue("Audio-Latency", "15049");
+                responseHeaders->addValue("Audio-Latency", "11025");
                                 
             } else if (0 == strcmp(cmd, "SET_PARAMETER")) {
                 
@@ -786,17 +699,17 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
                     const char* contentType = headers->valueForName("Content-Type");
                     
                     if (0 == strcmp(contentType, "application/x-dmap-tagged")) {
-                        
-                        DMAPParser* tags = new DMAPParser(request->getContent(), request->getContentLength());
+                                                
+                        DMAP* tags = new DMAP(request->getContent(), request->getContentLength());
                         
                         uint32_t containerTag;
-                        if (tags->count() > 0 && DMAPParser::typeForTag((containerTag = tags->tagAtIndex(0))) == kDMAPTypeContainer) {
+                        if (tags->getCount() > 0 && DMAP::typeForTag((containerTag = tags->getTagAtIndex(0))) == kDMAPTypeContainer) {
                             
-                            DMAPParser* trackTags = tags->containerForAtom(containerTag);
+                            DMAP* trackTags = tags->containerForAtom(containerTag);
                             NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientUpdatedTrackInfoNofificationName, this, trackTags);
                             
-                            const char* title = trackTags->stringForIdentifier("dmap.itemname");
-                            const char* artist = trackTags->stringForIdentifier("daap.songartist");
+                            const char* title = trackTags->stringForAtom("dmap.itemname");
+                            const char* artist = trackTags->stringForAtom("daap.songartist");
                             if (title != NULL && artist != NULL)
                                 log(LOG_INFO, "Now playing: \"%s\" by %s", title, artist);
                             
@@ -836,8 +749,13 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
             } else if (0 == strcmp(cmd, "TEARDOWN")) {
                 
                 _rtp->stop();
+                delete _rtp;
+                _rtp = NULL;
+                
                 responseHeaders->addValue("Connection", "Close");
                 response->setKeepAlive(false);
+                
+                NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientDisconnectedNotificationName, this, NULL);
                 
             } else
                 response->setStatus(400, "Bad Request");
@@ -874,7 +792,6 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
             
         }
         
-        //response = appendBuffer(response, true, "Audio-Jack-Status: %s", (_getAudioRoute() == kRAOPConnectionAudio_RouteHeadphones ? "connected; type=analog" : "disconnected"));
         responseHeaders->addValue("Audio-Jack-Status", "connected; type=digital");
                     
         if (parameters != NULL)
@@ -893,7 +810,8 @@ void RAOPConnection::_processRequestCallbackHelper(WebConnection* connection, We
 
 void RAOPConnection::_connectionClosedCallback(WebConnection* connection) {
     
-    NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientDisconnectedNotificationName, this, NULL);
+    if (_rtp != NULL)
+        NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientDisconnectedNotificationName, this, NULL);
     
     delete this;
 
@@ -923,8 +841,14 @@ const char* RAOPConnection::getSessionId() {
     
 }
 
-unsigned int RAOPConnection::getNetworkScopeId() {
+const char* RAOPConnection::getUserAgent() {
     
-    return _connection->getLocalEndPoint()->getScopeId();
+    return _userAgent;
+    
+}
+
+bool RAOPConnection::isConnected() {
+    
+    return _connection->isConnected();
     
 }
