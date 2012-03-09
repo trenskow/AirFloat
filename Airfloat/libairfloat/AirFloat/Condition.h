@@ -20,7 +20,7 @@ public:
     ~Condition();
     
     void wait(Mutex* mutex);
-    void timedWait(Mutex* mutex, int milliseconds);
+    bool timedWait(Mutex* mutex, int milliseconds);
     
     void signal();
     void broadcast();
