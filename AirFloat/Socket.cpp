@@ -1,42 +1,59 @@
 //
 //  Socket.cpp
-//  AirFloatCF
+//  AirFloat
 //
-//  Created by Kristian Trenskow on 5/10/11.
-//  Copyright 2011 The Famous Software Company. All rights reserved.
+//  Created by Kristian Trenskow on 3/5/12.
+//  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#include <pthread.h>
-#include <string.h>
 #include <unistd.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 #include <errno.h>
+#include <string.h>
 #include <assert.h>
 
 #include "Log.h"
 #include "Socket.h"
+
+#include "SocketEndPointIPv4.h"
+#include "SocketEndPointIPv6.h"
 
 Socket::Socket(bool isUDP) {
     
     _isUDP = isUDP;
     _socket = -1;
     
+    _localEndPoint = _remoteEndPoint = NULL;
+    
 }
 
-Socket::Socket(int socket, struct sockaddr* addr) {
+Socket::Socket(int socket) {
     
-    assert(socket != 0 && addr != NULL);
+    assert(socket != 0);
+    
+    _isUDP = false;
     
     _socket = socket;
-    socklen_t len = sizeof(struct sockaddr_in6);
-    getsockname(_socket, (struct sockaddr*) &_localEndPoint._ep, &len);
-    memcpy(&_remoteEndPoint._ep, addr, len);
+    
+    _localEndPoint = _remoteEndPoint = NULL;
     
 }
+
 
 Socket::~Socket() {
     
-    Close(); // Shutdown
-    close(_socket);
+    if (_socket > -1)        
+        Close();
+    
+    if (_localEndPoint != NULL) {
+        delete _localEndPoint;
+        _localEndPoint = NULL;
+    }
+    if (_remoteEndPoint != NULL) {
+        delete _remoteEndPoint;
+        _remoteEndPoint = NULL;
+    }
     
 }
 
@@ -44,17 +61,31 @@ bool Socket::Bind(SocketEndPoint* ep) {
     
     assert(ep != NULL);
     
-    if (_socket == -1)
-        _socket = socket(AF_INET6, (_isUDP ? SOCK_DGRAM : SOCK_STREAM), (_isUDP ? IPPROTO_UDP : IPPROTO_TCP));
+    if (_localEndPoint != NULL)
+        delete _localEndPoint;
     
-    struct sockaddr_in6* addr6 = (struct sockaddr_in6*) ep->getSocketAddress();
-    if (bind(_socket, (struct sockaddr*)addr6, sizeof(struct sockaddr_in6)) == 0) {
-        _localEndPoint = *ep;
-        return true;
+    _localEndPoint = ep->copy();
+    struct sockaddr* addr = _localEndPoint->getSocketAddress();
+    
+    if (_socket < 0) {
+        
+        _socket = socket(addr->sa_family, (_isUDP ? SOCK_DGRAM : SOCK_STREAM), (_isUDP ? IPPROTO_UDP : IPPROTO_TCP));
+        
+        if (_socket < 0)
+            log(LOG_INFO, "Socket creation error: %s", strerror(errno));
+
+        if (ep->isIPv6()) {
+            int32_t on = 1;
+            setsockopt(_socket, IPPROTO_IPV6, IPV6_V6ONLY, &on, sizeof(on));
+        }
+        
     }
     
-    return false;
+    if (bind(_socket, addr, addr->sa_len) == 0)
+        return true;
     
+    return false;
+        
 }
 
 bool Socket::Listen() {
@@ -63,7 +94,7 @@ bool Socket::Listen() {
         return true;
     
     return false;
-    
+        
 }
 
 Socket* Socket::Accept() {
@@ -72,8 +103,8 @@ Socket* Socket::Accept() {
     socklen_t addr_len = sizeof(client_addr);
     int newSocket = accept(_socket, (struct sockaddr*)&client_addr, &addr_len);
     if (newSocket >= 0)
-        return new Socket(newSocket, (struct sockaddr*)&client_addr);
-        
+        return new Socket(newSocket);
+
     return NULL;
     
 }
@@ -82,13 +113,17 @@ long Socket::Receive(unsigned char* buffer, long size) {
     
     assert(buffer != NULL && size > 0);
     
-    if (!_isUDP)
-        return recv(_socket, buffer, size, 0);
-        
-    socklen_t len = sizeof(struct sockaddr_in6);
-    int ret = recvfrom(_socket, buffer, size, 0, (struct sockaddr*) &_remoteEndPoint._ep, &len);
+    struct sockaddr_storage remoteAddr;
+    socklen_t remoteAddrLen = sizeof(sockaddr_storage);
+    int ret = recvfrom(_socket, buffer, size, 0, (struct sockaddr*) &remoteAddr, &remoteAddrLen);
+    
+    if (_remoteEndPoint != NULL)
+        delete _remoteEndPoint;
+    
+    _remoteEndPoint = SocketEndPoint::createSocket((struct sockaddr*) &remoteAddr);
     
     return ret;
+    
     
 }
 
@@ -105,9 +140,12 @@ long Socket::SendTo(SocketEndPoint* dst, const char* buffer, long size) {
     if (!_isUDP)
         return Send(buffer, size);
     
-    socklen_t len = sizeof(struct sockaddr_in6);
+    struct sockaddr* remoteSocketEndPoint = dst->getSocketAddress();
+    socklen_t len = remoteSocketEndPoint->sa_len;
     
-    long ret = sendto(_socket, buffer, size, 0, (struct sockaddr*) &dst->_ep, len);
+    assert(remoteSocketEndPoint->sa_family == _localEndPoint->getSocketAddress()->sa_family);
+    
+    long ret = sendto(_socket, buffer, size, 0, (struct sockaddr*) remoteSocketEndPoint, len);
     if (ret < 0)
         log(LOG_INFO, "Unable to send (errno: %d - %s)", errno, strerror(errno));
     
@@ -117,20 +155,37 @@ long Socket::SendTo(SocketEndPoint* dst, const char* buffer, long size) {
 
 void Socket::Close() {
     
-    shutdown(_socket, SHUT_RDWR);
-    if (_isUDP)
-        close(_socket);
-        
+    close(_socket);
+    _socket = -1;
+    
 }
 
 SocketEndPoint* Socket::GetLocalEndPoint() {
     
-    return &_localEndPoint;
+    if (_localEndPoint == NULL && _socket > 0) {
+        
+        struct sockaddr_storage addr;
+        socklen_t len = sizeof(sockaddr_storage);
+        if (getsockname(_socket, (struct sockaddr*)&addr, &len) == 0)
+            _localEndPoint = SocketEndPoint::createSocket((struct sockaddr*)&addr);
+        
+    }
+    
+    return _localEndPoint;
     
 }
 
 SocketEndPoint* Socket::GetRemoteEndPoint() {
     
-    return &_remoteEndPoint;
+    if (_remoteEndPoint == NULL && _socket > 0) {
+        
+        struct sockaddr_storage addr;
+        socklen_t len = sizeof(sockaddr_storage);
+        if (getpeername(_socket, (struct sockaddr*)&addr, &len) == 0)
+            _remoteEndPoint = SocketEndPoint::createSocket((struct sockaddr*) &addr);
+        
+    }
+    
+    return _remoteEndPoint;
     
 }
