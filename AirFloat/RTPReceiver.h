@@ -38,8 +38,8 @@ class RAOPConnection;
 class RTPReceiver : public NotificationObserver {
     
 public:
-    RTPReceiver(const char* localHost, const char* remoteHost, const unsigned char aesKey[16], const unsigned char aesIv[16], RAOPConnection* connection, int* fmtp, int fmtpLen);
-    RTPReceiver(const char* localHost, const char* remoteHost, RAOPConnection* connection, int* fmtp, int fmtpLen);
+    RTPReceiver(const unsigned char aesKey[16], const unsigned char aesIv[16], RAOPConnection* connection, int* fmtp, int fmtpLen);
+    RTPReceiver(RAOPConnection* connection, int* fmtp, int fmtpLen);
     ~RTPReceiver();
     
     unsigned short setup(unsigned short* timingPort, unsigned short* controlPort);
@@ -58,11 +58,11 @@ public:
     
 private:
     
-    void _setup(const char* localHost, const char* remoteHost, RAOPConnection* connection, int* fmtp, int fmtpLen);
+    void _setup(RAOPConnection* connection, int* fmtp, int fmtpLen);
     
     void _processSyncPacket(RTPPacket* packet);
     void _processTimingResponsePacket(RTPPacket* packet);
-    void _sendPacket(const char* buffer, size_t len, unsigned short port, Socket* sock);
+    void _sendPacket(const char* buffer, size_t len, SocketEndPoint* remoteEndPoint, Socket* sock);
     void _sendTimingRequest();
     void _sendResendRequest(unsigned short seqNum, unsigned short count);
     void _startSynchronizationLoop();
@@ -97,11 +97,9 @@ private:
     Socket* _timingSock;
     Socket* _controlSock;
     
-    char* _localHost;
-    char* _remoteHost;
-    
-    unsigned short _clientTimingPort;
-    unsigned short _clientControlPort;
+    SocketEndPoint* _localEndPoint;
+    SocketEndPoint* _remoteTimingEndPoint;
+    SocketEndPoint* _remoteControlEndPoint;
     
     bool _streamIsEncrypted;
     AES_KEY _aes;
