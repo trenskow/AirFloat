@@ -8,6 +8,7 @@
 
 #import <netinet/in.h>
 
+#import "AirFloatAdditions.h"
 #import "AirFloatReachability.h"
 
 @interface AirFloatReachability (Private)
@@ -59,6 +60,8 @@ static void reachabilityCallback(SCNetworkReachabilityRef reachability, SCNetwor
     
     _reachability = NULL;
     
+    [super dealloc];
+    
 }
 
 + (AirFloatReachability*)wifiReachability {
@@ -90,7 +93,7 @@ static void reachabilityCallback(SCNetworkReachabilityRef reachability, SCNetwor
     if (self.delegate)
         [self.delegate reachability:self didChangeStatus:self.isAvailable];
     
-    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:AirFloatReachabilityChangedStatus object:self]];
+    [NSDefaultNotificationCenter postNotification:[NSNotification notificationWithName:AirFloatReachabilityChangedStatus object:self]];
     
 }
 
