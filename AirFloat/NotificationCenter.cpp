@@ -7,6 +7,7 @@
 //
 
 #include <string.h>
+#include "Log.h"
 #include "Notification.h"
 #include "NotificationObserver.h"
 #include "NotificationCenter.h"
@@ -65,10 +66,14 @@ void NotificationCenter::postNotification(const char* name, void* sender, void* 
     
     _mutex.lock();
     
+    bool handled = false;
+    
     for (uint32_t i = 0 ; i < _observerCount ; i++) {
         
         bool objectMatch = (_observers[i].object == sender);
         bool nameMatch = (_observers[i].name != NULL && 0 == strcmp(_observers[i].name, name));
+        
+        handled = (handled || objectMatch || nameMatch);
         
         if ((_observers[i].name == NULL && _observers[i].object == NULL) || (objectMatch && _observers[i].name == NULL) || (nameMatch && _observers[i].object == NULL)) {
             if (_observers[i].observer != NULL)
@@ -82,6 +87,9 @@ void NotificationCenter::postNotification(const char* name, void* sender, void* 
     _mutex.unlock();
     
     delete notification;
+    
+    if (!handled)
+        log(LOG_INFO, "Notification \"%s\" had no observers.", name);
     
 }
 
