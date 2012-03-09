@@ -16,6 +16,7 @@ AudioPacket::AudioPacket(AudioPacketState initialState) {
     
     seqNo = 0;
     sampleTime = 0;
+    time = 0;
     state = initialState;
 
     _bufferSize = 0;
