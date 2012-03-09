@@ -22,6 +22,8 @@
     
     self.layer.mask = gradientLayer;
     
+    [gradientLayer release];
+    
 }
 
 @end
