@@ -12,13 +12,17 @@
 #include <assert.h>
 #include <stdio.h>
 #include "Log.h"
+#include "WebServer.h"
 #include "WebHeaders.h"
 #include "WebRequest.h"
 #include "WebConnection.h"
 
-WebConnection::WebConnection(Socket* socket) {
+WebConnection::WebConnection(Socket* socket, WebServer* server) {
     
     _socket = socket;
+    _server = server;
+    
+    _isConnected = false;
     
     _processRequestCallback = NULL;
     _connectionClosedCallback = NULL;
@@ -44,6 +48,30 @@ SocketEndPoint* WebConnection::getRemoteEndPoint() {
     
 }
 
+bool WebConnection::isConnected() {
+    
+    _mutex.lock();
+    bool ret = _isConnected;
+    _mutex.unlock();
+    
+    return ret;
+    
+}
+
+void WebConnection::closeConnection() {
+    
+    if (isConnected())
+        _socket->Close();
+    
+}
+
+void WebConnection::waitConnection() {
+    
+    if (isConnected())
+        pthread_join(_connectionLoopThread, NULL);
+    
+}
+
 void WebConnection::setProcessRequestCallback(processRequestCallback callback) {
     
     _processRequestCallback = callback;
@@ -62,21 +90,10 @@ void WebConnection::setCallbackCtx(void* ctx) {
     
 }
 
-void WebConnection::setCallbackReady() {
-    
-    pthread_create(&_connectionLoopThread, NULL, _connectionLoopKickStarter, this);
-    
-    char ip[50];
-    _socket->GetRemoteEndPoint()->getHost(ip, 50);
-    
-    log(LOG_INFO, "RAOPConnection (%p) took over connection from %s:%d", this, ip, _socket->GetRemoteEndPoint()->getPort());
-        
-}
-
 void* WebConnection::_connectionLoopKickStarter(void* t) {
     
     pthread_setname_np("Client Connection Socket");
-    ((WebConnection*)t)->_connectionLoop();
+    ((WebConnection*)t)->_connectionLoop();    
     pthread_exit(0);
         
 }
@@ -168,6 +185,12 @@ void WebConnection::_connectionLoop() {
             
             assert(request->_response->_statusCode < 1000);
             
+            if (request->_response->_statusCode == 404 && request->_response->_headers->_headerCount == 0)
+                request->_response->_headers->addValue("Content-Length", "0");
+            
+            if (request->_response->_contentLength > 0)
+                request->_response->_headers->addValue("Content-Length", "%d", request->_response->_contentLength);
+            
             uint32_t protocolLen = strlen(request->getProtocol());
             uint32_t statusCodeLen = 3;
             uint32_t statusMessageLen = strlen(request->_response->_statusMessage);
@@ -193,8 +216,10 @@ void WebConnection::_connectionLoop() {
             
             free(res);
             
-            if (request->_response->_contentLength > 0)
+            if (request->_response->_contentLength > 0) {
+                log_data(LOG_INFO, (char*) request->_response->_content, request->_response->_contentLength);
                 _socket->Send((char*)request->_response->_content, request->_response->_contentLength);
+            }
             
             if (!request->_response->_keepAlive)
                 _socket->Close();
@@ -216,11 +241,33 @@ void WebConnection::_connectionLoop() {
     log(LOG_INFO, "Client disconnected");
     
     _socket->Close();
-
+    
     if (buffer != NULL)
         free(buffer);
     
+    _mutex.lock();
+    _isConnected = false;
+    _mutex.unlock();
+    
+    _server->_connectionClosed(this);
+    
     if (_connectionClosedCallback != NULL)
         _connectionClosedCallback(this, _callbackCtx);
+    
+}
+
+void WebConnection::_takeOff() {
+    
+    _mutex.lock();
+    
+    _isConnected = true;    
+    pthread_create(&_connectionLoopThread, NULL, _connectionLoopKickStarter, this);
+    
+    _mutex.unlock();
+    
+    char ip[50];
+    _socket->GetRemoteEndPoint()->getHost(ip, 50);
+    
+    log(LOG_INFO, "RAOPConnection (%p) took over connection from %s:%d", this, ip, _socket->GetRemoteEndPoint()->getPort());
     
 }
