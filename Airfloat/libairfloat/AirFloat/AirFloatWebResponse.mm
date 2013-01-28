@@ -6,7 +6,7 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#import "WebHeaders.h"
+#import <AirFloatLibrary/Library.h>
 #import "AirFloatWebResponse+Private.h"
 
 @implementation AirFloatWebResponse

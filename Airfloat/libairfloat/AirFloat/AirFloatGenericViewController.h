@@ -6,8 +6,15 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
-@protocol AirFloatGenericViewController <NSObject>
+@protocol AirFloatGenericViewController
+
+@property (nonatomic,assign,setter=setAppereance:) BOOL apparent;
+
+- (void)appear;
+- (void)disappear;
+- (void)setAppereance:(BOOL)apparent;
+- (void)setAppereance:(BOOL)apparent animated:(BOOL)animated;
 
 @end

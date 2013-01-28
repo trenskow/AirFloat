@@ -6,7 +6,7 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#import "WebConnection.h"
+#import <AirFloatLibrary/Library.h>
 #import "AirFloatSocketEndPoint+Private.h"
 #import "AirFloatWebRequest+Private.h"
 #import "AirFloatWebConnection+Private.h"

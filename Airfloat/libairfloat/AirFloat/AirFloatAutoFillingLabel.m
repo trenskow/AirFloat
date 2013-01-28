@@ -55,7 +55,7 @@
         if ([[string substringWithRange:[result rangeAtIndex:1]] isEqualToString:@"DEVICENAME"])
             replacement = UICurrentDevice.name;
         
-        ret = [ret stringByReplacingOccurrencesOfString:[NSString stringWithFormat:[string substringWithRange:[result rangeAtIndex:0]]]
+        ret = [ret stringByReplacingOccurrencesOfString:[string substringWithRange:[result rangeAtIndex:0]]
                                              withString:replacement];
     }
     

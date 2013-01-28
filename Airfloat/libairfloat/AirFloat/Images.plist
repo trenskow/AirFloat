@@ -11,7 +11,7 @@
 			<string>top</string>
 		</dict>
 		<key>AirFloatAdImage</key>
-		<string>iTunes.png</string>
+		<string>iTunes.jpg</string>
 		<key>AirFloatAdTexts</key>
 		<array>
 			<dict>
@@ -61,7 +61,7 @@
 			<string>bottom</string>
 		</dict>
 		<key>AirFloatAdImage</key>
-		<string>iPad.png</string>
+		<string>iPad.jpg</string>
 		<key>AirFloatAdTexts</key>
 		<array>
 			<dict>
@@ -96,7 +96,7 @@
 			<key>x</key>
 			<integer>315</integer>
 			<key>y</key>
-			<integer>210</integer>
+			<integer>180</integer>
 		</dict>
 		<key>AirFloatAdScreenCenter</key>
 		<dict>
@@ -119,7 +119,7 @@
 			<string>bottom</string>
 		</dict>
 		<key>AirFloatAdImage</key>
-		<string>iPhone.png</string>
+		<string>iPhone.jpg</string>
 		<key>AirFloatAdTexts</key>
 		<array>
 			<dict>

@@ -8,7 +8,19 @@
 
 #import <UIKit/UIKit.h>
 
+typedef enum {
+    
+    kAirFloatSongCellStyleFull = 0,
+    kAirFloatSongCellStyleSimple = 1
+    
+} AirFloatSongCellStyle;
+
 @interface AirFloatSongCell : UITableViewCell {
+    
+    UIView* _coloredBackgroundView;
+    
+    CGRect _numberContentFrame;
+    CGRect _infoContentFrame;
     
     CGRect _nowPlayIndicatorFrame;
     CGRect _trackNumberFrame;
@@ -17,12 +29,21 @@
     CGRect _timeFrame;
     CGRect _albumNameFrame;
     
-    BOOL _displayArtist;
-    BOOL _displayAlbum;
+    AirFloatSongCellStyle _style;
+    
+    CGFloat _trackWidth;
+    
+    BOOL _selected;
+    BOOL _highlighted;
     
 }
 
 + (AirFloatSongCell*)cellForTableView:(UITableView*)tableView;
++ (CGSize)sizeForStyle:(AirFloatSongCellStyle)style;
+
+@property (retain, nonatomic) IBOutlet UIView *infoView;
+@property (retain, nonatomic) IBOutlet UIView *numberContentView;
+@property (retain, nonatomic) IBOutlet UIView *infoContentView;
 
 @property (retain, nonatomic) IBOutlet UIView *nowPlayingIndicatorView;
 @property (retain, nonatomic) IBOutlet UILabel *trackNumberLabel;
@@ -32,8 +53,7 @@
 @property (retain, nonatomic) IBOutlet UILabel *albumNameLabel;
 @property (retain, nonatomic) IBOutlet UIView *seperatorView;
 
-@property (assign, nonatomic,getter=shouldDisplayArtist) BOOL displayArtist;
-@property (assign, nonatomic,getter=shouldDisplayAlbum) BOOL displayAlbum;
+@property (assign, nonatomic) AirFloatSongCellStyle style;
 
 - (void)adjustTrackNumberToWidth:(CGFloat)width;
 

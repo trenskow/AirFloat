@@ -8,7 +8,14 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
-			<string>Thanks to Michael Paul Bailey (jinxidoru.blogspot.com) for figuring out the DAAP authentication algorithm.</string>
+			<string>Thanks to Michael Paul Bailey (jinxidoru.blogspot.com) for figuring out the DAAP authentication algorithm.
+
+----
+
+StackBlur Algorithm
+
+Developed by Mario Klingemann @ http://incubator.quasimondo.com/
+iOS library by Thomas Landspurg @ http://www.landspurg.net/ (https://github.com/tomsoft1)</string>
 		</dict>
 	</array>
 </dict>

@@ -6,7 +6,7 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#import "WebRequest.h"
+#import <AirFloatLibrary/Library.h>
 #import "AirFloatWebRequest.h"
 
 @class AirFloatWebConnection;

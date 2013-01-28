@@ -7,23 +7,28 @@
 //
 
 #import "AirFloatAdditions.h"
-#import <UIKit/UIKit.h>
+#import "AirFloatGenericViewController.h"
 
-@interface AirFloatViewController : UIViewController <UITableViewDelegate, UITableViewDataSource> {
+@interface AirFloatReceivingViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate, AirFloatTableViewDelegate, UITextFieldDelegate, AirFloatGenericViewController> {
     
     BOOL _playing;
     NSString* _previousPlayedAlbum;
     
     NSDictionary* _nowPlaying;
+    NSDictionary* _nowPlayingFiltered;
     
-    BOOL _displayArtist;
-    BOOL _displayAlbum;
+    NSInteger _songCellStyle;
     
     BOOL _contentOffsetSet;
+    BOOL _ignoreScroll;
     
     BOOL _canPausePlay;
     
-    NSUInteger _previousPlayedIndex;
+    dispatch_queue_t _filterQueue;
+    NSString* _currentFilterQuery;
+    BOOL _filtering;
+    
+    UIView* _playlistTopBackgroundView;
     
 }
 
@@ -32,19 +37,19 @@
 @property (retain, nonatomic) IBOutlet UILabel *trackTitleLabel;
 @property (retain, nonatomic) IBOutlet UILabel *artistNameLabel;
 @property (retain, nonatomic) IBOutlet AirFloatImageView *artworkImageView;
-@property (retain, nonatomic) IBOutlet AirFloatImageView *flippedArtworkImageView;
+@property (retain, nonatomic) IBOutlet UIImageView *flippedArtworkImageView;
 @property (retain, nonatomic) IBOutlet UIView *swipeView;
 @property (retain, nonatomic) IBOutlet UIButton *playButton;
 @property (retain, nonatomic) IBOutlet UIButton *nextButton;
 @property (retain, nonatomic) IBOutlet UIButton *prevButton;
 @property (retain, nonatomic) IBOutlet UIButton *pairButton;
 @property (retain, nonatomic) IBOutlet AirFloatBarButton *playlistButton;
-@property (retain, nonatomic) IBOutlet UITableView *playlistTableView;
-@property (retain, nonatomic) IBOutlet AirFloatAdView *adView;
+@property (retain, nonatomic) IBOutlet AirFloatTableView *playlistTableView;
 @property (retain, nonatomic) IBOutlet UIView *bottomView;
 @property (retain, nonatomic) IBOutlet UIView *topView;
-@property (retain, nonatomic) IBOutlet UIView *wifiView;
-@property (retain, nonatomic) IBOutlet UILabel *airfloatLabel;
+@property (retain, nonatomic) IBOutlet UIImageView *searchFieldBackground;
+@property (retain, nonatomic) IBOutlet UIButton *searchClearButton;
+@property (retain, nonatomic) IBOutlet UITextField *searchTextField;
 
 - (IBAction)tapGestureRecognized:(id)sender;
 - (IBAction)swipeGestureRecognized:(id)sender;
@@ -54,5 +59,7 @@
 - (IBAction)betaFeedbackButtonTouchUpInside:(id)sender;
 - (IBAction)pairButtonTouchUpInside:(id)sender;
 - (IBAction)playlistButtonTouchUpInside:(id)sender;
+- (IBAction)searchClearButtonTouchUpInside:(id)sender;
+- (IBAction)searchTextFieldEditingChanged:(UITextField *)sender;
 
 @end
