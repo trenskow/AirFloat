@@ -264,12 +264,6 @@ NSString* _itunesPairingcode(NSString* passcode, NSString* pair)
 
 - (void)processRequest:(AirFloatWebRequest *)request fromConnection:(AirFloatWebConnection *)connection {
     
-    NSArray* daapAddresses = [AirFloatServerController sharedServerController].currentDAAPAddresses;
-    
-    // If we found this service through bonjour, then we can allow only streaming host to authenticate
-    if (daapAddresses && [daapAddresses indexOfObject:connection.remoteEndPoint.host] == NSNotFound)
-        return;
-    
     [_loginToken release];
     _loginToken = nil;
     

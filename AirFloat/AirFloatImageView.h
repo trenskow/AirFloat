@@ -11,11 +11,26 @@
 @interface AirFloatImageView : UIImageView {
     
     UIImage* _fullsizeImage;
-    BOOL _flipped;
+    
+    UIImageView* _blurredImageView;
+    UIImageView* _flippedBlurredImageView;
+    
+    BOOL _generateBlurredImage;
+    BOOL _blur;
+    
+    dispatch_queue_t _imageManipulationQueue;
+    
+    UIImageView* _flippedMirroredImageView;
     
 }
 
 @property (readonly) UIImage* fullsizeImage;
-@property (nonatomic,assign,getter=isFlipped) BOOL flipped;
+@property (nonatomic,assign) BOOL generateBlurredImage;
+@property (nonatomic,assign) BOOL blur;
+
+@property (nonatomic,retain) IBOutlet UIImageView* flippedMirroredImageView;
+
+- (void)setBlur:(BOOL)blur animated:(BOOL)animated;
+- (void)setBlur:(BOOL)blur animated:(BOOL)animated slow:(BOOL)slowAnimated;
 
 @end

@@ -6,13 +6,10 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#import "DMAP.h"
-#import "RAOPServer.h"
-#import "RAOPConnection.h"
-#import "AudioQueue.h"
+#import <AirFloatLibrary/Library.h>
 
-#import "NotificationCenter.h"
-#import "NSNotificationCenter+AirFloatAdditions.h"
+#import <AirFloatLibrary/NotificationCenter.h>
+#import "AirFloatAdditions.h"
 #import "AirFloatNotificationsHub.h"
 
 static struct AirFloatNotificationBridge {

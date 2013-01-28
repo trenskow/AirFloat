@@ -39,14 +39,15 @@ typedef enum {
 #define kAirFloatDAAPPlaylistDatabaseIdentifierKey @"kAirFloatDAAPPlaylistDatabaseIdentifierKey"
 #define kAirFloatDAAPPlaylistIdentifierKey @"kAirFloatDAAPPlaylistIdentifierKey"
 #define kAirFloatDAAPPlaylistItemsKey @"kAirFloatDAAPPlaylistItemsKey"
-#define kAirFloatDAAPPlaylistItemsPlayingSongIndexKey @"kAirFloatDAAPPlaylistItemsPlayingSongIndexKey"
+#define kAirFloatDAAPPlaylistItemsPlayingItemKey @"kAirFloatDAAPPlaylistItemsPlayingSongIndexKey"
+#define kAirFloatDAAPPlaylistItemsPreviouslyPlayedItemKey @"kAirFloatDAAPPlaylistItemsPreviouslyPlayedSongIndexKey"
 
 #define kAirFloatDAAPItemIdenfifierKey @"kAirFloatDAAPItemIdenfifierKey"
 #define kAirFloatDAAPItemDurationKey @"kAirFloatDAAPItemDurationKey"
 #define kAirFloatDAAPItemNameKey @"kAirFloatDAAPItemNameKey"
-#define kAirFloatDAAPItemArtistNameKey @"kAirFloatDAAPItemArtistKey"
+#define kAirFloatDAAPItemArtistNameKey @"kAirFloatDAAPItemArtistNameKey"
 #define kAirFloatDAAPItemAlbumNameKey @"kAirFloatDAAPItemAlbumNameKey"
-#define kAirFloatDAAPItemArtworkKey @"kAirFloatDAAPItemArtwork"
+#define kAirFloatDAAPItemArtworkKey @"kAirFloatDAAPItemArtworkKey"
 
 #define AirFloatDAAPClientDidUpdatePlaylistNotification @"AirFloatDAAPClientDidUpdatePlaylistNotification"
 

@@ -34,7 +34,7 @@
                                    @"false", @"sm",
                                    @"2", @"ch",
                                    @"44100", @"sr",
-                                   ([NSStandarUserDefaults boolForKey:@"AirFloatAuthenticationEnabled"] && [[NSStandarUserDefaults objectForKey:@"AirFloatPassword"] length] > 0 ? @"true" : @"false"), @"pw",
+                                   ([NSStandarUserDefaults boolForKey:kAirFloatUserDefaultsAuthenticationEnabledKey defaultValue:NO] && [[NSStandarUserDefaults objectForKey:kAirFloatUserDefaultsPasswordKey] length] > 0 ? @"true" : @"false"), @"pw",
                                    nil];
         
         [_service setTXTRecordData:[NSNetService dataFromTXTRecordDictionary:txtRecord]];

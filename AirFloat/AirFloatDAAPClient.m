@@ -112,9 +112,9 @@ typedef struct {
     for (NSString* component in components)        
         if ([component length] > 7 && [[component substringToIndex:7] isEqualToString:@"iTunes/"])
             if ([[component substringFromIndex:7] doubleValue] > 9.0)
-                return @"_home-sharing._tcp.";
+                return @"_touch-able._tcp.";
     
-    return @"_home-sharing._tcp.";
+    return @"_daap._tcp.";
     
 }
 
@@ -158,6 +158,8 @@ typedef struct {
 }
 
 - (void)dealloc {
+    
+    dispatch_release(_clientQueue);
     
     [NSDefaultNotificationCenter removeObserver:self];
     
@@ -436,7 +438,7 @@ typedef struct {
                         NSDictionary* playlist = [[self _executeCommand:[NSString stringWithFormat:@"databases/%d/containers/%d/items?meta=dmap.itemname,dmap.itemid,dmap.containeritemid,daap.songartist,daap.songalbum,daap.songtime&type=music&query='*'", info.databaseId, info.containerId]] objectForKey:@"daap.playlistsongs"];
                         
                         NSMutableArray* nowPlayingItems = [[NSMutableArray alloc] init];
-                        NSUInteger nowPlayingIndex = NSNotFound;
+                        NSDictionary* nowPlayingItem = nil;
                         
                         for (NSUInteger i = 0 ; i < [[playlist objectForKey:@"dmap.listing"] count] ; i++) {
                             
@@ -452,7 +454,7 @@ typedef struct {
                                                             nil];
                             
                             if ([[song objectForKey:@"dmap.itemid"] integerValue] == info.itemId)
-                                nowPlayingIndex = i;
+                                nowPlayingItem = newItem;
                             
                             [nowPlayingItems addObject:newItem];
                             
@@ -464,8 +466,8 @@ typedef struct {
                                                            nowPlayingItems, kAirFloatDAAPPlaylistItemsKey,
                                                            nil];
                         
-                        if (nowPlayingIndex != NSNotFound)
-                            [nowPlaying setObject:[NSNumber numberWithInteger:nowPlayingIndex] forKey:kAirFloatDAAPPlaylistItemsPlayingSongIndexKey];
+                        if (nowPlayingItem)
+                            [nowPlaying setObject:nowPlayingItem forKey:kAirFloatDAAPPlaylistItemsPlayingItemKey];
                         
                         [nowPlayingItems release];
                         
@@ -476,10 +478,13 @@ typedef struct {
                         
                         // Play status was updated, but playing playlist didn't change. Find and set the current playing track.
                         
-                        NSArray* nowPlayingItems = [_nowPlaying objectForKey:kAirFloatDAAPPlaylistItemsKey];
-                        for (NSInteger i = 0 ; i < [nowPlayingItems count] ; i++)
-                            if ([[[nowPlayingItems objectAtIndex:i] objectForKey:kAirFloatDAAPItemOwnIdKey] integerValue] == info.itemId) {
-                                [_nowPlaying setObject:[NSNumber numberWithInteger:i] forKey:kAirFloatDAAPPlaylistItemsPlayingSongIndexKey];
+                        NSDictionary* previousPlayingItem = nil;
+                        if ((previousPlayingItem = [_nowPlaying objectForKey:kAirFloatDAAPPlaylistItemsPlayingItemKey]))
+                            [_nowPlaying setObject:previousPlayingItem forKey:kAirFloatDAAPPlaylistItemsPreviouslyPlayedItemKey];
+
+                        for (NSDictionary* item in [_nowPlaying objectForKey:kAirFloatDAAPPlaylistItemsKey])
+                            if ([[item objectForKey:kAirFloatDAAPItemOwnIdKey] integerValue] == info.itemId) {
+                                [_nowPlaying setObject:item forKey:kAirFloatDAAPPlaylistItemsPlayingItemKey];
                                 break;
                             }
                         

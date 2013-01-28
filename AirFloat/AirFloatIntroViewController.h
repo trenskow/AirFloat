@@ -6,8 +6,10 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "AirFloatGenericViewController.h"
 
-@interface AirFloatIntroViewController : UIViewController
+@interface AirFloatIntroViewController : UIViewController <AirFloatGenericViewController>
+
+@property (retain, nonatomic) IBOutlet AirFloatAdView *adView;
 
 @end

@@ -6,7 +6,7 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#import "SocketEndPoint.h"
+#import <AirFloatLibrary/Library.h>
 #import "AirFloatSocketEndPoint.h"
 
 @interface AirFloatSocketEndPoint (Private)

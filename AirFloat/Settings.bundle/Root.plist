@@ -18,7 +18,7 @@
 			<key>Title</key>
 			<string>Enable Authentication</string>
 			<key>Key</key>
-			<string>AirFloatAuthenticationEnabled</string>
+			<string>kAirFloatUserDefaultsAuthenticationEnabledKey</string>
 			<key>DefaultValue</key>
 			<false/>
 		</dict>
@@ -32,13 +32,49 @@
 			<key>IsSecure</key>
 			<true/>
 			<key>Key</key>
-			<string>AirFloatPassword</string>
+			<string>kAirFloatUserDefaultsPasswordKey</string>
 			<key>KeyboardType</key>
 			<string>Alphabet</string>
 			<key>Title</key>
 			<string>Password</string>
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Power Management</string>
+			<key>FooterText</key>
+			<string>Turning this on will result in the device not dimming the screen when connected to a power source. Looks great for artwork when the device is docked.</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Keep Screen Alive</string>
+			<key>Key</key>
+			<string>kAirFloatUserDefaultsDoNotDimDisplayKey</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Synchronization</string>
+			<key>FooterText</key>
+			<string>Synchronization is disabled by default. This might cause skippings in the audio stream. Enable this if you need multiple AirPlay receivers to play at the same time.</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Synchronize</string>
+			<key>Key</key>
+			<string>kAirFloatUserDefaultsSynchronizeAudioKey</string>
+			<key>DefaultValue</key>
+			<false/>
 		</dict>
 		<dict>
 			<key>Type</key>

@@ -8,6 +8,7 @@
 
 #pragma mark - Custom Classees
 
+#import <CommonAdditions/Additions.h>
 #import "AirFloatMacros.h"
 
 #import "AirFloatImageView.h"
@@ -15,6 +16,8 @@
 #import "AirFloatBarButton.h"
 #import "AirFloatAutoFillingLabel.h"
 #import "AirFloatHighlightedButton.h"
+#import "AirFloatTableView.h"
+#import "AirFloatTapPanGestureRecognizer.h"
 
 #import "AirFloatAdView.h"
 #import "AirFloatFlipInView.h"
@@ -22,13 +25,3 @@
 #pragma mark - Categories
 
 #import "NSDictionary+AirFloatAdditions.h"
-#import "NSData+AirFloatAdditions.h"
-#import "NSUserDefaults+AirFloatAdditions.h"
-#import "NSNotificationCenter+AirFloatAdditions.h"
-#import "NSString+AirFloatAdditions.h"
-#import "NSNull+AirFloatAdditions.h"
-#import "NSBundle+AirFloatAdditions.h"
-
-#import "UIDevice+AirFloatAdditions.h"
-#import "UIApplication+AirFloatAdditions.h"
-#import "UIView+AirFloatAdditions.h"

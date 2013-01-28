@@ -7,7 +7,7 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
-#import "UIDevice+AirFloatAdditions.h"
+#import "AirFloatAdditions.h"
 #import "AirFloatFlipInView.h"
 #import "AirFloatAdView.h"
 
@@ -86,6 +86,7 @@
                              _currentImage = 0;
                              _isAnimating = NO;
                              self.alpha = 1.0;
+                             self.hidden = YES;
                          }];
         
     }
@@ -95,6 +96,8 @@
 #pragma mark - Private Methods
 
 - (void)_displayNextImage {
+    
+    self.hidden = NO;
     
     NSDictionary* image = [self.images objectAtIndex:_currentImage++];
     
@@ -113,7 +116,7 @@
     
     [nextView addSubview:imageView];
     
-    CGFloat startScale = 1.1 - ((CGFloat)(arc4random() % 10) / 40.0);
+    CGFloat startScale = 1.1 - ((CGFloat)(arc4random() % 10) / 50.0);
     imageView.layer.transform = CATransform3DMakeScale(startScale, startScale, 1.0);
     
     CGPoint startCenter = CGPointMake([[[image objectForKey:@"AirFloatAdScreenCenter"] objectForKey:@"x"] doubleValue] * self.frame.size.width, 

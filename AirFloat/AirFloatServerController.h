@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
 #import "AirFloatDAAPClient.h"
 #import "AirFloatBonjourBrowser.h"
 #import "AirFloatNotificationsHub.h"
@@ -16,16 +17,17 @@
 
 typedef enum {
     
-    kAirFloatServerControllerNeedsWifiStatus = 0,
-    kAirFloatServerControllerReadyStatus,
-    kAirFloatServerControllerReceivingStatus
+    kAirFloatServerControllerStatusUnknown = 0,
+    kAirFloatServerControllerStatusNeedsWifi,
+    kAirFloatServerControllerStatusReady,
+    kAirFloatServerControllerStatusReceiving
     
 } AirFloatServerControllerStatus;
 
 #define AirFloatServerControllerDidChangeStatusNotification @"AirFloatServerControllerDidChangeStatusNotification"
 #define AirFloatServerControllerFailedFindingDAAPNoification @"AirFloatServerControllerFailedFindingDAAPNoification"
 
-@interface AirFloatServerController : NSObject <NSNetServiceBrowserDelegate, NSNetServiceDelegate, AirFloatReachabilityDelegate, AirFloatBonjourBrowserDelegate, AirFloatDAAPClientDelegate> {
+@interface AirFloatServerController : NSObject <NSNetServiceBrowserDelegate, NSNetServiceDelegate, AirFloatReachabilityDelegate, AirFloatBonjourBrowserDelegate, AirFloatDAAPClientDelegate, AVAudioSessionDelegate> {
     
     void* _server;
     
@@ -38,6 +40,8 @@ typedef enum {
     AirFloatNotificationsHub* _notificationHub;
     
     NSDate* _lastLocalhostErrorNoticationDate;
+    
+    UIBackgroundTaskIdentifier _suspendBackgroundTaskIdentifier;
     
 }
 

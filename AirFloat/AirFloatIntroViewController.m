@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
+#import "AirFloatAdditions.h"
 #import "AirFloatIntroViewController.h"
 
 @interface AirFloatIntroViewController ()
@@ -14,31 +15,69 @@
 
 @implementation AirFloatIntroViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
+#pragma mark - Allocation / Deallocation / Load / Unload
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
+    
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+    
+    self.adView.images = [NSArray arrayWithContentsOfFile:[NSMainBundle pathForResource:@"Images" ofType:@"plist"]];
+    
 }
 
-- (void)viewDidUnload
-{
+- (void)viewDidUnload {
+    
+    self.adView = nil;
+    
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
+    
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+- (void)dealloc {
+    
+    self.adView = nil;
+    
+    [super dealloc];
+
 }
+
+#pragma mark - AirFloat Generic View Controller Methods
+
+- (void)appear {
+    
+    [self.adView startAnimation];
+    
+}
+
+- (void)disappear {
+    
+    [self.adView stopAnimation];
+    
+}
+
+- (BOOL)apparent {
+    
+    return self.adView.isAnimating;
+    
+}
+
+- (void)setAppereance:(BOOL)apparent {
+    
+    if (apparent)
+        [self appear];
+    else
+        [self disappear];
+    
+}
+
+- (void)setAppereance:(BOOL)apparent animated:(BOOL)animated {
+    
+    [self setAppereance:apparent];
+    
+}
+
+#pragma mark - Public Properties
+
+@synthesize adView;
 
 @end

@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
+#import "AirFloatAdditions.h"
 #import "AirFloatMissingWifiViewController.h"
 
 @interface AirFloatMissingWifiViewController ()
@@ -14,31 +15,88 @@
 
 @implementation AirFloatMissingWifiViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
+#pragma mark - Allocation / Deallocation / Load / Unload
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
+    
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+    
+    if ([UICurrentDevice.systemVersion doubleValue] < 5)
+        self.airFloatLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:15];
+    
+    self.view.hidden = YES;
+    
 }
 
-- (void)viewDidUnload
-{
+- (void)viewDidUnload {
+    
+    self.airFloatLabel = nil;
+    
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
+    
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+- (void)dealloc {
+    
+    self.airFloatLabel = nil;
+    
+    [super dealloc];
+    
 }
+
+#pragma mark - AirFloat Generic View Controller Methods
+
+- (void)appear {
+    
+    [self setAppereance:YES];
+    
+}
+
+- (void)disappear {
+    
+    [self setAppereance:NO];
+    
+}
+
+- (BOOL)apparent {
+    
+    return !self.view.hidden;
+    
+}
+
+- (void)setAppereance:(BOOL)apparent animated:(BOOL)animated {
+    
+    if (apparent == self.view.hidden) {
+        
+        if (apparent) {
+            self.view.alpha = 0.0;
+            self.view.hidden = NO;
+        }
+        
+        [UIView animateWithDuration:(animated ? 2.0 : 0.0)
+                              delay:0.0
+                            options:UIViewAnimationCurveEaseOut
+                         animations:^{
+                             self.view.alpha = (apparent ? 1.0 : 0.0);
+                         } completion:^(BOOL finished) {
+                             if (!apparent) {
+                                 self.view.hidden = YES;
+                                 self.view.alpha = 1.0;
+                             }
+                         }];
+        
+    }
+    
+}
+
+- (void)setAppereance:(BOOL)apparent {
+    
+    return [self setAppereance:apparent animated:YES];
+    
+}
+
+#pragma mark - Public Properties
+
+@synthesize airFloatLabel;
 
 @end
