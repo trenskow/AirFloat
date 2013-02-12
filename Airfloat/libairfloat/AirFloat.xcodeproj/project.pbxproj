@@ -82,7 +82,6 @@
 		A14D36B5151217B100CB6C9A /* SearchClearHighlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A14D36B1151217B100CB6C9A /* SearchClearHighlighted@2x.png */; };
 		A1566B5D1521DF87000475C4 /* AirFloatTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A1566B5C1521DF87000475C4 /* AirFloatTableView.m */; };
 		A1566B601521EAAA000475C4 /* AirFloatTapPanGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = A1566B5F1521EAAA000475C4 /* AirFloatTapPanGestureRecognizer.m */; };
-		A15886E4160F31B700B2F69B /* libTestFlight.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A15886E3160F31B700B2F69B /* libTestFlight.a */; };
 		A15F64F8151A343A00A7D712 /* iTunes@2x.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A15F64F7151A343A00A7D712 /* iTunes@2x.jpg */; };
 		A15F64FA151A344500A7D712 /* iTunes.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A15F64F9151A344500A7D712 /* iTunes.jpg */; };
 		A15F64FD151A35A200A7D712 /* iPad.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A15F64FB151A35A100A7D712 /* iPad.jpg */; };
@@ -93,24 +92,55 @@
 		A168F6A114F23F7200EDBCDC /* AirFloatHighlightedButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A168F6A014F23F7200EDBCDC /* AirFloatHighlightedButton.m */; };
 		A168F6A414F2401900EDBCDC /* ButtonHighlight.png in Resources */ = {isa = PBXBuildFile; fileRef = A168F6A214F2401900EDBCDC /* ButtonHighlight.png */; };
 		A168F6A514F2401900EDBCDC /* ButtonHighlight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A168F6A314F2401900EDBCDC /* ButtonHighlight@2x.png */; };
-		A16B3CA21535BAA50092DA27 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A16B3CA11535BAA50092DA27 /* Cocoa.framework */; };
-		A16B3CD71535BE740092DA27 /* AirFloatMacAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = A16B3CD41535BE740092DA27 /* AirFloatMacAppDelegate.mm */; };
-		A16B3CD81535BE740092DA27 /* main-Mac.m in Sources */ = {isa = PBXBuildFile; fileRef = A16B3CD51535BE740092DA27 /* main-Mac.m */; };
-		A16B3CDC1535BF5C0092DA27 /* StatusItemImage.png in Resources */ = {isa = PBXBuildFile; fileRef = A16B3CDA1535BF5C0092DA27 /* StatusItemImage.png */; };
-		A16B3CDD1535BF5C0092DA27 /* StatusItemImageHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = A16B3CDB1535BF5C0092DA27 /* StatusItemImageHighlighted.png */; };
-		A16B3CDF1535BFD90092DA27 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = A16B3CDE1535BFD90092DA27 /* MainMenu.xib */; };
-		A16B3CF31535C6420092DA27 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1CD00A914DDA283001A6DE1 /* AudioToolbox.framework */; };
-		A16B3CF51535C7160092DA27 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A16B3CF41535C7140092DA27 /* libcrypto.dylib */; };
-		A16B3CF71535C71D0092DA27 /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A16B3CF61535C71B0092DA27 /* libssl.dylib */; };
-		A16B3CF81535C7360092DA27 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1CD00A514DDA275001A6DE1 /* CoreAudio.framework */; };
-		A16B3CFA1535C7650092DA27 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A16B3CF91535C7650092DA27 /* QuartzCore.framework */; };
-		A17D49D9163E77B900A94C23 /* libAirFloatLibraryiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A17D49D6163E77A300A94C23 /* libAirFloatLibraryiOS.a */; };
 		A17D49DB163E7A4C00A94C23 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A17D49DA163E7A4C00A94C23 /* Default-568h@2x.png */; };
-		A17E9234152DA909000331D3 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A17E9233152DA909000331D3 /* libz.dylib */; };
-		A18F05A415362D7E00265479 /* libCommonAdditions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A18F059D15362C4A00265479 /* libCommonAdditions.a */; };
 		A190852D14FB927F005B02EF /* NowPlayingIndicator.png in Resources */ = {isa = PBXBuildFile; fileRef = A190852B14FB927F005B02EF /* NowPlayingIndicator.png */; };
 		A190852E14FB927F005B02EF /* NowPlayingIndicator@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A190852C14FB927F005B02EF /* NowPlayingIndicator@2x.png */; };
 		A194311F14D46878009FC07B /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A194311E14D46878009FC07B /* CoreAudio.framework */; };
+		A19E4ACC16CA951500E5D60F /* Settings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4ACB16CA951500E5D60F /* Settings.cpp */; };
+		A19E4AD116CA952700E5D60F /* DMAP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AD016CA952700E5D60F /* DMAP.cpp */; };
+		A19E4AD516CA953600E5D60F /* Log.mm in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AD416CA953600E5D60F /* Log.mm */; };
+		A19E4ADB16CA954500E5D60F /* Mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AD816CA954500E5D60F /* Mutex.cpp */; };
+		A19E4ADC16CA954500E5D60F /* Condition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4ADA16CA954500E5D60F /* Condition.cpp */; };
+		A19E4AE616CA957900E5D60F /* Notification.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AE116CA957900E5D60F /* Notification.cpp */; };
+		A19E4AE716CA957900E5D60F /* NotificationCenter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AE316CA957900E5D60F /* NotificationCenter.cpp */; };
+		A19E4AE816CA957900E5D60F /* NotificationObserver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AE516CA957900E5D60F /* NotificationObserver.cpp */; };
+		A19E4AF716CA959700E5D60F /* AudioConverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AEC16CA959700E5D60F /* AudioConverter.cpp */; };
+		A19E4AF816CA959700E5D60F /* AppleLosslessAudioConverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AEE16CA959700E5D60F /* AppleLosslessAudioConverter.cpp */; };
+		A19E4AF916CA959700E5D60F /* AppleLosslessSoftwareAudioConverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AF016CA959700E5D60F /* AppleLosslessSoftwareAudioConverter.cpp */; };
+		A19E4AFA16CA959700E5D60F /* AudioPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AF216CA959700E5D60F /* AudioPlayer.cpp */; };
+		A19E4AFB16CA959700E5D60F /* AudioPacket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AF416CA959700E5D60F /* AudioPacket.cpp */; };
+		A19E4AFC16CA959700E5D60F /* AudioQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AF616CA959700E5D60F /* AudioQueue.cpp */; };
+		A19E4B0716CA959F00E5D60F /* CADebugPrintf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B0016CA959F00E5D60F /* CADebugPrintf.cpp */; };
+		A19E4B0816CA959F00E5D60F /* CAHostTimeBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B0216CA959F00E5D60F /* CAHostTimeBase.cpp */; };
+		A19E4B0916CA959F00E5D60F /* CAStreamBasicDescription.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B0416CA959F00E5D60F /* CAStreamBasicDescription.cpp */; };
+		A19E4B0A16CA959F00E5D60F /* CAXException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B0616CA959F00E5D60F /* CAXException.cpp */; };
+		A19E4B0D16CA95AC00E5D60F /* alac.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B0C16CA95AC00E5D60F /* alac.c */; };
+		A19E4B1816CA95C900E5D60F /* Socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1116CA95C900E5D60F /* Socket.cpp */; };
+		A19E4B1916CA95C900E5D60F /* SocketEndPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1316CA95C900E5D60F /* SocketEndPoint.cpp */; };
+		A19E4B1A16CA95C900E5D60F /* SocketEndPointIPv4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1516CA95C900E5D60F /* SocketEndPointIPv4.cpp */; };
+		A19E4B1B16CA95C900E5D60F /* SocketEndPointIPv6.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1716CA95C900E5D60F /* SocketEndPointIPv6.cpp */; };
+		A19E4B2816CA95D300E5D60F /* WebTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1D16CA95D300E5D60F /* WebTools.cpp */; };
+		A19E4B2916CA95D300E5D60F /* WebHeaders.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1F16CA95D300E5D60F /* WebHeaders.cpp */; };
+		A19E4B2A16CA95D300E5D60F /* WebResponse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2116CA95D300E5D60F /* WebResponse.cpp */; };
+		A19E4B2B16CA95D300E5D60F /* WebRequest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2316CA95D300E5D60F /* WebRequest.cpp */; };
+		A19E4B2C16CA95D300E5D60F /* WebConnection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2516CA95D300E5D60F /* WebConnection.cpp */; };
+		A19E4B2D16CA95D300E5D60F /* WebServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2716CA95D300E5D60F /* WebServer.cpp */; };
+		A19E4B3816CA95E200E5D60F /* Base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2F16CA95E200E5D60F /* Base64.cpp */; };
+		A19E4B3916CA95E200E5D60F /* RTPReceiver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B3116CA95E200E5D60F /* RTPReceiver.cpp */; };
+		A19E4B3A16CA95E200E5D60F /* RAOPParameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B3316CA95E200E5D60F /* RAOPParameters.cpp */; };
+		A19E4B3B16CA95E200E5D60F /* RAOPConnection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B3516CA95E200E5D60F /* RAOPConnection.cpp */; };
+		A19E4B3C16CA95E200E5D60F /* RAOPServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B3716CA95E200E5D60F /* RAOPServer.cpp */; };
+		A19E4B4016CA96A300E5D60F /* NSBundle+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B3F16CA96A300E5D60F /* NSBundle+AirFloatAdditions.m */; };
+		A19E4B4416CA96DD00E5D60F /* NSUserDefaults+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B4316CA96DD00E5D60F /* NSUserDefaults+AirFloatAdditions.m */; };
+		A19E4B4716CA96F700E5D60F /* NSData+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B4616CA96F700E5D60F /* NSData+AirFloatAdditions.m */; };
+		A19E4B4B16CA971900E5D60F /* UIView+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B4A16CA971900E5D60F /* UIView+AirFloatAdditions.m */; };
+		A19E4B4E16CA973C00E5D60F /* UIDevice+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B4D16CA973C00E5D60F /* UIDevice+AirFloatAdditions.m */; };
+		A19E4B5216CA975900E5D60F /* CAKeyframeAnimation+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B5116CA975900E5D60F /* CAKeyframeAnimation+AirFloatAdditions.m */; };
+		A19E4B5516CA976C00E5D60F /* UIImage+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B5416CA976C00E5D60F /* UIImage+AirFloatAdditions.m */; };
+		A19E4B5816CA977E00E5D60F /* NSString+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B5716CA977E00E5D60F /* NSString+AirFloatAdditions.m */; };
+		A19E4B5E16CA97A800E5D60F /* NSNull+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B5D16CA97A800E5D60F /* NSNull+AirFloatAdditions.m */; };
+		A19E4B6116CA97BF00E5D60F /* UIApplication+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B6016CA97BF00E5D60F /* UIApplication+AirFloatAdditions.m */; };
+		A19E4B6A16CA9C2100E5D60F /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A19E4B6716CA9BDC00E5D60F /* libcrypto.a */; };
 		A1A8078C14EF1C0B005FFDA5 /* NSDictionary+AirFloatAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = A1A8078B14EF1C0B005FFDA5 /* NSDictionary+AirFloatAdditions.mm */; };
 		A1C20920150F4C820097EB4E /* AirFloatMissingWifiViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A1C2091E150F4C820097EB4E /* AirFloatMissingWifiViewController.m */; };
 		A1C20921150F4C820097EB4E /* AirFloatMissingWifiViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A1C2091F150F4C820097EB4E /* AirFloatMissingWifiViewController.xib */; };
@@ -131,40 +161,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		A17D49D3163E77A300A94C23 /* PBXContainerItemProxy */ = {
+		A19E4B6616CA9BDC00E5D60F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = A17D49CB163E77A300A94C23 /* AirFloatLibrary.xcodeproj */;
+			containerPortal = A19E4B6216CA9BDC00E5D60F /* openssl.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = A16B3B461535A9F20092DA27;
-			remoteInfo = AirFloatLibrary;
+			remoteGlobalIDString = 9069D28C0FCE659A0042E34C;
+			remoteInfo = crypto;
 		};
-		A17D49D5163E77A300A94C23 /* PBXContainerItemProxy */ = {
+		A19E4B6816CA9C1F00E5D60F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = A17D49CB163E77A300A94C23 /* AirFloatLibrary.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A16B3B5E1535AA0A0092DA27;
-			remoteInfo = AirFloatLibraryiOS;
-		};
-		A17D49D7163E77B200A94C23 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A17D49CB163E77A300A94C23 /* AirFloatLibrary.xcodeproj */;
+			containerPortal = A19E4B6216CA9BDC00E5D60F /* openssl.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = A16B3B5D1535AA0A0092DA27;
-			remoteInfo = AirFloatLibraryiOS;
-		};
-		A18F059C15362C4A00265479 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A18F059515362C4A00265479 /* CommonAdditions.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A18F054D15362A1800265479;
-			remoteInfo = CommonAdditions;
-		};
-		A18F05A215362D7800265479 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A18F059515362C4A00265479 /* CommonAdditions.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = A18F054C15362A1800265479;
-			remoteInfo = CommonAdditions;
+			remoteGlobalIDString = 9069D28B0FCE659A0042E34C;
+			remoteInfo = crypto;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -275,8 +284,6 @@
 		A1566B5C1521DF87000475C4 /* AirFloatTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFloatTableView.m; sourceTree = "<group>"; };
 		A1566B5E1521EAAA000475C4 /* AirFloatTapPanGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFloatTapPanGestureRecognizer.h; sourceTree = "<group>"; };
 		A1566B5F1521EAAA000475C4 /* AirFloatTapPanGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFloatTapPanGestureRecognizer.m; sourceTree = "<group>"; };
-		A15886E3160F31B700B2F69B /* libTestFlight.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTestFlight.a; sourceTree = "<group>"; };
-		A15886F1160F3EA800B2F69B /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = OpenSSL/lib/libcrypto.a; sourceTree = "<group>"; };
 		A15F64F7151A343A00A7D712 /* iTunes@2x.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "iTunes@2x.jpg"; sourceTree = "<group>"; };
 		A15F64F9151A344500A7D712 /* iTunes.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = iTunes.jpg; sourceTree = "<group>"; };
 		A15F64FB151A35A100A7D712 /* iPad.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = iPad.jpg; sourceTree = "<group>"; };
@@ -289,30 +296,105 @@
 		A168F6A014F23F7200EDBCDC /* AirFloatHighlightedButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFloatHighlightedButton.m; sourceTree = "<group>"; };
 		A168F6A214F2401900EDBCDC /* ButtonHighlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ButtonHighlight.png; sourceTree = "<group>"; };
 		A168F6A314F2401900EDBCDC /* ButtonHighlight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ButtonHighlight@2x.png"; sourceTree = "<group>"; };
-		A16B3C9F1535BAA50092DA27 /* AirFloat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AirFloat.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A16B3CA11535BAA50092DA27 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
-		A16B3CA41535BAA50092DA27 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-		A16B3CA51535BAA50092DA27 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		A16B3CA61535BAA50092DA27 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		A16B3CD11535BE740092DA27 /* AirFloat-Mac-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "AirFloat-Mac-Info.plist"; sourceTree = "<group>"; };
-		A16B3CD21535BE740092DA27 /* AirFloat-Mac-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AirFloat-Mac-Prefix.pch"; sourceTree = "<group>"; };
-		A16B3CD31535BE740092DA27 /* AirFloatMacAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFloatMacAppDelegate.h; sourceTree = "<group>"; };
-		A16B3CD41535BE740092DA27 /* AirFloatMacAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AirFloatMacAppDelegate.mm; sourceTree = "<group>"; };
-		A16B3CD51535BE740092DA27 /* main-Mac.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "main-Mac.m"; sourceTree = "<group>"; };
-		A16B3CDA1535BF5C0092DA27 /* StatusItemImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StatusItemImage.png; sourceTree = "<group>"; };
-		A16B3CDB1535BF5C0092DA27 /* StatusItemImageHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StatusItemImageHighlighted.png; sourceTree = "<group>"; };
-		A16B3CDE1535BFD90092DA27 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
-		A16B3CF41535C7140092DA27 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/usr/lib/libcrypto.dylib; sourceTree = DEVELOPER_DIR; };
-		A16B3CF61535C71B0092DA27 /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/usr/lib/libssl.dylib; sourceTree = DEVELOPER_DIR; };
-		A16B3CF91535C7650092DA27 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
-		A17D49CB163E77A300A94C23 /* AirFloatLibrary.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AirFloatLibrary.xcodeproj; path = Library/AirFloatLibrary.xcodeproj; sourceTree = "<group>"; };
 		A17D49DA163E7A4C00A94C23 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "../Default-568h@2x.png"; sourceTree = "<group>"; };
-		A17E9231152DA843000331D3 /* TestFlight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestFlight.h; sourceTree = "<group>"; };
 		A17E9233152DA909000331D3 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		A18F059515362C4A00265479 /* CommonAdditions.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CommonAdditions.xcodeproj; path = CommonAdditions/CommonAdditions.xcodeproj; sourceTree = "<group>"; };
 		A190852B14FB927F005B02EF /* NowPlayingIndicator.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NowPlayingIndicator.png; sourceTree = "<group>"; };
 		A190852C14FB927F005B02EF /* NowPlayingIndicator@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NowPlayingIndicator@2x.png"; sourceTree = "<group>"; };
 		A194311E14D46878009FC07B /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		A19E4ACA16CA951500E5D60F /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
+		A19E4ACB16CA951500E5D60F /* Settings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Settings.cpp; sourceTree = "<group>"; };
+		A19E4ACE16CA952700E5D60F /* Endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Endian.h; sourceTree = "<group>"; };
+		A19E4ACF16CA952700E5D60F /* DMAP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DMAP.h; sourceTree = "<group>"; };
+		A19E4AD016CA952700E5D60F /* DMAP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DMAP.cpp; sourceTree = "<group>"; };
+		A19E4AD316CA953600E5D60F /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
+		A19E4AD416CA953600E5D60F /* Log.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Log.mm; sourceTree = "<group>"; };
+		A19E4AD716CA954500E5D60F /* Mutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mutex.h; sourceTree = "<group>"; };
+		A19E4AD816CA954500E5D60F /* Mutex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mutex.cpp; sourceTree = "<group>"; };
+		A19E4AD916CA954500E5D60F /* Condition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Condition.h; sourceTree = "<group>"; };
+		A19E4ADA16CA954500E5D60F /* Condition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Condition.cpp; sourceTree = "<group>"; };
+		A19E4AE016CA957900E5D60F /* Notification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notification.h; sourceTree = "<group>"; };
+		A19E4AE116CA957900E5D60F /* Notification.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Notification.cpp; sourceTree = "<group>"; };
+		A19E4AE216CA957900E5D60F /* NotificationCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationCenter.h; sourceTree = "<group>"; };
+		A19E4AE316CA957900E5D60F /* NotificationCenter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NotificationCenter.cpp; sourceTree = "<group>"; };
+		A19E4AE416CA957900E5D60F /* NotificationObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationObserver.h; sourceTree = "<group>"; };
+		A19E4AE516CA957900E5D60F /* NotificationObserver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NotificationObserver.cpp; sourceTree = "<group>"; };
+		A19E4AEB16CA959700E5D60F /* AudioConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioConverter.h; sourceTree = "<group>"; };
+		A19E4AEC16CA959700E5D60F /* AudioConverter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioConverter.cpp; sourceTree = "<group>"; };
+		A19E4AED16CA959700E5D60F /* AppleLosslessAudioConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleLosslessAudioConverter.h; sourceTree = "<group>"; };
+		A19E4AEE16CA959700E5D60F /* AppleLosslessAudioConverter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AppleLosslessAudioConverter.cpp; sourceTree = "<group>"; };
+		A19E4AEF16CA959700E5D60F /* AppleLosslessSoftwareAudioConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleLosslessSoftwareAudioConverter.h; sourceTree = "<group>"; };
+		A19E4AF016CA959700E5D60F /* AppleLosslessSoftwareAudioConverter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AppleLosslessSoftwareAudioConverter.cpp; sourceTree = "<group>"; };
+		A19E4AF116CA959700E5D60F /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
+		A19E4AF216CA959700E5D60F /* AudioPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioPlayer.cpp; sourceTree = "<group>"; };
+		A19E4AF316CA959700E5D60F /* AudioPacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPacket.h; sourceTree = "<group>"; };
+		A19E4AF416CA959700E5D60F /* AudioPacket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioPacket.cpp; sourceTree = "<group>"; };
+		A19E4AF516CA959700E5D60F /* AudioQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioQueue.h; sourceTree = "<group>"; };
+		A19E4AF616CA959700E5D60F /* AudioQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioQueue.cpp; sourceTree = "<group>"; };
+		A19E4AFD16CA959F00E5D60F /* CAMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAMath.h; sourceTree = "<group>"; };
+		A19E4AFE16CA959F00E5D60F /* CADebugMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CADebugMacros.h; sourceTree = "<group>"; };
+		A19E4AFF16CA959F00E5D60F /* CADebugPrintf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CADebugPrintf.h; sourceTree = "<group>"; };
+		A19E4B0016CA959F00E5D60F /* CADebugPrintf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CADebugPrintf.cpp; sourceTree = "<group>"; };
+		A19E4B0116CA959F00E5D60F /* CAHostTimeBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAHostTimeBase.h; sourceTree = "<group>"; };
+		A19E4B0216CA959F00E5D60F /* CAHostTimeBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CAHostTimeBase.cpp; sourceTree = "<group>"; };
+		A19E4B0316CA959F00E5D60F /* CAStreamBasicDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAStreamBasicDescription.h; sourceTree = "<group>"; };
+		A19E4B0416CA959F00E5D60F /* CAStreamBasicDescription.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CAStreamBasicDescription.cpp; sourceTree = "<group>"; };
+		A19E4B0516CA959F00E5D60F /* CAXException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAXException.h; sourceTree = "<group>"; };
+		A19E4B0616CA959F00E5D60F /* CAXException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CAXException.cpp; sourceTree = "<group>"; };
+		A19E4B0B16CA95AC00E5D60F /* alac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alac.h; sourceTree = "<group>"; };
+		A19E4B0C16CA95AC00E5D60F /* alac.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alac.c; sourceTree = "<group>"; };
+		A19E4B1016CA95C900E5D60F /* Socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Socket.h; sourceTree = "<group>"; };
+		A19E4B1116CA95C900E5D60F /* Socket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Socket.cpp; sourceTree = "<group>"; };
+		A19E4B1216CA95C900E5D60F /* SocketEndPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketEndPoint.h; sourceTree = "<group>"; };
+		A19E4B1316CA95C900E5D60F /* SocketEndPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SocketEndPoint.cpp; sourceTree = "<group>"; };
+		A19E4B1416CA95C900E5D60F /* SocketEndPointIPv4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketEndPointIPv4.h; sourceTree = "<group>"; };
+		A19E4B1516CA95C900E5D60F /* SocketEndPointIPv4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SocketEndPointIPv4.cpp; sourceTree = "<group>"; };
+		A19E4B1616CA95C900E5D60F /* SocketEndPointIPv6.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketEndPointIPv6.h; sourceTree = "<group>"; };
+		A19E4B1716CA95C900E5D60F /* SocketEndPointIPv6.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SocketEndPointIPv6.cpp; sourceTree = "<group>"; };
+		A19E4B1C16CA95D300E5D60F /* WebTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebTools.h; sourceTree = "<group>"; };
+		A19E4B1D16CA95D300E5D60F /* WebTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebTools.cpp; sourceTree = "<group>"; };
+		A19E4B1E16CA95D300E5D60F /* WebHeaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebHeaders.h; sourceTree = "<group>"; };
+		A19E4B1F16CA95D300E5D60F /* WebHeaders.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebHeaders.cpp; sourceTree = "<group>"; };
+		A19E4B2016CA95D300E5D60F /* WebResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebResponse.h; sourceTree = "<group>"; };
+		A19E4B2116CA95D300E5D60F /* WebResponse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebResponse.cpp; sourceTree = "<group>"; };
+		A19E4B2216CA95D300E5D60F /* WebRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebRequest.h; sourceTree = "<group>"; };
+		A19E4B2316CA95D300E5D60F /* WebRequest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebRequest.cpp; sourceTree = "<group>"; };
+		A19E4B2416CA95D300E5D60F /* WebConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebConnection.h; sourceTree = "<group>"; };
+		A19E4B2516CA95D300E5D60F /* WebConnection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebConnection.cpp; sourceTree = "<group>"; };
+		A19E4B2616CA95D300E5D60F /* WebServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebServer.h; sourceTree = "<group>"; };
+		A19E4B2716CA95D300E5D60F /* WebServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebServer.cpp; sourceTree = "<group>"; };
+		A19E4B2E16CA95E200E5D60F /* Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64.h; sourceTree = "<group>"; };
+		A19E4B2F16CA95E200E5D60F /* Base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Base64.cpp; sourceTree = "<group>"; };
+		A19E4B3016CA95E200E5D60F /* RTPReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTPReceiver.h; sourceTree = "<group>"; };
+		A19E4B3116CA95E200E5D60F /* RTPReceiver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RTPReceiver.cpp; sourceTree = "<group>"; };
+		A19E4B3216CA95E200E5D60F /* RAOPParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAOPParameters.h; sourceTree = "<group>"; };
+		A19E4B3316CA95E200E5D60F /* RAOPParameters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RAOPParameters.cpp; sourceTree = "<group>"; };
+		A19E4B3416CA95E200E5D60F /* RAOPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAOPConnection.h; sourceTree = "<group>"; };
+		A19E4B3516CA95E200E5D60F /* RAOPConnection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RAOPConnection.cpp; sourceTree = "<group>"; };
+		A19E4B3616CA95E200E5D60F /* RAOPServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAOPServer.h; sourceTree = "<group>"; };
+		A19E4B3716CA95E200E5D60F /* RAOPServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RAOPServer.cpp; sourceTree = "<group>"; };
+		A19E4B3D16CA95F500E5D60F /* Server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Server.h; sourceTree = "<group>"; };
+		A19E4B3E16CA96A300E5D60F /* NSBundle+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+AirFloatAdditions.h"; sourceTree = "<group>"; };
+		A19E4B3F16CA96A300E5D60F /* NSBundle+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+AirFloatAdditions.m"; sourceTree = "<group>"; };
+		A19E4B4116CA96B400E5D60F /* NSNotificationCenter+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "NSNotificationCenter+AirFloatAdditions.h"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		A19E4B4216CA96DD00E5D60F /* NSUserDefaults+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "NSUserDefaults+AirFloatAdditions.h"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		A19E4B4316CA96DD00E5D60F /* NSUserDefaults+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "NSUserDefaults+AirFloatAdditions.m"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		A19E4B4516CA96F700E5D60F /* NSData+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+AirFloatAdditions.h"; sourceTree = "<group>"; };
+		A19E4B4616CA96F700E5D60F /* NSData+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "NSData+AirFloatAdditions.m"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		A19E4B4916CA971900E5D60F /* UIView+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+AirFloatAdditions.h"; sourceTree = "<group>"; };
+		A19E4B4A16CA971900E5D60F /* UIView+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+AirFloatAdditions.m"; sourceTree = "<group>"; };
+		A19E4B4C16CA973C00E5D60F /* UIDevice+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+AirFloatAdditions.h"; sourceTree = "<group>"; };
+		A19E4B4D16CA973C00E5D60F /* UIDevice+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+AirFloatAdditions.m"; sourceTree = "<group>"; };
+		A19E4B5016CA975900E5D60F /* CAKeyframeAnimation+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "CAKeyframeAnimation+AirFloatAdditions.h"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		A19E4B5116CA975900E5D60F /* CAKeyframeAnimation+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "CAKeyframeAnimation+AirFloatAdditions.m"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		A19E4B5316CA976C00E5D60F /* UIImage+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+AirFloatAdditions.h"; sourceTree = "<group>"; };
+		A19E4B5416CA976C00E5D60F /* UIImage+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+AirFloatAdditions.m"; sourceTree = "<group>"; };
+		A19E4B5616CA977E00E5D60F /* NSString+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "NSString+AirFloatAdditions.h"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		A19E4B5716CA977E00E5D60F /* NSString+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "NSString+AirFloatAdditions.m"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		A19E4B5C16CA97A800E5D60F /* NSNull+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "NSNull+AirFloatAdditions.h"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		A19E4B5D16CA97A800E5D60F /* NSNull+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "NSNull+AirFloatAdditions.m"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		A19E4B5F16CA97BF00E5D60F /* UIApplication+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplication+AirFloatAdditions.h"; sourceTree = "<group>"; };
+		A19E4B6016CA97BF00E5D60F /* UIApplication+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIApplication+AirFloatAdditions.m"; sourceTree = "<group>"; };
+		A19E4B6216CA9BDC00E5D60F /* openssl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openssl.xcodeproj; path = Library/openssl.xcodeproj; sourceTree = "<group>"; };
 		A1A8078A14EF1C0B005FFDA5 /* NSDictionary+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+AirFloatAdditions.h"; sourceTree = "<group>"; };
 		A1A8078B14EF1C0B005FFDA5 /* NSDictionary+AirFloatAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSDictionary+AirFloatAdditions.mm"; sourceTree = "<group>"; };
 		A1A8079714F10FE9005FFDA5 /* AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AirFloatAdditions.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -331,9 +413,6 @@
 		A1C7F7971500CB0100D7DE52 /* WiFi@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WiFi@2x.png"; sourceTree = "<group>"; };
 		A1C7F7991500D22100D7DE52 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "../Default@2x.png"; sourceTree = "<group>"; };
 		A1C7F79B1500D2B600D7DE52 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = ../Default.png; sourceTree = "<group>"; };
-		A1CD00A514DDA275001A6DE1 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
-		A1CD00A714DDA27D001A6DE1 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
-		A1CD00A914DDA283001A6DE1 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
 		A1DA80C814F3D77A006B18D9 /* AirFloatSongCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AirFloatSongCell.xib; sourceTree = "<group>"; };
 		A1DA80CB14F3D8F0006B18D9 /* AirFloatSongCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFloatSongCell.h; sourceTree = "<group>"; };
 		A1DA80CC14F3D8F0006B18D9 /* AirFloatSongCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFloatSongCell.m; sourceTree = "<group>"; };
@@ -346,9 +425,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A17D49D9163E77B900A94C23 /* libAirFloatLibraryiOS.a in Frameworks */,
-				A18F05A415362D7E00265479 /* libCommonAdditions.a in Frameworks */,
-				A17E9234152DA909000331D3 /* libz.dylib in Frameworks */,
+				A19E4B6A16CA9C2100E5D60F /* libcrypto.a in Frameworks */,
 				A1389E1F14E43684004FE040 /* SystemConfiguration.framework in Frameworks */,
 				A194311F14D46878009FC07B /* CoreAudio.framework in Frameworks */,
 				A1DE598714CF163500A6767D /* MediaPlayer.framework in Frameworks */,
@@ -358,20 +435,6 @@
 				4898F9F313CDAAD1006EC97E /* UIKit.framework in Frameworks */,
 				4898F9F513CDAAD1006EC97E /* Foundation.framework in Frameworks */,
 				4898F9F713CDAAD1006EC97E /* CoreGraphics.framework in Frameworks */,
-				A15886E4160F31B700B2F69B /* libTestFlight.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A16B3C9C1535BAA50092DA27 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A16B3CFA1535C7650092DA27 /* QuartzCore.framework in Frameworks */,
-				A16B3CF81535C7360092DA27 /* CoreAudio.framework in Frameworks */,
-				A16B3CF71535C71D0092DA27 /* libssl.dylib in Frameworks */,
-				A16B3CF51535C7160092DA27 /* libcrypto.dylib in Frameworks */,
-				A16B3CF31535C6420092DA27 /* AudioToolbox.framework in Frameworks */,
-				A16B3CA21535BAA50092DA27 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -382,7 +445,6 @@
 			isa = PBXGroup;
 			children = (
 				4898F9F813CDAAD1006EC97E /* AirFloat */,
-				A188ECF3150BD7AB00CC089E /* External Projects */,
 				4898F9EF13CDAAD1006EC97E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -391,7 +453,6 @@
 			isa = PBXGroup;
 			children = (
 				4898F9EE13CDAAD1006EC97E /* AirFloat.app */,
-				A16B3C9F1535BAA50092DA27 /* AirFloat.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -399,6 +460,7 @@
 		4898F9F113CDAAD1006EC97E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A19E4B6216CA9BDC00E5D60F /* openssl.xcodeproj */,
 				A17E9233152DA909000331D3 /* libz.dylib */,
 				A1389E1E14E43683004FE040 /* SystemConfiguration.framework */,
 				A194311E14D46878009FC07B /* CoreAudio.framework */,
@@ -417,7 +479,6 @@
 		4898F9F813CDAAD1006EC97E /* AirFloat */ = {
 			isa = PBXGroup;
 			children = (
-				A16B3CBF1535BADE0092DA27 /* Mac App */,
 				A1389E1114E422B8004FE040 /* iOS App */,
 			);
 			path = AirFloat;
@@ -431,15 +492,6 @@
 				A188ECF2150BD6EA00CC089E /* Other */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		A10392DF14E9B93100DB356F /* TestFlight */ = {
-			isa = PBXGroup;
-			children = (
-				A15886E3160F31B700B2F69B /* libTestFlight.a */,
-				A17E9231152DA843000331D3 /* TestFlight.h */,
-			);
-			name = TestFlight;
 			sourceTree = "<group>";
 		};
 		A10EB41114E81D0200615CDB /* DAAP */ = {
@@ -457,6 +509,8 @@
 			isa = PBXGroup;
 			children = (
 				A1A8079214F10E92005FFDA5 /* Foundation */,
+				A19E4B4816CA970D00E5D60F /* Cocoa Touch */,
+				A19E4B4F16CA975000E5D60F /* Quartz Core */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -514,9 +568,10 @@
 			children = (
 				4898FA0113CDAAD1006EC97E /* AirFloatiOSAppDelegate.h */,
 				4898FA0213CDAAD1006EC97E /* AirFloatiOSAppDelegate.m */,
+				A1B3E3DE14CE09A300379E8C /* Additions */,
+				A19E4AC716CA94FA00E5D60F /* Server */,
 				A130A1DD14F5301200EADC03 /* Bridges */,
 				A1389E2314E4394C004FE040 /* Logic */,
-				A1B3E3DE14CE09A300379E8C /* Additions */,
 				A1389E1314E422E6004FE040 /* View Controllers */,
 				A1389E1214E422D4004FE040 /* Network Services */,
 				4898F9F913CDAAD1006EC97E /* Supporting Files */,
@@ -584,71 +639,6 @@
 			name = "Search Bar";
 			sourceTree = "<group>";
 		};
-		A16B3CBF1535BADE0092DA27 /* Mac App */ = {
-			isa = PBXGroup;
-			children = (
-				A16B3CD31535BE740092DA27 /* AirFloatMacAppDelegate.h */,
-				A16B3CD41535BE740092DA27 /* AirFloatMacAppDelegate.mm */,
-				A16B3CC01535BAE90092DA27 /* Supporting Files */,
-				A16B3CF21535C5E90092DA27 /* Frameworks */,
-			);
-			name = "Mac App";
-			sourceTree = "<group>";
-		};
-		A16B3CC01535BAE90092DA27 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				A16B3CE01535BFDF0092DA27 /* XIBs */,
-				A16B3CD91535BF510092DA27 /* Images */,
-				A16B3CC11535BAF00092DA27 /* Other */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		A16B3CC11535BAF00092DA27 /* Other */ = {
-			isa = PBXGroup;
-			children = (
-				A16B3CD11535BE740092DA27 /* AirFloat-Mac-Info.plist */,
-				A16B3CD21535BE740092DA27 /* AirFloat-Mac-Prefix.pch */,
-				A16B3CD51535BE740092DA27 /* main-Mac.m */,
-			);
-			name = Other;
-			sourceTree = "<group>";
-		};
-		A16B3CD91535BF510092DA27 /* Images */ = {
-			isa = PBXGroup;
-			children = (
-				A16B3CDA1535BF5C0092DA27 /* StatusItemImage.png */,
-				A16B3CDB1535BF5C0092DA27 /* StatusItemImageHighlighted.png */,
-			);
-			name = Images;
-			sourceTree = "<group>";
-		};
-		A16B3CE01535BFDF0092DA27 /* XIBs */ = {
-			isa = PBXGroup;
-			children = (
-				A16B3CDE1535BFD90092DA27 /* MainMenu.xib */,
-			);
-			name = XIBs;
-			sourceTree = "<group>";
-		};
-		A16B3CF21535C5E90092DA27 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				A16B3CF61535C71B0092DA27 /* libssl.dylib */,
-				A16B3CF41535C7140092DA27 /* libcrypto.dylib */,
-				A16B3CA41535BAA50092DA27 /* AppKit.framework */,
-				A16B3CA51535BAA50092DA27 /* CoreData.framework */,
-				A16B3CA61535BAA50092DA27 /* Foundation.framework */,
-				A16B3CA11535BAA50092DA27 /* Cocoa.framework */,
-				A1CD00A914DDA283001A6DE1 /* AudioToolbox.framework */,
-				A16B3CF91535C7650092DA27 /* QuartzCore.framework */,
-				A1CD00A714DDA27D001A6DE1 /* AVFoundation.framework */,
-				A1CD00A514DDA275001A6DE1 /* CoreAudio.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		A16EF34514FB79C800593466 /* Cocoa Touch */ = {
 			isa = PBXGroup;
 			children = (
@@ -670,15 +660,6 @@
 				A1566B5F1521EAAA000475C4 /* AirFloatTapPanGestureRecognizer.m */,
 			);
 			name = "Cocoa Touch";
-			sourceTree = "<group>";
-		};
-		A17D49CC163E77A300A94C23 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				A17D49D4163E77A300A94C23 /* libAirFloatLibrary.a */,
-				A17D49D6163E77A300A94C23 /* libAirFloatLibraryiOS.a */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		A188ECE5150BD56C00CC089E /* App Graphics */ = {
@@ -835,21 +816,209 @@
 			name = Other;
 			sourceTree = "<group>";
 		};
-		A188ECF3150BD7AB00CC089E /* External Projects */ = {
+		A19E4AC716CA94FA00E5D60F /* Server */ = {
 			isa = PBXGroup;
 			children = (
-				A15886F1160F3EA800B2F69B /* libcrypto.a */,
-				A18F059515362C4A00265479 /* CommonAdditions.xcodeproj */,
-				A17D49CB163E77A300A94C23 /* AirFloatLibrary.xcodeproj */,
-				A10392DF14E9B93100DB356F /* TestFlight */,
+				A19E4AC916CA950C00E5D60F /* Tools */,
+				A19E4ADD16CA955700E5D60F /* Notifications */,
+				A19E4ADE16CA955C00E5D60F /* Audio */,
+				A19E4ADF16CA956400E5D60F /* Connection */,
+				A19E4B3D16CA95F500E5D60F /* Server.h */,
 			);
-			name = "External Projects";
+			name = Server;
 			sourceTree = "<group>";
 		};
-		A18F059615362C4A00265479 /* Products */ = {
+		A19E4AC816CA950500E5D60F /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				A18F059D15362C4A00265479 /* libCommonAdditions.a */,
+				A19E4ACA16CA951500E5D60F /* Settings.h */,
+				A19E4ACB16CA951500E5D60F /* Settings.cpp */,
+			);
+			name = Settings;
+			sourceTree = "<group>";
+		};
+		A19E4AC916CA950C00E5D60F /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4AC816CA950500E5D60F /* Settings */,
+				A19E4ACD16CA951A00E5D60F /* DMAP */,
+				A19E4AD216CA952C00E5D60F /* Logging */,
+				A19E4AD616CA953A00E5D60F /* Threading */,
+			);
+			name = Tools;
+			sourceTree = "<group>";
+		};
+		A19E4ACD16CA951A00E5D60F /* DMAP */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4ACE16CA952700E5D60F /* Endian.h */,
+				A19E4ACF16CA952700E5D60F /* DMAP.h */,
+				A19E4AD016CA952700E5D60F /* DMAP.cpp */,
+			);
+			name = DMAP;
+			sourceTree = "<group>";
+		};
+		A19E4AD216CA952C00E5D60F /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4AD316CA953600E5D60F /* Log.h */,
+				A19E4AD416CA953600E5D60F /* Log.mm */,
+			);
+			name = Logging;
+			sourceTree = "<group>";
+		};
+		A19E4AD616CA953A00E5D60F /* Threading */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4AD716CA954500E5D60F /* Mutex.h */,
+				A19E4AD816CA954500E5D60F /* Mutex.cpp */,
+				A19E4AD916CA954500E5D60F /* Condition.h */,
+				A19E4ADA16CA954500E5D60F /* Condition.cpp */,
+			);
+			name = Threading;
+			sourceTree = "<group>";
+		};
+		A19E4ADD16CA955700E5D60F /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4AE016CA957900E5D60F /* Notification.h */,
+				A19E4AE116CA957900E5D60F /* Notification.cpp */,
+				A19E4AE216CA957900E5D60F /* NotificationCenter.h */,
+				A19E4AE316CA957900E5D60F /* NotificationCenter.cpp */,
+				A19E4AE416CA957900E5D60F /* NotificationObserver.h */,
+				A19E4AE516CA957900E5D60F /* NotificationObserver.cpp */,
+			);
+			name = Notifications;
+			sourceTree = "<group>";
+		};
+		A19E4ADE16CA955C00E5D60F /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4AEA16CA958E00E5D60F /* Software Decoder */,
+				A19E4AE916CA958900E5D60F /* Public Utility */,
+				A19E4AEB16CA959700E5D60F /* AudioConverter.h */,
+				A19E4AEC16CA959700E5D60F /* AudioConverter.cpp */,
+				A19E4AED16CA959700E5D60F /* AppleLosslessAudioConverter.h */,
+				A19E4AEE16CA959700E5D60F /* AppleLosslessAudioConverter.cpp */,
+				A19E4AEF16CA959700E5D60F /* AppleLosslessSoftwareAudioConverter.h */,
+				A19E4AF016CA959700E5D60F /* AppleLosslessSoftwareAudioConverter.cpp */,
+				A19E4AF116CA959700E5D60F /* AudioPlayer.h */,
+				A19E4AF216CA959700E5D60F /* AudioPlayer.cpp */,
+				A19E4AF316CA959700E5D60F /* AudioPacket.h */,
+				A19E4AF416CA959700E5D60F /* AudioPacket.cpp */,
+				A19E4AF516CA959700E5D60F /* AudioQueue.h */,
+				A19E4AF616CA959700E5D60F /* AudioQueue.cpp */,
+			);
+			name = Audio;
+			sourceTree = "<group>";
+		};
+		A19E4ADF16CA956400E5D60F /* Connection */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4B0F16CA95C000E5D60F /* Socket */,
+				A19E4B0E16CA95BB00E5D60F /* Web Server */,
+				A19E4B2E16CA95E200E5D60F /* Base64.h */,
+				A19E4B2F16CA95E200E5D60F /* Base64.cpp */,
+				A19E4B3016CA95E200E5D60F /* RTPReceiver.h */,
+				A19E4B3116CA95E200E5D60F /* RTPReceiver.cpp */,
+				A19E4B3216CA95E200E5D60F /* RAOPParameters.h */,
+				A19E4B3316CA95E200E5D60F /* RAOPParameters.cpp */,
+				A19E4B3416CA95E200E5D60F /* RAOPConnection.h */,
+				A19E4B3516CA95E200E5D60F /* RAOPConnection.cpp */,
+				A19E4B3616CA95E200E5D60F /* RAOPServer.h */,
+				A19E4B3716CA95E200E5D60F /* RAOPServer.cpp */,
+			);
+			name = Connection;
+			sourceTree = "<group>";
+		};
+		A19E4AE916CA958900E5D60F /* Public Utility */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4AFD16CA959F00E5D60F /* CAMath.h */,
+				A19E4AFE16CA959F00E5D60F /* CADebugMacros.h */,
+				A19E4AFF16CA959F00E5D60F /* CADebugPrintf.h */,
+				A19E4B0016CA959F00E5D60F /* CADebugPrintf.cpp */,
+				A19E4B0116CA959F00E5D60F /* CAHostTimeBase.h */,
+				A19E4B0216CA959F00E5D60F /* CAHostTimeBase.cpp */,
+				A19E4B0316CA959F00E5D60F /* CAStreamBasicDescription.h */,
+				A19E4B0416CA959F00E5D60F /* CAStreamBasicDescription.cpp */,
+				A19E4B0516CA959F00E5D60F /* CAXException.h */,
+				A19E4B0616CA959F00E5D60F /* CAXException.cpp */,
+			);
+			name = "Public Utility";
+			sourceTree = "<group>";
+		};
+		A19E4AEA16CA958E00E5D60F /* Software Decoder */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4B0B16CA95AC00E5D60F /* alac.h */,
+				A19E4B0C16CA95AC00E5D60F /* alac.c */,
+			);
+			name = "Software Decoder";
+			sourceTree = "<group>";
+		};
+		A19E4B0E16CA95BB00E5D60F /* Web Server */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4B1C16CA95D300E5D60F /* WebTools.h */,
+				A19E4B1D16CA95D300E5D60F /* WebTools.cpp */,
+				A19E4B1E16CA95D300E5D60F /* WebHeaders.h */,
+				A19E4B1F16CA95D300E5D60F /* WebHeaders.cpp */,
+				A19E4B2016CA95D300E5D60F /* WebResponse.h */,
+				A19E4B2116CA95D300E5D60F /* WebResponse.cpp */,
+				A19E4B2216CA95D300E5D60F /* WebRequest.h */,
+				A19E4B2316CA95D300E5D60F /* WebRequest.cpp */,
+				A19E4B2416CA95D300E5D60F /* WebConnection.h */,
+				A19E4B2516CA95D300E5D60F /* WebConnection.cpp */,
+				A19E4B2616CA95D300E5D60F /* WebServer.h */,
+				A19E4B2716CA95D300E5D60F /* WebServer.cpp */,
+			);
+			name = "Web Server";
+			sourceTree = "<group>";
+		};
+		A19E4B0F16CA95C000E5D60F /* Socket */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4B1016CA95C900E5D60F /* Socket.h */,
+				A19E4B1116CA95C900E5D60F /* Socket.cpp */,
+				A19E4B1216CA95C900E5D60F /* SocketEndPoint.h */,
+				A19E4B1316CA95C900E5D60F /* SocketEndPoint.cpp */,
+				A19E4B1416CA95C900E5D60F /* SocketEndPointIPv4.h */,
+				A19E4B1516CA95C900E5D60F /* SocketEndPointIPv4.cpp */,
+				A19E4B1616CA95C900E5D60F /* SocketEndPointIPv6.h */,
+				A19E4B1716CA95C900E5D60F /* SocketEndPointIPv6.cpp */,
+			);
+			name = Socket;
+			sourceTree = "<group>";
+		};
+		A19E4B4816CA970D00E5D60F /* Cocoa Touch */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4B5F16CA97BF00E5D60F /* UIApplication+AirFloatAdditions.h */,
+				A19E4B6016CA97BF00E5D60F /* UIApplication+AirFloatAdditions.m */,
+				A19E4B4916CA971900E5D60F /* UIView+AirFloatAdditions.h */,
+				A19E4B4A16CA971900E5D60F /* UIView+AirFloatAdditions.m */,
+				A19E4B4C16CA973C00E5D60F /* UIDevice+AirFloatAdditions.h */,
+				A19E4B4D16CA973C00E5D60F /* UIDevice+AirFloatAdditions.m */,
+				A19E4B5316CA976C00E5D60F /* UIImage+AirFloatAdditions.h */,
+				A19E4B5416CA976C00E5D60F /* UIImage+AirFloatAdditions.m */,
+			);
+			name = "Cocoa Touch";
+			sourceTree = "<group>";
+		};
+		A19E4B4F16CA975000E5D60F /* Quartz Core */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4B5016CA975900E5D60F /* CAKeyframeAnimation+AirFloatAdditions.h */,
+				A19E4B5116CA975900E5D60F /* CAKeyframeAnimation+AirFloatAdditions.m */,
+			);
+			name = "Quartz Core";
+			sourceTree = "<group>";
+		};
+		A19E4B6316CA9BDC00E5D60F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4B6716CA9BDC00E5D60F /* libcrypto.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -859,6 +1028,17 @@
 			children = (
 				A1A8078A14EF1C0B005FFDA5 /* NSDictionary+AirFloatAdditions.h */,
 				A1A8078B14EF1C0B005FFDA5 /* NSDictionary+AirFloatAdditions.mm */,
+				A19E4B3E16CA96A300E5D60F /* NSBundle+AirFloatAdditions.h */,
+				A19E4B3F16CA96A300E5D60F /* NSBundle+AirFloatAdditions.m */,
+				A19E4B4216CA96DD00E5D60F /* NSUserDefaults+AirFloatAdditions.h */,
+				A19E4B4316CA96DD00E5D60F /* NSUserDefaults+AirFloatAdditions.m */,
+				A19E4B4516CA96F700E5D60F /* NSData+AirFloatAdditions.h */,
+				A19E4B4616CA96F700E5D60F /* NSData+AirFloatAdditions.m */,
+				A19E4B5616CA977E00E5D60F /* NSString+AirFloatAdditions.h */,
+				A19E4B5716CA977E00E5D60F /* NSString+AirFloatAdditions.m */,
+				A19E4B5C16CA97A800E5D60F /* NSNull+AirFloatAdditions.h */,
+				A19E4B5D16CA97A800E5D60F /* NSNull+AirFloatAdditions.m */,
+				A19E4B4116CA96B400E5D60F /* NSNotificationCenter+AirFloatAdditions.h */,
 			);
 			name = Foundation;
 			sourceTree = "<group>";
@@ -923,30 +1103,11 @@
 			buildRules = (
 			);
 			dependencies = (
-				A17D49D8163E77B200A94C23 /* PBXTargetDependency */,
-				A18F05A315362D7800265479 /* PBXTargetDependency */,
+				A19E4B6916CA9C1F00E5D60F /* PBXTargetDependency */,
 			);
 			name = "AirFloat iOS";
 			productName = AirFloat;
 			productReference = 4898F9EE13CDAAD1006EC97E /* AirFloat.app */;
-			productType = "com.apple.product-type.application";
-		};
-		A16B3C9E1535BAA50092DA27 /* AirFloat Mac */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A16B3CB91535BAA60092DA27 /* Build configuration list for PBXNativeTarget "AirFloat Mac" */;
-			buildPhases = (
-				A16B3C9B1535BAA50092DA27 /* Sources */,
-				A16B3C9C1535BAA50092DA27 /* Frameworks */,
-				A16B3C9D1535BAA50092DA27 /* Resources */,
-				A16B3CEC1535C3360092DA27 /* ShellScript */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "AirFloat Mac";
-			productName = AirFloat;
-			productReference = A16B3C9F1535BAA50092DA27 /* AirFloat.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -955,7 +1116,7 @@
 		4898F9E513CDAAD1006EC97E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0430;
+				LastUpgradeCheck = 0460;
 			};
 			buildConfigurationList = 4898F9E813CDAAD1006EC97E /* Build configuration list for PBXProject "AirFloat" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -969,42 +1130,23 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = A17D49CC163E77A300A94C23 /* Products */;
-					ProjectRef = A17D49CB163E77A300A94C23 /* AirFloatLibrary.xcodeproj */;
-				},
-				{
-					ProductGroup = A18F059615362C4A00265479 /* Products */;
-					ProjectRef = A18F059515362C4A00265479 /* CommonAdditions.xcodeproj */;
+					ProductGroup = A19E4B6316CA9BDC00E5D60F /* Products */;
+					ProjectRef = A19E4B6216CA9BDC00E5D60F /* openssl.xcodeproj */;
 				},
 			);
 			projectRoot = "";
 			targets = (
 				4898F9ED13CDAAD1006EC97E /* AirFloat iOS */,
-				A16B3C9E1535BAA50092DA27 /* AirFloat Mac */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		A17D49D4163E77A300A94C23 /* libAirFloatLibrary.a */ = {
+		A19E4B6716CA9BDC00E5D60F /* libcrypto.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libAirFloatLibrary.a;
-			remoteRef = A17D49D3163E77A300A94C23 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		A17D49D6163E77A300A94C23 /* libAirFloatLibraryiOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libAirFloatLibraryiOS.a;
-			remoteRef = A17D49D5163E77A300A94C23 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		A18F059D15362C4A00265479 /* libCommonAdditions.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libCommonAdditions.a;
-			remoteRef = A18F059C15362C4A00265479 /* PBXContainerItemProxy */;
+			path = libcrypto.a;
+			remoteRef = A19E4B6616CA9BDC00E5D60F /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -1084,32 +1226,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A16B3C9D1535BAA50092DA27 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A16B3CDC1535BF5C0092DA27 /* StatusItemImage.png in Resources */,
-				A16B3CDD1535BF5C0092DA27 /* StatusItemImageHighlighted.png in Resources */,
-				A16B3CDF1535BFD90092DA27 /* MainMenu.xib in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		A16B3CEC1535C3360092DA27 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "buildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" AirFloat/AirFloat-Mac-Info.plist)\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" AirFloat/AirFloat-Mac-Info.plist";
-		};
 		A1C7F7B5150104E100D7DE52 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1160,30 +1279,60 @@
 				A1C20925150F4C960097EB4E /* AirFloatIntroViewController.m in Sources */,
 				A1566B5D1521DF87000475C4 /* AirFloatTableView.m in Sources */,
 				A1566B601521EAAA000475C4 /* AirFloatTapPanGestureRecognizer.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A16B3C9B1535BAA50092DA27 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A16B3CD71535BE740092DA27 /* AirFloatMacAppDelegate.mm in Sources */,
-				A16B3CD81535BE740092DA27 /* main-Mac.m in Sources */,
+				A19E4ACC16CA951500E5D60F /* Settings.cpp in Sources */,
+				A19E4AD116CA952700E5D60F /* DMAP.cpp in Sources */,
+				A19E4AD516CA953600E5D60F /* Log.mm in Sources */,
+				A19E4ADB16CA954500E5D60F /* Mutex.cpp in Sources */,
+				A19E4ADC16CA954500E5D60F /* Condition.cpp in Sources */,
+				A19E4AE616CA957900E5D60F /* Notification.cpp in Sources */,
+				A19E4AE716CA957900E5D60F /* NotificationCenter.cpp in Sources */,
+				A19E4AE816CA957900E5D60F /* NotificationObserver.cpp in Sources */,
+				A19E4AF716CA959700E5D60F /* AudioConverter.cpp in Sources */,
+				A19E4AF816CA959700E5D60F /* AppleLosslessAudioConverter.cpp in Sources */,
+				A19E4AF916CA959700E5D60F /* AppleLosslessSoftwareAudioConverter.cpp in Sources */,
+				A19E4AFA16CA959700E5D60F /* AudioPlayer.cpp in Sources */,
+				A19E4AFB16CA959700E5D60F /* AudioPacket.cpp in Sources */,
+				A19E4AFC16CA959700E5D60F /* AudioQueue.cpp in Sources */,
+				A19E4B0716CA959F00E5D60F /* CADebugPrintf.cpp in Sources */,
+				A19E4B0816CA959F00E5D60F /* CAHostTimeBase.cpp in Sources */,
+				A19E4B0916CA959F00E5D60F /* CAStreamBasicDescription.cpp in Sources */,
+				A19E4B0A16CA959F00E5D60F /* CAXException.cpp in Sources */,
+				A19E4B0D16CA95AC00E5D60F /* alac.c in Sources */,
+				A19E4B1816CA95C900E5D60F /* Socket.cpp in Sources */,
+				A19E4B1916CA95C900E5D60F /* SocketEndPoint.cpp in Sources */,
+				A19E4B1A16CA95C900E5D60F /* SocketEndPointIPv4.cpp in Sources */,
+				A19E4B1B16CA95C900E5D60F /* SocketEndPointIPv6.cpp in Sources */,
+				A19E4B2816CA95D300E5D60F /* WebTools.cpp in Sources */,
+				A19E4B2916CA95D300E5D60F /* WebHeaders.cpp in Sources */,
+				A19E4B2A16CA95D300E5D60F /* WebResponse.cpp in Sources */,
+				A19E4B2B16CA95D300E5D60F /* WebRequest.cpp in Sources */,
+				A19E4B2C16CA95D300E5D60F /* WebConnection.cpp in Sources */,
+				A19E4B2D16CA95D300E5D60F /* WebServer.cpp in Sources */,
+				A19E4B3816CA95E200E5D60F /* Base64.cpp in Sources */,
+				A19E4B3916CA95E200E5D60F /* RTPReceiver.cpp in Sources */,
+				A19E4B3A16CA95E200E5D60F /* RAOPParameters.cpp in Sources */,
+				A19E4B3B16CA95E200E5D60F /* RAOPConnection.cpp in Sources */,
+				A19E4B3C16CA95E200E5D60F /* RAOPServer.cpp in Sources */,
+				A19E4B4016CA96A300E5D60F /* NSBundle+AirFloatAdditions.m in Sources */,
+				A19E4B4416CA96DD00E5D60F /* NSUserDefaults+AirFloatAdditions.m in Sources */,
+				A19E4B4716CA96F700E5D60F /* NSData+AirFloatAdditions.m in Sources */,
+				A19E4B4B16CA971900E5D60F /* UIView+AirFloatAdditions.m in Sources */,
+				A19E4B4E16CA973C00E5D60F /* UIDevice+AirFloatAdditions.m in Sources */,
+				A19E4B5216CA975900E5D60F /* CAKeyframeAnimation+AirFloatAdditions.m in Sources */,
+				A19E4B5516CA976C00E5D60F /* UIImage+AirFloatAdditions.m in Sources */,
+				A19E4B5816CA977E00E5D60F /* NSString+AirFloatAdditions.m in Sources */,
+				A19E4B5E16CA97A800E5D60F /* NSNull+AirFloatAdditions.m in Sources */,
+				A19E4B6116CA97BF00E5D60F /* UIApplication+AirFloatAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		A17D49D8163E77B200A94C23 /* PBXTargetDependency */ = {
+		A19E4B6916CA9C1F00E5D60F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = AirFloatLibraryiOS;
-			targetProxy = A17D49D7163E77B200A94C23 /* PBXContainerItemProxy */;
-		};
-		A18F05A315362D7800265479 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = CommonAdditions;
-			targetProxy = A18F05A215362D7800265479 /* PBXContainerItemProxy */;
+			name = crypto;
+			targetProxy = A19E4B6816CA9C1F00E5D60F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1211,8 +1360,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
@@ -1222,16 +1369,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"\"/Developer/Extras/CoreAudio/PublicUtility/\"",
-					"\"$(SRCROOT)/AirFloat\"",
-					"\"$(SRCROOT)/Library\"",
-				);
+				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/AirFloat\"";
+				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -1240,24 +1381,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"\"/Developer/Extras/CoreAudio/PublicUtility/\"",
-					"\"$(SRCROOT)/AirFloat\"",
-					"\"$(SRCROOT)/Library\"",
-				);
+				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/AirFloat\"";
+				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 			};
 			name = Release;
@@ -1265,13 +1398,10 @@
 		4898FA1013CDAAD1006EC97E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = (
 					armv6,
 					armv7,
 				);
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1279,17 +1409,9 @@
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/CommonAdditions\"",
-				);
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-iOS-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/OpenSSL/lib\"",
-				);
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
@@ -1303,28 +1425,17 @@
 		4898FA1113CDAAD1006EC97E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = (
 					armv6,
 					armv7,
 				);
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-iOS-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/CommonAdditions\"",
-				);
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-iOS-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/OpenSSL/lib\"",
-				);
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
@@ -1340,8 +1451,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
@@ -1351,16 +1460,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"\"/Developer/Extras/CoreAudio/PublicUtility/\"",
-					"\"$(SRCROOT)/AirFloat\"",
-					"\"$(SRCROOT)/Library\"",
-				);
+				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/AirFloat\"";
+				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "-DLOG_SERVER";
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 			};
 			name = "Debug (Server Logs)";
@@ -1368,7 +1471,6 @@
 		A149209514E7323900849DC3 /* Debug (Server Logs) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = (
 					armv6,
 					armv7,
@@ -1380,17 +1482,9 @@
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/CommonAdditions\"",
-				);
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-iOS-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/OpenSSL/lib\"",
-				);
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
@@ -1401,163 +1495,20 @@
 			};
 			name = "Debug (Server Logs)";
 		};
-		A16B3CBA1535BAA60092DA27 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
-				);
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Mac-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				INFOPLIST_FILE = "AirFloat/AirFloat-Mac-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = AirFloat;
-				SDKROOT = macosx;
-				WRAPPER_EXTENSION = app;
-			};
-			name = Debug;
-		};
-		A16B3CBB1535BAA60092DA27 /* Debug (Server Logs) */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
-				);
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Mac-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				INFOPLIST_FILE = "AirFloat/AirFloat-Mac-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = AirFloat;
-				SDKROOT = macosx;
-				WRAPPER_EXTENSION = app;
-			};
-			name = "Debug (Server Logs)";
-		};
-		A16B3CBC1535BAA60092DA27 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
-				);
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Mac-Prefix.pch";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				INFOPLIST_FILE = "AirFloat/AirFloat-Mac-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				PRODUCT_NAME = AirFloat;
-				SDKROOT = macosx;
-				WRAPPER_EXTENSION = app;
-			};
-			name = Release;
-		};
-		A16B3CBD1535BAA60092DA27 /* App Store Distribution */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
-				);
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Mac-Prefix.pch";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				INFOPLIST_FILE = "AirFloat/AirFloat-Mac-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				PRODUCT_NAME = AirFloat;
-				SDKROOT = macosx;
-				WRAPPER_EXTENSION = app;
-			};
-			name = "App Store Distribution";
-		};
-		A16B3CBE1535BAA60092DA27 /* Ad Hoc Distribution */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
-				);
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Mac-Prefix.pch";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				INFOPLIST_FILE = "AirFloat/AirFloat-Mac-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				PRODUCT_NAME = AirFloat;
-				SDKROOT = macosx;
-				WRAPPER_EXTENSION = app;
-			};
-			name = "Ad Hoc Distribution";
-		};
 		A1A76011151B56B800728C9C /* App Store Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: The Famous Software Company";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: The Famous Software Company";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"\"/Developer/Extras/CoreAudio/PublicUtility/\"",
-					"\"$(SRCROOT)/AirFloat\"",
-					"\"$(SRCROOT)/Library\"",
-				);
+				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/AirFloat\"";
+				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
-				PROVISIONING_PROFILE = "D27B5D68-DEF0-4C95-A98B-ACFB8CE87791";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "D27B5D68-DEF0-4C95-A98B-ACFB8CE87791";
 				SDKROOT = iphoneos;
 			};
 			name = "App Store Distribution";
@@ -1565,7 +1516,6 @@
 		A1A76012151B56B800728C9C /* App Store Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = (
 					armv6,
 					armv7,
@@ -1574,17 +1524,9 @@
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-iOS-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/CommonAdditions\"",
-				);
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-iOS-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/OpenSSL/lib\"",
-				);
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
@@ -1600,8 +1542,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: The Famous Software Company";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: The Famous Software Company";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_THUMB_SUPPORT = NO;
@@ -1609,19 +1549,13 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"\"/Developer/Extras/CoreAudio/PublicUtility/\"",
-					"\"$(SRCROOT)/AirFloat\"",
-					"\"$(SRCROOT)/Library\"",
-				);
+				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/AirFloat\"";
+				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = (
 					"-DNS_BLOCK_ASSERTIONS=1",
 					"-DLOG_SERVER",
 				);
-				PROVISIONING_PROFILE = "F8BE25DD-E07F-44AC-890D-0288CA946B30";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "F8BE25DD-E07F-44AC-890D-0288CA946B30";
 				SDKROOT = iphoneos;
 			};
 			name = "Ad Hoc Distribution";
@@ -1629,35 +1563,22 @@
 		A1C7F7AB1501048400D7DE52 /* Ad Hoc Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = (
 					armv6,
 					armv7,
 				);
-				CODE_SIGN_IDENTITY = "iPhone Distribution: The Famous Software Company";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: The Famous Software Company";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-iOS-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/CommonAdditions\"",
-				);
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-iOS-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/OpenSSL/lib\"",
-				);
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
 				);
 				PRODUCT_NAME = AirFloat;
-				PROVISIONING_PROFILE = "91084A10-135C-4D39-8DCA-304550BEC4FC";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "91084A10-135C-4D39-8DCA-304550BEC4FC";
 				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
@@ -1687,18 +1608,6 @@
 				4898FA1113CDAAD1006EC97E /* Release */,
 				A1A76012151B56B800728C9C /* App Store Distribution */,
 				A1C7F7AB1501048400D7DE52 /* Ad Hoc Distribution */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		A16B3CB91535BAA60092DA27 /* Build configuration list for PBXNativeTarget "AirFloat Mac" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A16B3CBA1535BAA60092DA27 /* Debug */,
-				A16B3CBB1535BAA60092DA27 /* Debug (Server Logs) */,
-				A16B3CBC1535BAA60092DA27 /* Release */,
-				A16B3CBD1535BAA60092DA27 /* App Store Distribution */,
-				A16B3CBE1535BAA60092DA27 /* Ad Hoc Distribution */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
