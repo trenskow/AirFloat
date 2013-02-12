@@ -1398,10 +1398,7 @@
 		4898FA1013CDAAD1006EC97E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					armv6,
-					armv7,
-				);
+				ARCHS = armv7;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1425,10 +1422,7 @@
 		4898FA1113CDAAD1006EC97E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					armv6,
-					armv7,
-				);
+				ARCHS = armv7;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
@@ -1471,10 +1465,7 @@
 		A149209514E7323900849DC3 /* Debug (Server Logs) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					armv6,
-					armv7,
-				);
+				ARCHS = armv7;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1516,10 +1507,7 @@
 		A1A76012151B56B800728C9C /* App Store Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					armv6,
-					armv7,
-				);
+				ARCHS = armv7;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
@@ -1563,10 +1551,7 @@
 		A1C7F7AB1501048400D7DE52 /* Ad Hoc Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					armv6,
-					armv7,
-				);
+				ARCHS = armv7;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
