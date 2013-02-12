@@ -29,6 +29,4 @@
 @property (retain, nonatomic) IBOutlet AirFloatIntroViewController *introViewController;
 @property (retain, nonatomic) IBOutlet AirFloatReceivingViewController *receivingViewController;
 
-- (void)userDidPassCheckPoint:(NSString*)name;
-
 @end

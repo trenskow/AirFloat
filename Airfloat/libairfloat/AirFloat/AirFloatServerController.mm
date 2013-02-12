@@ -6,7 +6,7 @@
 //  Copyright 2011 The Famous Software Company. All rights reserved.
 //
 
-#import <AirFloatLibrary/Library.h>
+#import "Server.h"
 
 #import "AirFloatiOSAppDelegate.h"
 #import "AirFloatAdditions.h"
@@ -95,9 +95,7 @@
         [NSDefaultNotificationCenter addObserver:self selector:@selector(_didPairDaap:) name:AirFloatDAAPPairerDidPairNotification object:nil];
         
         [self _updateServerStatus];
-        
-        [AirFloatiOSSharedAppDelegate userDidPassCheckPoint:@"AirPlay server STARTED"];
-        
+                
         return;
         
     }
@@ -112,8 +110,6 @@
 - (void)stop {
     
     if (_server && RTPReceiver::isAvailable()) {
-        
-        [AirFloatiOSSharedAppDelegate userDidPassCheckPoint:@"AirPlay server STOPPED"];
         
         self._server->stopServer();
         self._server->waitServer();
@@ -213,11 +209,6 @@
                     
                     NSDLog(@"Connected to service %@", [service name]);
                     
-                    if ([[service type] isEqualToString:@"_dacp._tcp."])
-                        [AirFloatiOSSharedAppDelegate userDidPassCheckPoint:@"Connected to DACP service"];
-                    else
-                        [AirFloatiOSSharedAppDelegate userDidPassCheckPoint:@"Connected to DAAP service"];
-                    
                     return true;
                     
                 }
@@ -259,8 +250,6 @@
     [_daapClient release];
     _daapClient = nil;
     
-    [AirFloatiOSSharedAppDelegate userDidPassCheckPoint:@"DAAP authentication failed and DACP is unavailable."];
-    
     [NSDefaultNotificationCenter postNotificationName:AirFloatServerControllerFailedFindingDAAPNoification object:self];
     
 }
@@ -269,16 +258,12 @@
 
 - (void)_didPairDaap:(NSNotification *)notification {
     
-    [AirFloatiOSSharedAppDelegate userDidPassCheckPoint:@"iTunes was paired"];
-    
     if (!_daapClient)
         [_bonjourBrowser findService:[AirFloatDAAPClient daapServiceTypeForClientUserAgent:self.connectedUserAgent]];
     
 }
 
 - (void)_daapAuthenticationFailed:(NSNotification *)notification {
-    
-    [AirFloatiOSSharedAppDelegate userDidPassCheckPoint:@"iTunes pairing failed"];
     
     [AirFloatDAAPClient removeServiceForGuid:[notification.userInfo objectForKey:kAirFloatDAAPClientGuidKey]];
     

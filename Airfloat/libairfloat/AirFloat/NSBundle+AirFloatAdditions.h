@@ -1,12 +1,12 @@
 //
 //  NSBundle+AirFloatAdditions.h
-//  AirFloat
+//  
 //
 //  Created by Kristian Trenskow on 2/27/12.
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 #define NSMainBundle [NSBundle mainBundle]
 
