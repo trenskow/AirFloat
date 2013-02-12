@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="7.10">
 	<data>
-		<int key="IBDocument.SystemTarget">1536</int>
-		<string key="IBDocument.SystemVersion">12C60</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2843</string>
+		<int key="IBDocument.SystemTarget">1552</int>
+		<string key="IBDocument.SystemVersion">12C3012</string>
+		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
 		<string key="IBDocument.AppKitVersion">1187.34</string>
 		<string key="IBDocument.HIToolboxVersion">625.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-			<string key="NS.object.0">1929</string>
+			<string key="NS.object.0">2083</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -301,7 +301,7 @@
 										<string key="NSFrameSize">{320, 44}</string>
 										<reference key="NSSuperview" ref="881396234"/>
 										<reference key="NSWindow"/>
-										<reference key="NSNextKeyView" ref="874314877"/>
+										<reference key="NSNextKeyView"/>
 										<string key="NSReuseIdentifierKey">_NS:328</string>
 										<bool key="IBUIOpaque">NO</bool>
 										<bool key="IBUIClipsSubviews">YES</bool>
@@ -395,35 +395,6 @@
 										</object>
 										<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
 									</object>
-									<object class="IBUIButton" id="874314877">
-										<reference key="NSNextResponder" ref="881396234"/>
-										<int key="NSvFlags">-2147483356</int>
-										<string key="NSFrame">{{6, 7}, {103, 30}}</string>
-										<reference key="NSSuperview" ref="881396234"/>
-										<reference key="NSWindow"/>
-										<reference key="NSNextKeyView" ref="532507953"/>
-										<string key="NSReuseIdentifierKey">_NS:225</string>
-										<bool key="IBUIOpaque">NO</bool>
-										<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-										<bool key="IBUIEnabled">NO</bool>
-										<int key="IBUIContentHorizontalAlignment">0</int>
-										<int key="IBUIContentVerticalAlignment">0</int>
-										<string key="IBUINormalTitle">Beta Feedback</string>
-										<reference key="IBUIHighlightedTitleColor" ref="721572707"/>
-										<reference key="IBUINormalTitleColor" ref="721572707"/>
-										<reference key="IBUINormalTitleShadowColor" ref="825743798"/>
-										<object class="IBUIFontDescription" key="IBUIFontDescription" id="817242093">
-											<string key="name">HelveticaNeue-Bold</string>
-											<string key="family">Helvetica Neue</string>
-											<int key="traits">2</int>
-											<double key="pointSize">12</double>
-										</object>
-										<object class="NSFont" key="IBUIFont" id="1021211252">
-											<string key="NSName">HelveticaNeue-Bold</string>
-											<double key="NSSize">12</double>
-											<int key="NSfFlags">16</int>
-										</object>
-									</object>
 									<object class="IBUIButton" id="532507953">
 										<reference key="NSNextResponder" ref="881396234"/>
 										<int key="NSvFlags">-2147483359</int>
@@ -440,8 +411,17 @@
 										<reference key="IBUIHighlightedTitleColor" ref="721572707"/>
 										<reference key="IBUINormalTitleColor" ref="721572707"/>
 										<reference key="IBUINormalTitleShadowColor" ref="825743798"/>
-										<reference key="IBUIFontDescription" ref="817242093"/>
-										<reference key="IBUIFont" ref="1021211252"/>
+										<object class="IBUIFontDescription" key="IBUIFontDescription" id="817242093">
+											<string key="name">HelveticaNeue-Bold</string>
+											<string key="family">Helvetica Neue</string>
+											<int key="traits">2</int>
+											<double key="pointSize">12</double>
+										</object>
+										<object class="NSFont" key="IBUIFont" id="1059122606">
+											<string key="NSName">HelveticaNeue-Bold</string>
+											<double key="NSSize">12</double>
+											<int key="NSfFlags">16</int>
+										</object>
 									</object>
 									<object class="IBUIButton" id="318574162">
 										<reference key="NSNextResponder" ref="881396234"/>
@@ -463,7 +443,7 @@
 											<string key="NSResourceName">Playlist.png</string>
 										</object>
 										<reference key="IBUIFontDescription" ref="817242093"/>
-										<reference key="IBUIFont" ref="1021211252"/>
+										<reference key="IBUIFont" ref="1059122606"/>
 									</object>
 								</object>
 								<string key="NSFrameSize">{320, 96}</string>
@@ -584,7 +564,6 @@
 										<string key="NSFrame">{{214, 34}, {31, 27}}</string>
 										<reference key="NSSuperview" ref="211369612"/>
 										<reference key="NSWindow"/>
-										<reference key="NSNextKeyView"/>
 										<string key="NSReuseIdentifierKey">_NS:225</string>
 										<bool key="IBUIOpaque">NO</bool>
 										<float key="IBUIAlpha">0.0</float>
@@ -873,15 +852,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
-						<string key="label">betaFeedbackButtonTouchUpInside:</string>
-						<reference key="source" ref="874314877"/>
-						<reference key="destination" ref="372490531"/>
-						<int key="IBEventType">7</int>
-					</object>
-					<int key="connectionID">147</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchEventConnection" key="connection">
 						<string key="label">pairButtonTouchUpInside:</string>
 						<reference key="source" ref="532507953"/>
 						<reference key="destination" ref="372490531"/>
@@ -1010,7 +980,6 @@
 							<reference ref="971654827"/>
 							<reference ref="793265093"/>
 							<reference ref="59454354"/>
-							<reference ref="874314877"/>
 							<reference ref="532507953"/>
 							<reference ref="318574162"/>
 						</object>
@@ -1067,11 +1036,6 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 						</object>
 						<reference key="parent" ref="779431445"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">131</int>
-						<reference key="object" ref="874314877"/>
-						<reference key="parent" ref="881396234"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">143</int>
@@ -1175,8 +1139,6 @@
 					<string>117.CustomClassName</string>
 					<string>117.IBPluginDependency</string>
 					<string>129.IBPluginDependency</string>
-					<string>131.CustomClassName</string>
-					<string>131.IBPluginDependency</string>
 					<string>143.CustomClassName</string>
 					<string>143.IBPluginDependency</string>
 					<string>154.CustomClassName</string>
@@ -1218,8 +1180,6 @@
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>AirFloatHighlightedButton</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-					<string>AirFloatBarButton</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>AirFloatBarButton</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -1315,7 +1275,6 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>betaFeedbackButtonTouchUpInside:</string>
 							<string>nextButtonTouchUpInside:</string>
 							<string>pairButtonTouchUpInside:</string>
 							<string>playButtonTouchUpInside:</string>
@@ -1328,7 +1287,6 @@
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -1344,7 +1302,6 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>betaFeedbackButtonTouchUpInside:</string>
 							<string>nextButtonTouchUpInside:</string>
 							<string>pairButtonTouchUpInside:</string>
 							<string>playButtonTouchUpInside:</string>
@@ -1357,10 +1314,6 @@
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBActionInfo">
-								<string key="name">betaFeedbackButtonTouchUpInside:</string>
-								<string key="candidateClassName">id</string>
-							</object>
 							<object class="IBActionInfo">
 								<string key="name">nextButtonTouchUpInside:</string>
 								<string key="candidateClassName">id</string>
@@ -1562,7 +1515,7 @@
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaTouchFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaTouchPlugin.iPhoneOS</string>
-			<real value="1536" key="NS.object.0"/>
+			<real value="1552" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaTouchPlugin.InterfaceBuilder3</string>
@@ -1605,6 +1558,6 @@
 				<string>{320, 96}</string>
 			</object>
 		</object>
-		<string key="IBCocoaTouchPluginVersion">1929</string>
+		<string key="IBCocoaTouchPluginVersion">2083</string>
 	</data>
 </archive>

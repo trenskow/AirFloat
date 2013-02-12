@@ -9,8 +9,6 @@
 #import <QuartzCore/QuartzCore.h>
 #import <MediaPlayer/MediaPlayer.h>
 
-#import "TestFlight.h"
-
 #import "AirFloatAdditions.h"
 #import "AirFloatSongCell.h"
 #import "AirFloatDAAPClient.h"
@@ -289,7 +287,7 @@
 #pragma mark - Action Methods
 - (IBAction)tapGestureRecognized:(id)sender {
     
-    [self _setInfoAppearence:(self.infoViews.alpha == 0.0)];
+    //[self _setInfoAppearence:(self.infoViews.alpha == 0.0)];
     
 }
 
@@ -329,12 +327,6 @@
 
     [NSDefaultNotificationCenter postNotificationName:AirFloatDAAPPlaybackPrevNotification object:nil];
 
-}
-
-- (IBAction)betaFeedbackButtonTouchUpInside:(id)sender {
-    
-    [TestFlight openFeedbackView];
-    
 }
 
 - (IBAction)pairButtonTouchUpInside:(id)sender {
@@ -394,7 +386,6 @@
         
         if (_playlistVisible) {
             
-            [AirFloatiOSSharedAppDelegate userDidPassCheckPoint:@"User toggled to playlist"];
             self.playlistTableView.alpha = 0.0;
             self.playlistTableView.hidden = NO;
             [self performSelector:@selector(_playlistTimedOut) withObject:nil afterDelay:kAirFloatPlaylistIdleTime];
@@ -571,6 +562,10 @@
     
     if ([AirFloatiOSSharedAppDelegate.serverController.connectedUserAgent rangeOfString:@"iTunes"].location != NSNotFound && self.pairButton.hidden == YES) {
         
+        /*
+         
+         Pairing has currently been disabled due to bug.
+         
         self.pairButton.alpha = 0.0;
         self.pairButton.hidden = NO;
         [UIView animateWithDuration:0.3
@@ -579,6 +574,8 @@
                          animations:^{
                              self.pairButton.alpha = 1.0;
                          } completion:NULL];
+         
+         */
         
     }
     

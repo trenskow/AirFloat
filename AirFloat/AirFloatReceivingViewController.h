@@ -56,7 +56,6 @@
 - (IBAction)playButtonTouchUpInside:(id)sender;
 - (IBAction)nextButtonTouchUpInside:(id)sender;
 - (IBAction)prevButtonTouchUpInside:(id)sender;
-- (IBAction)betaFeedbackButtonTouchUpInside:(id)sender;
 - (IBAction)pairButtonTouchUpInside:(id)sender;
 - (IBAction)playlistButtonTouchUpInside:(id)sender;
 - (IBAction)searchClearButtonTouchUpInside:(id)sender;

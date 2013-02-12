@@ -1,6 +1,6 @@
 //
 //  NSString+AirFloatAdditions.m
-//  AirFloat
+//  
 //
 //  Created by Kristian Trenskow on 2/22/12.
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
@@ -18,6 +18,18 @@
         ret = [[ret substringFromIndex:[self length]] stringByAppendingString:self];
 
     return ret;
+    
+}
+
+- (NSString*)predicateFormattedStringForKey:(NSString *)key {
+    
+    NSArray* components = [[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] componentsSeparatedByString:@" "];
+    NSMutableArray* queries = [NSMutableArray array];
+    
+    for (NSString* query in components)
+        [queries addObject:[NSString stringWithFormat:@"(%@ like[cd] '*%@*')", key, query]];
+    
+    return [NSString stringWithFormat:@"(%@)", [queries componentsJoinedByString:@" OR "]];
     
 }
 

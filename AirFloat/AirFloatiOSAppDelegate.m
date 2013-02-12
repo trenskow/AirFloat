@@ -6,8 +6,6 @@
 //  Copyright 2011 The Famous Software Company. All rights reserved.
 //
 
-#import "TestFlight.h"
-
 #import "AirFloatMacros.h"
 #import "AirFloatiOSAppDelegate.h"
 #import "AirFloatAdditions.h"
@@ -104,20 +102,8 @@
 
 #pragma mark - Public Methods
 
-- (void)userDidPassCheckPoint:(NSString *)name {
-    
-    [TestFlight passCheckpoint:name];
-    
-}
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-
-    [TestFlight takeOff:@"d98b9af2b7b55c408e39e74b43268c30_NjIxOTgyMDEyLTAyLTEzIDE2OjI5OjE5LjEwNjY0Mw"];
-    
-#ifdef DEBUG
-    [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
-#endif
     
     AudioSessionInitialize(NULL, NULL, NULL, NULL);
     

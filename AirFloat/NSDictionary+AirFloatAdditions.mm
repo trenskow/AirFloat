@@ -6,7 +6,7 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#import <AirFloatLibrary/Library.h>
+#import "Server.h"
 #import "NSDictionary+AirFloatAdditions.h"
 
 @interface NSDictionary (AirFloatPrivate)

@@ -6,9 +6,9 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#import <AirFloatLibrary/Library.h>
+#import "Server.h"
 
-#import <AirFloatLibrary/NotificationCenter.h>
+#import "NotificationCenter.h"
 #import "AirFloatAdditions.h"
 #import "AirFloatNotificationsHub.h"
 
