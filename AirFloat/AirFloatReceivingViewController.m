@@ -13,7 +13,7 @@
 #import "AirFloatSongCell.h"
 #import "AirFloatDAAPClient.h"
 #import "AirFloatPairViewController.h"
-#import "AirFloatiOSAppDelegate.h"
+#import "AirFloatAppDelegate.h"
 #import "AirFloatServerController.h"
 #import "AirFloatReceivingViewController.h"
 

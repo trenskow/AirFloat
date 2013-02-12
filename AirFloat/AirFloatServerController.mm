@@ -8,7 +8,7 @@
 
 #import "Server.h"
 
-#import "AirFloatiOSAppDelegate.h"
+#import "AirFloatAppDelegate.h"
 #import "AirFloatAdditions.h"
 #import "AirFloatDAAPPairer.h"
 #import "AirFloatServerController.h"

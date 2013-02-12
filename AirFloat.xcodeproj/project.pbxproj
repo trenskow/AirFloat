@@ -12,8 +12,8 @@
 		4898F9F313CDAAD1006EC97E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898F9F213CDAAD1006EC97E /* UIKit.framework */; };
 		4898F9F513CDAAD1006EC97E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898F9F413CDAAD1006EC97E /* Foundation.framework */; };
 		4898F9F713CDAAD1006EC97E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898F9F613CDAAD1006EC97E /* CoreGraphics.framework */; };
-		4898FA0013CDAAD1006EC97E /* main-iOS.m in Sources */ = {isa = PBXBuildFile; fileRef = 4898F9FF13CDAAD1006EC97E /* main-iOS.m */; };
-		4898FA0313CDAAD1006EC97E /* AirFloatiOSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4898FA0213CDAAD1006EC97E /* AirFloatiOSAppDelegate.m */; };
+		4898FA0013CDAAD1006EC97E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4898F9FF13CDAAD1006EC97E /* main.m */; };
+		4898FA0313CDAAD1006EC97E /* AirFloatAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4898FA0213CDAAD1006EC97E /* AirFloatAppDelegate.m */; };
 		4898FA0613CDAAD1006EC97E /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4898FA0413CDAAD1006EC97E /* MainWindow.xib */; };
 		4898FA0913CDAAD1006EC97E /* AirFloatReceivingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4898FA0813CDAAD1006EC97E /* AirFloatReceivingViewController.m */; };
 		4898FA0C13CDAAD1006EC97E /* AirFloatReceivingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4898FA0A13CDAAD1006EC97E /* AirFloatReceivingViewController.xib */; };
@@ -186,11 +186,11 @@
 		4898F9F213CDAAD1006EC97E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		4898F9F413CDAAD1006EC97E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4898F9F613CDAAD1006EC97E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		4898F9FA13CDAAD1006EC97E /* AirFloat-iOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AirFloat-iOS-Info.plist"; sourceTree = "<group>"; };
-		4898F9FE13CDAAD1006EC97E /* AirFloat-iOS-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "AirFloat-iOS-Prefix.pch"; sourceTree = "<group>"; };
-		4898F9FF13CDAAD1006EC97E /* main-iOS.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "main-iOS.m"; sourceTree = "<group>"; };
-		4898FA0113CDAAD1006EC97E /* AirFloatiOSAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AirFloatiOSAppDelegate.h; sourceTree = "<group>"; };
-		4898FA0213CDAAD1006EC97E /* AirFloatiOSAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AirFloatiOSAppDelegate.m; sourceTree = "<group>"; };
+		4898F9FA13CDAAD1006EC97E /* AirFloat-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AirFloat-Info.plist"; sourceTree = "<group>"; };
+		4898F9FE13CDAAD1006EC97E /* AirFloat-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "AirFloat-Prefix.pch"; sourceTree = "<group>"; };
+		4898F9FF13CDAAD1006EC97E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = main.m; sourceTree = "<group>"; };
+		4898FA0113CDAAD1006EC97E /* AirFloatAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AirFloatAppDelegate.h; sourceTree = "<group>"; };
+		4898FA0213CDAAD1006EC97E /* AirFloatAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AirFloatAppDelegate.m; sourceTree = "<group>"; };
 		4898FA0513CDAAD1006EC97E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
 		4898FA0713CDAAD1006EC97E /* AirFloatReceivingViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AirFloatReceivingViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		4898FA0813CDAAD1006EC97E /* AirFloatReceivingViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AirFloatReceivingViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -566,8 +566,8 @@
 		A1389E1114E422B8004FE040 /* iOS App */ = {
 			isa = PBXGroup;
 			children = (
-				4898FA0113CDAAD1006EC97E /* AirFloatiOSAppDelegate.h */,
-				4898FA0213CDAAD1006EC97E /* AirFloatiOSAppDelegate.m */,
+				4898FA0113CDAAD1006EC97E /* AirFloatAppDelegate.h */,
+				4898FA0213CDAAD1006EC97E /* AirFloatAppDelegate.m */,
 				A1B3E3DE14CE09A300379E8C /* Additions */,
 				A19E4AC716CA94FA00E5D60F /* Server */,
 				A130A1DD14F5301200EADC03 /* Bridges */,
@@ -808,9 +808,9 @@
 		A188ECF2150BD6EA00CC089E /* Other */ = {
 			isa = PBXGroup;
 			children = (
-				4898F9FA13CDAAD1006EC97E /* AirFloat-iOS-Info.plist */,
-				4898F9FE13CDAAD1006EC97E /* AirFloat-iOS-Prefix.pch */,
-				4898F9FF13CDAAD1006EC97E /* main-iOS.m */,
+				4898F9FA13CDAAD1006EC97E /* AirFloat-Info.plist */,
+				4898F9FE13CDAAD1006EC97E /* AirFloat-Prefix.pch */,
+				4898F9FF13CDAAD1006EC97E /* main.m */,
 				48B49ED913D216EC00AB67D1 /* Settings.bundle */,
 			);
 			name = Other;
@@ -1091,9 +1091,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4898F9ED13CDAAD1006EC97E /* AirFloat iOS */ = {
+		4898F9ED13CDAAD1006EC97E /* AirFloat */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4898FA0F13CDAAD1006EC97E /* Build configuration list for PBXNativeTarget "AirFloat iOS" */;
+			buildConfigurationList = 4898FA0F13CDAAD1006EC97E /* Build configuration list for PBXNativeTarget "AirFloat" */;
 			buildPhases = (
 				4898F9EA13CDAAD1006EC97E /* Sources */,
 				4898F9EB13CDAAD1006EC97E /* Frameworks */,
@@ -1105,7 +1105,7 @@
 			dependencies = (
 				A19E4B8616CAA81400E5D60F /* PBXTargetDependency */,
 			);
-			name = "AirFloat iOS";
+			name = AirFloat;
 			productName = AirFloat;
 			productReference = 4898F9EE13CDAAD1006EC97E /* AirFloat.app */;
 			productType = "com.apple.product-type.application";
@@ -1136,7 +1136,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				4898F9ED13CDAAD1006EC97E /* AirFloat iOS */,
+				4898F9ED13CDAAD1006EC97E /* AirFloat */,
 			);
 		};
 /* End PBXProject section */
@@ -1240,7 +1240,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "buildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" AirFloat/AirFloat-iOS-Info.plist)\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" AirFloat/AirFloat-iOS-Info.plist";
+			shellScript = "buildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" AirFloat/AirFloat-Info.plist)\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" AirFloat/AirFloat-Info.plist";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1249,8 +1249,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4898FA0013CDAAD1006EC97E /* main-iOS.m in Sources */,
-				4898FA0313CDAAD1006EC97E /* AirFloatiOSAppDelegate.m in Sources */,
+				4898FA0013CDAAD1006EC97E /* main.m in Sources */,
+				4898FA0313CDAAD1006EC97E /* AirFloatAppDelegate.m in Sources */,
 				4898FA0913CDAAD1006EC97E /* AirFloatReceivingViewController.m in Sources */,
 				48487E4613D6343700E55831 /* AirFloatServerController.mm in Sources */,
 				48487E4913D634A400E55831 /* AirFloatInterfaces.m in Sources */,
@@ -1405,12 +1405,12 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "AirFloat/AirFloat-iOS-Prefix.pch";
+				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
-				INFOPLIST_FILE = "AirFloat/AirFloat-iOS-Info.plist";
+				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_LDFLAGS = (
 					"-all_load",
@@ -1430,11 +1430,11 @@
 					armv7,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "AirFloat/AirFloat-iOS-Prefix.pch";
+				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
-				INFOPLIST_FILE = "AirFloat/AirFloat-iOS-Info.plist";
+				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_LDFLAGS = (
 					"-all_load",
@@ -1478,12 +1478,12 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "AirFloat/AirFloat-iOS-Prefix.pch";
+				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
-				INFOPLIST_FILE = "AirFloat/AirFloat-iOS-Info.plist";
+				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_LDFLAGS = (
 					"-all_load",
@@ -1521,11 +1521,11 @@
 					armv7,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "AirFloat/AirFloat-iOS-Prefix.pch";
+				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
-				INFOPLIST_FILE = "AirFloat/AirFloat-iOS-Info.plist";
+				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_LDFLAGS = (
 					"-all_load",
@@ -1568,11 +1568,11 @@
 					armv7,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "AirFloat/AirFloat-iOS-Prefix.pch";
+				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
-				INFOPLIST_FILE = "AirFloat/AirFloat-iOS-Info.plist";
+				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_LDFLAGS = (
 					"-all_load",
@@ -1600,7 +1600,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4898FA0F13CDAAD1006EC97E /* Build configuration list for PBXNativeTarget "AirFloat iOS" */ = {
+		4898FA0F13CDAAD1006EC97E /* Build configuration list for PBXNativeTarget "AirFloat" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4898FA1013CDAAD1006EC97E /* Debug */,
