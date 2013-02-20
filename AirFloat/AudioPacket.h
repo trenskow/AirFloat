@@ -29,7 +29,8 @@ public:
     
     void setBuffer(void* buffer, uint32_t size);
     uint32_t getBuffer(void* buffer, uint32_t size);
-    bool hasBuffer();
+    void shiftBuffer(uint32_t size);
+    uint32_t getBufferSize();
     
     void remove();
     

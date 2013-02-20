@@ -67,8 +67,29 @@ uint32_t AudioPacket::getBuffer(void* buffer, uint32_t size) {
     
 }
 
+void AudioPacket::shiftBuffer(uint32_t size) {
+    
+    _mutex.lock();
+    
+    if (size >= _bufferSize) {
+        
+        if (_buffer != NULL)
+            free(_buffer);
+        _buffer = NULL;
+        _bufferSize = 0;
+        
+    } else {
+        
+        memcpy(_buffer, &((char*)_buffer)[size], _bufferSize - size);
+        _bufferSize -= size;
+        
+    }
+    
+    _mutex.unlock();
+    
+}
 
-bool AudioPacket::hasBuffer() {
+uint32_t AudioPacket::getBufferSize() {
     
     _mutex.lock();
     
