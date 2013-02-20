@@ -26,7 +26,7 @@ public:
     
     bool hasAvailablePacket();
     double getPacketTime();
-    void getPacket(void* buffer, uint32_t* size, double* time, uint32_t* sampleTime);
+    void getAudio(void* buffer, uint32_t* size, double* time, uint32_t* sampleTime);
     void discardPacket();
     void synchronize(uint32_t currentSampleTime, double currentTime, uint32_t nextSampleTime);
     int getNextMissingWindow(int* seqNo);
