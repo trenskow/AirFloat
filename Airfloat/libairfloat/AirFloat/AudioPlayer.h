@@ -14,12 +14,18 @@
 #include "Mutex.h"
 #include "AudioConverter.h"
 #include "AudioQueue.h"
+#include "AudioGraph.h"
+#include "AudioUnitConverter.h"
+#include "AudioUnitMixer.h"
+#include "AudioUnitOutput.h"
 #include <AudioToolbox/AudioToolbox.h>
 
 #define CLIENT_SERVER_DIFFERENCE_BACKLOG 10
 
+using namespace Audio;
+
 class AudioPlayer {
-        
+    
 public:
     AudioPlayer(int* fmts, int fmtsSize);
     ~AudioPlayer();
@@ -38,32 +44,31 @@ public:
     
 private:
     
-    void _audioOutputCallback(AudioQueueRef inAQ, AudioQueueBufferRef inBuffer);
-    static void _audioOutputCallbackHelper(void* aqData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer);
-    
+    OSStatus _renderCallback (AudioUnitRenderActionFlags *ioActionFlags, const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList  *ioData);
+    static OSStatus _renderCallbackHelper (void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags, const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList  *ioData);
+
     int _srcFramesPerPacket;
     struct {
-        AudioStreamBasicDescription outDesc;
-        AudioQueueTimelineRef timeline;
         AudioConverter* losslessConverter;
-        AudioConverter* speedUpConverter;
-        AudioConverter* slowDownConverter;
-        AudioQueueRef queue;
-        AudioQueueBufferRef buffers[BUFFER_COUNT];
-        AudioStreamPacketDescription* pckDesc;
+        AudioStreamBasicDescription outDesc;
+        struct {
+            Graph *graph;
+            UnitMixer *mixerUnit;
+            UnitOutput *outputUnit;
+        } graph;
     } _audio;
     
     double _clientServerDifferenceHistory[10];
     int _clientServerDifferenceHistoryCount;
     
     double _clientServerDifference;
-    double _nextPacketTime;
     bool _outputIsHomed;
     
     Mutex _timeMutex;
-
+    
     AudioQueueParameterValue _preFlushVolume;
     
+    bool _synchronizationEnabled;
     AudioQueue* _audioQueue;
     
     int32_t _flushedSeq;
