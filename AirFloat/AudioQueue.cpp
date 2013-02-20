@@ -17,7 +17,7 @@
 
 #define MAX_QUEUE_COUNT 300
 #define UINT16_MIDDLE (0xFFFF > 1)
-#define LoopFrom(x, y, d) for (AudioPacket* x = y ; x != NULL ; x = x->d)
+#define LoopFrom(x, y, d, c) for (AudioPacket* x = y ; x != c ; x = x->d)
 #define MIN(x,y) (x < y ? x : y)
 #define MAX(x,y) (x > y ? x : y)
 #define SafeDR(x,y) if (x != NULL) *x = y
@@ -45,7 +45,7 @@ static void dumpqueue(AudioPacket* head) {
     
     assert(head != NULL);
     
-    LoopFrom(currentPacket, head, next)
+    LoopFrom(currentPacket, head, next, NULL)
         log(LOG_ERROR, " %05d --> %s", currentPacket->seqNo, statestr(currentPacket->state));
     
 }
@@ -90,7 +90,7 @@ void AudioQueue::_checkQueueConsistency() {
     int count = 0;
     int missing = 0;
     
-    LoopFrom(currentPacket, _queueHead, next) {
+    LoopFrom(currentPacket, _queueHead, next, NULL) {
         if (currentPacket->state >= kAudioPacketStateMissing)
             missing++;
         
@@ -141,7 +141,7 @@ void AudioQueue::_addPacketToQueueTail(AudioPacket* packet) {
     _queueTail = packet;
     
     while (_queueCount > MAX_QUEUE_COUNT)
-        _disposePacket(_popQueueFromHead());         
+        _disposePacket(_popQueueFromHead());
     
 }
 
@@ -151,6 +151,11 @@ AudioPacket* AudioQueue::_addEmptyPacket() {
     
     if (_queueTail != NULL)
         newPacket->seqNo = _handleSequenceOverflow(_queueTail->seqNo + 1);
+    
+    uint32_t size = _frameSize * _packetSize;
+    char* emptyBuffer[size];
+    bzero(emptyBuffer, size);
+    newPacket->setBuffer(emptyBuffer, size);
     
     _addPacketToQueueTail(newPacket);
     
@@ -260,11 +265,10 @@ int AudioQueue::_addAudioPacket(void* buffer, uint32_t size, int seqNo, uint32_t
     } else {
         
         bool found = false;
-        LoopFrom(currentPacket, _queueTail, prev) {
+        LoopFrom(currentPacket, _queueTail, prev, _queueHead) {
             
             if (currentPacket->seqNo == seqNo) {
-                if (currentPacket->state == kAudioPacketStateMissing) {
-                    log(LOG_INFO, "Adding missing package %d", seqNo);
+                if (currentPacket->state != kAudioPacketStateComplete) {
                     _missingCount--;
                     
                     currentPacket->setBuffer(buffer, size);
@@ -319,45 +323,64 @@ double AudioQueue::getPacketTime() {
     
 }
 
-void AudioQueue::getPacket(void* buffer, uint32_t* size, double* time, uint32_t* sampleTime) {
+void AudioQueue::getAudio(void* buffer, uint32_t* size, double* time, uint32_t* sampleTime) {
     
     assert(buffer != NULL && size != NULL);
     
     _mutex.lock();
+    
+    char* bufWriteHead = (char*)buffer;
+    uint32_t bufWriteSize = *size;
     
     uint32_t outSize = 0;
     SafeDR(time, 0);
     
     if (_queueHead != NULL) {
         
-        uint32_t silentSize = _frameSize * _packetSize;
-        while (_queueHead != NULL && *size - outSize >= (_queueHead->hasBuffer() ? _queueHead->getBuffer(NULL, *size) : silentSize)) {
+        uint32_t packetByteSize = _frameSize * _packetSize;
+        while (bufWriteSize > 0) {
             
-            AudioPacket* audioPacket = _popQueueFromHead();
-            
-            if (outSize == 0) {
+            if (_queueHead) {
                 
-                if (sampleTime != NULL)
-                    *sampleTime = audioPacket->sampleTime;
-                if (time != NULL && _lastKnowSampleTime > 0 && _lastKnowSampleTimesTime > 0)
-                    *time = _convertTime(_lastKnowSampleTime, _lastKnowSampleTimesTime, audioPacket->sampleTime);
-
+                AudioPacket *audioPacket = _queueHead;
+                
+                if (outSize == 0) {
+                    
+                    if (sampleTime != NULL)
+                        *sampleTime = audioPacket->sampleTime;
+                    if (time != NULL && _lastKnowSampleTime > 0 && _lastKnowSampleTimesTime > 0)
+                        *time = _convertTime(_lastKnowSampleTime, _lastKnowSampleTimesTime, audioPacket->sampleTime);
+                    
+                }
+                
+                uint32_t written = audioPacket->getBuffer(bufWriteHead, bufWriteSize);
+                
+                audioPacket->shiftBuffer(written);
+                
+                if (audioPacket->getBufferSize() > 0) {
+                    if (audioPacket->time > 0)
+                        audioPacket->time += ((written / _frameSize) / _sampleRate);
+                    audioPacket->sampleTime += (written / _frameSize);
+                }
+                
+                bufWriteHead = &bufWriteHead[written];
+                bufWriteSize -= written;
+                outSize += written;
+                
+                if (audioPacket->seqNo % 100 == 0)
+                    log(LOG_INFO, "%d packages in queue (%d missing / seq %d)", _queueCount, _missingCount, audioPacket->seqNo);
+                
+                if (audioPacket->getBufferSize() == 0)
+                    _disposePacket(_popQueueFromHead(false));
+                
+            } else {
+                uint32_t silenceSize = MIN(packetByteSize, bufWriteSize);
+                bzero(bufWriteHead, silenceSize);
+                bufWriteHead = &bufWriteHead[silenceSize];
+                bufWriteSize -= silenceSize;
+                outSize += packetByteSize;
             }
             
-            if (audioPacket->hasBuffer())
-                outSize += audioPacket->getBuffer(&((char*)buffer)[outSize], *size - outSize);
-            else {
-                
-                bzero(&((char*)buffer)[outSize], silentSize);
-                outSize += silentSize;
-                
-            }
-            
-            if (audioPacket->seqNo % 100 == 0)
-                log(LOG_INFO, "%d packages in queue (%d missing / seq %d)", _queueCount, _missingCount, audioPacket->seqNo);
-            
-            _disposePacket(audioPacket);
-                        
         }
         
     }
@@ -413,12 +436,12 @@ int AudioQueue::getNextMissingWindow(int* seqNo) {
     
     _mutex.lock();
     
-    LoopFrom(currentPacket, _queueHead, next) {
+    LoopFrom(currentPacket, _queueHead, next, NULL) {
         
         if (currentPacket->state == kAudioPacketStateMissing) {
             *seqNo = currentPacket->seqNo % 0xFFFF;
             
-            LoopFrom(missingPacket, currentPacket, next) {
+            LoopFrom(missingPacket, currentPacket, next, NULL) {
                 if (missingPacket->state == kAudioPacketStateMissing) {
                     missingPacket->state = kAudioPacketStateRequested;
                     ret++;
