@@ -9,12 +9,12 @@
 #include "Log.h"
 #include "AudioConverter.h"
 
-AudioConverter::AudioConverter(double srcSampleRate, double destSampleRate) {
+AudioConverter::AudioConverter(uint32_t channels, double sampleRate, uint32_t bitDepth) {
     
-    assert(srcSampleRate > 0 && destSampleRate > 0);
+    assert(sampleRate > 0);
     
-    _setupAudioDescription(&_srcDesc, srcSampleRate);
-    _setupAudioDescription(&_destDesc, destSampleRate);
+    _setupAudioDescription(&_srcDesc, channels, sampleRate, bitDepth);
+    _setupAudioDescription(&_destDesc, channels, sampleRate, bitDepth);
     
     bzero(&_pckDesc, sizeof(_pckDesc));
     
@@ -35,19 +35,22 @@ AudioStreamBasicDescription AudioConverter::getDestDescription() {
     
 }
 
-void AudioConverter::_setupAudioDescription(AudioStreamBasicDescription* desc, double sampleRate) {
+void AudioConverter::_setupAudioDescription(AudioStreamBasicDescription* desc, uint32_t channels, double sampleRate, uint32_t bitDepth) {
     
     assert(desc != NULL && sampleRate > 0);
     
     bzero(desc, sizeof(AudioStreamBasicDescription));
     desc->mFormatID = kAudioFormatLinearPCM;
-    desc->mFormatFlags = kAudioFormatFlagIsFloat;
+    desc->mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
     desc->mSampleRate = sampleRate;
-    desc->mChannelsPerFrame = 2;
+    desc->mChannelsPerFrame = channels;
     desc->mFramesPerPacket = 1;
-    desc->mBitsPerChannel = sizeof(float) * 8;
-    desc->mBytesPerFrame = desc->mChannelsPerFrame * (desc->mBitsPerChannel / 8);
-    desc->mBytesPerPacket = desc->mBytesPerFrame;
+    desc->mBitsPerChannel = bitDepth;
+    
+    UInt32 size = sizeof(*desc);
+    OSStatus err = AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, desc);
+    if (err != noErr)
+        log(LOG_ERROR, "Error");
     
 }
 

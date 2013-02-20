@@ -15,7 +15,7 @@
 class AudioConverter {
     
 public:
-    AudioConverter(double srcSampleRate, double destSampleRate);
+    AudioConverter(uint32_t channels, double sampleRate, uint32_t bitDepth);
     virtual ~AudioConverter();
     
     virtual void convert(void* srcBuffer, uint32_t srcSize, void* destBuffer, uint32_t* destSize);
@@ -38,7 +38,7 @@ protected:
     
 private:
     
-    void _setupAudioDescription(AudioStreamBasicDescription* desc, double sampleRate);
+    void _setupAudioDescription(AudioStreamBasicDescription* desc, uint32_t channels, double sampleRate, uint32_t bitDepth);
         
 };
 

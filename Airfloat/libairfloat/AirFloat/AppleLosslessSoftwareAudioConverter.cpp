@@ -6,9 +6,11 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
+#include "Log.h"
+
 #include "AppleLosslessSoftwareAudioConverter.h"
 
-AppleLosslessSoftwareAudioConverter::AppleLosslessSoftwareAudioConverter(int* fmts, int fmtsSize) : AudioConverter(fmts[10], fmts[10]) {
+AppleLosslessSoftwareAudioConverter::AppleLosslessSoftwareAudioConverter(int* fmts, int fmtsSize) : AudioConverter(fmts[6], fmts[10], fmts[2]) {
     
     int frame_size = fmts[0];
     int sample_size = fmts[2];
@@ -56,10 +58,14 @@ AudioStreamBasicDescription AppleLosslessSoftwareAudioConverter::getDestDescript
     
     AudioStreamBasicDescription outDesc = AudioConverter::getDestDescription();
     
-    outDesc.mFormatFlags = kAudioFormatFlagIsBigEndian;
-    outDesc.mBitsPerChannel = 16;
+    outDesc.mFormatFlags = kAudioFormatFlagIsBigEndian | kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
     outDesc.mBytesPerFrame = (outDesc.mChannelsPerFrame * (outDesc.mBitsPerChannel / 8));
     outDesc.mBytesPerPacket = outDesc.mBytesPerFrame * outDesc.mFramesPerPacket;
+    
+    UInt32 size = sizeof(outDesc);
+    OSStatus err = AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, &outDesc);
+    if (err != noErr)
+        log(LOG_ERROR, "Error");
     
     return outDesc;
     
