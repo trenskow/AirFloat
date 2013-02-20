@@ -26,3 +26,16 @@ uint32_t WebTools::_convertNewLines(unsigned char* buffer, uint32_t length) {
     return length;
     
 }
+
+unsigned char* WebTools::_getContentStart(unsigned char* buffer, uint32_t length) {
+    
+    for (uint32_t i = 0; i < length; i++) {
+        if (i < length - 1 && memcmp(&buffer[i], "\n\n", 2) == 0)
+            return &buffer[i + 2];
+        if (i < length - 3 && memcmp(&buffer[i], "\r\n\r\n", 4) == 0)
+            return &buffer[i + 4];
+    }
+    
+    return NULL;
+    
+}

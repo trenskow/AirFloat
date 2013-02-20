@@ -15,6 +15,7 @@ class WebTools {
     
 protected:
     static uint32_t _convertNewLines(unsigned char* buffer, uint32_t length);
+    static unsigned char* _getContentStart(unsigned char* buffer, uint32_t length);
     
 };
 

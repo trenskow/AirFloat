@@ -108,24 +108,35 @@ void WebConnection::_connectionLoop() {
     
     for (;;) {
         
-        if (READ_SIZE + readpos > buffersize) {
-            buffersize += READ_SIZE;
-            buffer = (unsigned char*)realloc(buffer, buffersize);
-        }
+        unsigned char* contentStart;
+        int32_t read = 0;
         
-        int32_t read = _socket->Receive(&buffer[readpos], READ_SIZE);
+        do {
+            
+            if (READ_SIZE + readpos > buffersize) {
+                buffersize += READ_SIZE;
+                buffer = (unsigned char*)realloc(buffer, buffersize);
+            }
+            
+            read = _socket->Receive(&buffer[readpos], READ_SIZE);
+            
+            if (read <= 0)
+                break;
+            else
+                readpos += read;
+            
+        } while ((contentStart = WebTools::_getContentStart(buffer, readpos)) == NULL);
         
         if (read <= 0)
             break;
         
-        readpos += read;
-        
-        unsigned char* contentStart;
         unsigned char* headerStart = buffer;
-        if ((contentStart = (unsigned char*)memmem(buffer, readpos, "\r\n\r\n", 4)) != NULL) { // Find request end
-            contentStart += 4;
+        if ((contentStart = WebTools::_getContentStart(buffer, readpos)) != NULL) { // Find request end
             
             uint32_t headerLength = _convertNewLines(buffer, contentStart - headerStart);
+            
+            if (headerLength == 2)
+                break;
             
             log_data(LOG_INFO, (char*)buffer, headerLength - 1);
             
@@ -143,6 +154,9 @@ void WebConnection::_connectionLoop() {
                 headerStart++;
                 headerLength--;
             }
+            
+            if (!path || !protocol)
+                break;
             
             headerStart[0] = '\0';
             
