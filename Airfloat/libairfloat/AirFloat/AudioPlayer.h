@@ -17,6 +17,7 @@
 #include "AudioGraph.h"
 #include "AudioUnitConverter.h"
 #include "AudioUnitMixer.h"
+#include "AudioUnitVariSpeed.h"
 #include "AudioUnitOutput.h"
 #include <AudioToolbox/AudioToolbox.h>
 
@@ -54,6 +55,7 @@ private:
         struct {
             Graph *graph;
             UnitMixer *mixerUnit;
+            VarispeedUnit *speedUnit;
             UnitOutput *outputUnit;
         } graph;
     } _audio;

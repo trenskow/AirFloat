@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
+#include <sys/utsname.h>
 #include <QuartzCore/QuartzCore.h>
 
 #include "CAHostTimeBase.h"
@@ -55,12 +56,23 @@ AudioPlayer::AudioPlayer(int* fmts, int fmtsSize) {
     _preFlushVolume = 1.0;
     _flushedSeq = -1;
     
+    /* Find out if Varispeed is supported */
+    struct utsname name;
+    uname(&name);
+    
+    double version = strtod(name.release, NULL);
     
     Graph *graph = _audio.graph.graph = new Graph(maximumFramesPerSlice);
     
     _audio.graph.mixerUnit = new UnitMixer(1, graph);
     _audio.graph.outputUnit = new UnitOutput(graph);
     
+    if (version >= 11) { /* Darwin 11 is iOS 5. Varispeed is only available in iOS 5+. */
+        _audio.graph.speedUnit = new VarispeedUnit(graph);
+        _audio.graph.outputUnit->connect(_audio.graph.speedUnit, 0, 0);
+        _audio.graph.speedUnit->connect(_audio.graph.mixerUnit, 0, 0);
+    } else {
+        _audio.graph.speedUnit = NULL;
         _audio.graph.outputUnit->connect(_audio.graph.mixerUnit, 0, 0);
     }
     
@@ -70,6 +82,7 @@ AudioPlayer::AudioPlayer(int* fmts, int fmtsSize) {
     
     _audio.graph.mixerUnit->setVolume(1.0f, 0);
     _audio.graph.mixerUnit->setEnabled(TRUE, 0);
+    _audio.graph.speedUnit->setPlaybackRate(1.0);
     
     _audio.graph.graph->inititializeAndUpdate();
     
@@ -82,6 +95,7 @@ AudioPlayer::~AudioPlayer() {
     _audio.graph.graph->setRunning(false);
     
     delete _audio.graph.mixerUnit;
+    delete _audio.graph.speedUnit;
     delete _audio.graph.outputUnit;
     delete _audio.graph.graph;
     
@@ -190,8 +204,23 @@ OSStatus AudioPlayer::_renderCallback (AudioUnitRenderActionFlags *ioActionFlags
             
         }
         
+        if (_outputIsHomed) {
             
+            char* buf = &((char*)ioData->mBuffers[0].mData)[dataOffset];
+            uint32_t size = ioData->mBuffers[0].mDataByteSize - dataOffset;
+            _audioQueue->getAudio(buf, &size, NULL, NULL);
             
+            if (_synchronizationEnabled && _audio.graph.speedUnit != NULL && queueTime > 0) {
+                
+                double delay = queueTime - packetStartTime;
+                
+                if (delay > 0.005)
+                    _audio.graph.speedUnit->setPlaybackRate(0.995);
+                else if (delay < -0.005)
+                    _audio.graph.speedUnit->setPlaybackRate(1.005);
+                else if ((delay <= .00025f || delay >= -.00025f) && _audio.graph.speedUnit->getPlaybackRate() != 1.0)
+                    _audio.graph.speedUnit->setPlaybackRate(1.0);
+                
             }
             
         }
