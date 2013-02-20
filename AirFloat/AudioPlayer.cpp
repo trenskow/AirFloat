@@ -9,7 +9,6 @@
 #include <QuartzCore/QuartzCore.h>
 
 #include "CAHostTimeBase.h"
-#include "CAXException.h"
 #include "Log.h"
 
 #include "AppleLosslessSoftwareAudioConverter.h"
@@ -22,90 +21,78 @@
 #ifndef MIN
 #define MIN(x,y) (x < y ? x : y)
 #endif
-#define SILENT_PACKET_SIZE (_srcFramesPerPacket * _audio.outDesc.mBytesPerFrame * 2)
-#define MAX_PACKET_SIZE ((double)SILENT_PACKET_SIZE * 1.1)
 #define FROM_CLIENT_TIME(x) (x + _clientServerDifference)
-#define TO_CLIENT_TIME(x) (x - _clientServerDifference)
-#define FROM_DEVICE_TIME(x) (CAHostTimeBase::ConvertToNanos(x) / 1000000000.0)
-#define TO_DEVICE_TIME(x) CAHostTimeBase::ConvertFromNanos(x * 1000000000.0)
-#define ACCEPTABLE_DELAY 0.01
+
+using namespace Audio;
 
 AudioPlayer::AudioPlayer(int* fmts, int fmtsSize) {
     
     assert(fmts != NULL && fmtsSize > 0);
     
+    uint32_t maximumFramesPerSlice = 4096;
+    
 #if TARGET_OS_IPHONE
     UInt32 category = kAudioSessionCategory_MediaPlayback;
     AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(category), &category);
+    float bufferLength = maximumFramesPerSlice / 44100.0f;
+    AudioSessionSetProperty(kAudioSessionProperty_PreferredHardwareIOBufferDuration, sizeof(bufferLength), &bufferLength);
     AudioSessionSetActive(true);
 #endif
         
     bzero(&_audio, sizeof(_audio));
     
-    _audio.losslessConverter = new AppleLosslessAudioConverter(fmts, fmtsSize);
-    _audio.speedUpConverter = new AudioConverter(fmts[10], fmts[10] - 441);
-    _audio.slowDownConverter = new AudioConverter(fmts[10], fmts[10] + 441);
-    
     _srcFramesPerPacket = fmts[0];
     
     _clientServerDifference = 0;
-    _nextPacketTime = 0;
     _outputIsHomed = false;
     
     bzero(_clientServerDifferenceHistory, sizeof(double) * CLIENT_SERVER_DIFFERENCE_BACKLOG);
     _clientServerDifferenceHistoryCount = 0;
         
+    _audio.losslessConverter = new AppleLosslessAudioConverter(fmts, fmtsSize);
     _audio.outDesc = _audio.losslessConverter->getDestDescription();
-
-    _audioQueue = new AudioQueue(fmts[0], _audio.outDesc.mBytesPerFrame, _audio.outDesc.mSampleRate);
-    
-    XThrowIfError(
-                  AudioQueueNewOutput(&_audio.outDesc, AudioPlayer::_audioOutputCallbackHelper, this, NULL, NULL, 0, &_audio.queue);
-                  , "AudioQueueNewOutput");
-    
-    XThrowIfError(
-                  AudioQueueCreateTimeline(_audio.queue, &_audio.timeline)
-                  , "AudioQueueCreateTimeline");
-    
-    for (int i = 0 ; i < BUFFER_COUNT ; i++) {
-        AudioQueueAllocateBuffer(_audio.queue, MAX_PACKET_SIZE, &_audio.buffers[i]);
-        _audio.buffers[i]->mAudioDataByteSize = SILENT_PACKET_SIZE;
-        bzero(_audio.buffers[i]->mAudioData, MAX_PACKET_SIZE);
-        AudioQueueEnqueueBuffer(_audio.queue, _audio.buffers[i], 0, NULL);
-    }
     
     _preFlushVolume = 1.0;
     _flushedSeq = -1;
     
-    _skipPacket = false;
+    
+    Graph *graph = _audio.graph.graph = new Graph(maximumFramesPerSlice);
+    
+    _audio.graph.mixerUnit = new UnitMixer(1, graph);
+    _audio.graph.outputUnit = new UnitOutput(graph);
+    
+        _audio.graph.outputUnit->connect(_audio.graph.mixerUnit, 0, 0);
+    }
+    
+    _audio.graph.mixerUnit->setAudioDescriptionForInputBus(_audio.outDesc, 0);
+    
+    _audio.graph.mixerUnit->setInputCallback(0, _renderCallbackHelper, this);
+    
+    _audio.graph.mixerUnit->setVolume(1.0f, 0);
+    _audio.graph.mixerUnit->setEnabled(TRUE, 0);
+    
+    _audio.graph.graph->inititializeAndUpdate();
+    
+    _audioQueue = new AudioQueue(fmts[0], _audio.outDesc.mBytesPerFrame, _audio.outDesc.mSampleRate);
     
 }
 
 AudioPlayer::~AudioPlayer() {
     
-    AudioQueueStop(_audio.queue, true);
+    _audio.graph.graph->setRunning(false);
     
-    for (int i = 0 ; i < BUFFER_COUNT ; i++)
-        AudioQueueFreeBuffer(_audio.queue, _audio.buffers[i]);
-    
-    AudioQueueDispose(_audio.queue, true);
+    delete _audio.graph.mixerUnit;
+    delete _audio.graph.outputUnit;
+    delete _audio.graph.graph;
     
     delete _audioQueue;
-    
     delete _audio.losslessConverter;
-    delete _audio.speedUpConverter;
-    delete _audio.slowDownConverter;
     
 }
 
 void AudioPlayer::start() {
     
-    OSStatus err;
-    if (noErr == (err = AudioQueueStart(_audio.queue, NULL)))
-        log(LOG_INFO, "Audio queue started.");
-    XThrowIfError(
-                  err
-                  , "AudioQueueStart");
+    _audio.graph.graph->setRunning(true);
     
 }
 
@@ -120,10 +107,9 @@ void AudioPlayer::flush(int lastSeq) {
     
     _packetMutex.unlock();
     
-    AudioQueueSetParameter(_audio.queue, kAudioQueueParam_Volume, 0.0);
+    _audio.graph.mixerUnit->setVolume(.0f, 0);
     
     _outputIsHomed = false;
-    _nextPacketTime = 0;
     
     _timeMutex.unlock();
         
@@ -132,7 +118,9 @@ void AudioPlayer::flush(int lastSeq) {
 void AudioPlayer::setVolume(double volume) {
     
     _preFlushVolume = volume;
-    AudioQueueSetParameter(_audio.queue, kAudioQueueParam_Volume, _preFlushVolume);
+    _audio.graph.mixerUnit->setVolume(volume, 0);
+    
+}
     
 }
 
@@ -140,9 +128,7 @@ void AudioPlayer::setClientTime(double time) {
     
     _timeMutex.lock();
     
-    AudioTimeStamp timeStamp;
-    bzero(&timeStamp, sizeof(AudioTimeStamp));
-    AudioQueueDeviceGetCurrentTime(_audio.queue, &timeStamp);
+    UInt64 currentTime = CAHostTimeBase::GetCurrentTimeInNanos();
     
     _clientServerDifference = 0;
     
@@ -150,7 +136,7 @@ void AudioPlayer::setClientTime(double time) {
     for (int i = _clientServerDifferenceHistoryCount - 1 ; i > 0 ; i--)
         _clientServerDifference += (_clientServerDifferenceHistory[i] = _clientServerDifferenceHistory[i-1]);
     
-    _clientServerDifference += (_clientServerDifferenceHistory[0] = CAHostTimeBase::ConvertToNanos(timeStamp.mHostTime) / 1000000000.0 - time);
+    _clientServerDifference += (_clientServerDifferenceHistory[0] = currentTime / 1000000000.0 - time);
     
     _clientServerDifference /= (double)_clientServerDifferenceHistoryCount;
     
@@ -166,91 +152,66 @@ AudioQueue* AudioPlayer::getAudioQueue() {
     
 }
 
-void AudioPlayer::_audioOutputCallback(AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
+OSStatus AudioPlayer::_renderCallback (AudioUnitRenderActionFlags *ioActionFlags, const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList  *ioData) {
     
-    UInt32 size = sizeof(UInt32);
-    UInt32 isRunning = 0;
-    AudioQueueGetProperty(_audio.queue, kAudioQueueProperty_IsRunning, &isRunning, &size);
-    
-    if (!isRunning)
-        return;
+    static int run = 0;
     
     _timeMutex.lock();
     
-    inBuffer->mAudioDataByteSize = SILENT_PACKET_SIZE;
-    bzero(inBuffer->mAudioData, SILENT_PACKET_SIZE);
+    bzero(ioData->mBuffers[0].mData, ioData->mBuffers[0].mDataByteSize);
     
-    double time = 0;
-    uint32_t sampleTime = 0;
-    bool hasPacket = _audioQueue->hasAvailablePacket();
-    
-    if (_nextPacketTime > 0 && hasPacket) {
+    if (_audioQueue->hasAvailablePacket()) {
+        
+        double packetDuration = inNumberFrames / _audio.outDesc.mSampleRate;
+        double packetStartTime = CAHostTimeBase::ConvertToNanos(inTimeStamp->mHostTime) / 1000000000.0;
+        double queueTime = FROM_CLIENT_TIME(_audioQueue->getPacketTime());
+        
+        uint32_t dataOffset = 0;
         
         if (!_outputIsHomed) {
             
-            double timeToStart = (FROM_CLIENT_TIME((time = _audioQueue->getPacketTime())) - _nextPacketTime);
-
-            inBuffer->mAudioDataByteSize = MIN((timeToStart * _audio.outDesc.mSampleRate * _audio.outDesc.mBytesPerPacket), SILENT_PACKET_SIZE);
+                /* We calculate for next frame */
+                double packetEndTime = packetStartTime + packetDuration;
+                
+                if (queueTime < packetEndTime) {
+                    
+                    double packetPos = packetEndTime - queueTime;
+                    dataOffset = floor(inNumberFrames * packetPos) * _audio.outDesc.mBytesPerFrame;
+                    _outputIsHomed = true;
+                    log(LOG_INFO, "Output is homed (%d - %d/%d)", run, dataOffset, ioData->mBuffers[0].mDataByteSize);
+                    
+                } else if (queueTime < packetStartTime) {
+                    
+                    _audioQueue->getAudio(ioData->mBuffers[0].mData, (uint32_t *)&ioData->mBuffers[0].mDataByteSize, NULL, NULL);
+                    _outputIsHomed = true;
+                    log(LOG_INFO, "Output is homed - without catching the exact moment.");
+                    
+                }
             
-            if (timeToStart - ((_srcFramesPerPacket * 2) / _audio.outDesc.mSampleRate) <= 0) {
-                _outputIsHomed = true;
-                log(LOG_INFO, "Output is homed (client time: %1.6f)", TO_CLIENT_TIME(CACurrentMediaTime()));
-            }
-            
-            time = 0;
-
-        } else {
-            
-            AudioQueueSetParameter(_audio.queue, kAudioQueueParam_Volume, _preFlushVolume);
-            
-            if (!_skipPacket) {
-                inBuffer->mAudioDataByteSize = inBuffer->mAudioDataBytesCapacity;
-                _audioQueue->getPacket(inBuffer->mAudioData, (uint32_t*)&inBuffer->mAudioDataByteSize, &time, &sampleTime);
-            }
-                            
         }
         
-    } else if (_nextPacketTime > 0 && hasPacket == false && _outputIsHomed) {
+            
+            
+            }
+            
+        }
+        
+    } else if (_outputIsHomed) {
         _outputIsHomed = false;
-        _skipPacket = false;
         log(LOG_INFO, "Output lost synchronization");
     }
     
-    AudioTimeStamp timeStamp;
-    
-    if (noErr == AudioQueueEnqueueBufferWithParameters(_audio.queue, inBuffer, 0, NULL, 0, 0, 0, NULL, NULL, &timeStamp)) {
-        
-        double currentPacketTime = CAHostTimeBase::ConvertToNanos(timeStamp.mHostTime) / 1000000000.0;
-        _nextPacketTime = currentPacketTime + ((inBuffer->mAudioDataByteSize / _audio.outDesc.mBytesPerPacket) / _audio.outDesc.mSampleRate);
-        
-        if (Settings::isSyncronizationEnabled()) {
-            
-            if (time > 0 && _outputIsHomed && !_skipPacket) {
-                
-                double audioDelay = (CAHostTimeBase::ConvertToNanos(timeStamp.mHostTime) / 1000000000.0) - (time + _clientServerDifference);
-                if (audioDelay > (double)_srcFramesPerPacket / _audio.outDesc.mSampleRate) {
-                    _audioQueue->discardPacket();
-                    log(LOG_INFO, "Skipped packet to keep up with syncronization");
-                } else if (-audioDelay > (double)_srcFramesPerPacket / _audio.outDesc.mSampleRate)
-                    _skipPacket = true;
-                
-            } else
-                _skipPacket = false;
-
-        }
-        
-    } else
-        log(LOG_ERROR, "Cannot enqueue audio buffer");
+    run++;
     
     _timeMutex.unlock();
     
+    return noErr;
+    
 }
 
-void AudioPlayer::_audioOutputCallbackHelper(void* aqData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
+OSStatus AudioPlayer::_renderCallbackHelper (void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags, const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList  *ioData) {
     
-    assert(aqData != NULL);
-    
-    ((AudioPlayer*)aqData)->_audioOutputCallback(inAQ, inBuffer);
+    return ((AudioPlayer *)inRefCon)->_renderCallback(ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, ioData);
     
 }
 
@@ -261,8 +222,10 @@ int AudioPlayer::addAudio(void* buffer, uint32_t size, int seqNo, uint32_t sampl
         log(LOG_INFO, "Audio packet (seq %d) ignored", seqNo);
         _packetMutex.unlock();
         return 0;
-    } else
+    } else {
         _flushedSeq = -1;
+        _audio.graph.mixerUnit->setVolume(_preFlushVolume, 0);
+    }
     _packetMutex.unlock();
     
     int ret = 0;
