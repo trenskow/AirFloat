@@ -79,7 +79,7 @@ typedef struct ALACMagicCookie {
     
 } ALACMagicCookie;
 
-AppleLosslessAudioConverter::AppleLosslessAudioConverter(int* fmts, int fmtsSize) : AudioConverter(fmts[10], fmts[10]) {
+AppleLosslessAudioConverter::AppleLosslessAudioConverter(int* fmts, int fmtsSize) : AudioConverter(fmts[6], fmts[10], fmts[2]) {
     
     bzero(&_srcDesc, sizeof(AudioStreamBasicDescription));
     
