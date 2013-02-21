@@ -76,14 +76,15 @@ AudioPlayer::AudioPlayer(int* fmts, int fmtsSize) {
         _audio.graph.speedUnit = NULL;
         _audio.graph.outputUnit->connect(_audio.graph.mixerUnit, 0, 0);
     }
-    
+        
     _audio.graph.mixerUnit->setAudioDescriptionForInputBus(_audio.outDesc, 0);
     
     _audio.graph.mixerUnit->setInputCallback(0, _renderCallbackHelper, this);
     
     _audio.graph.mixerUnit->setVolume(1.0f, 0);
     _audio.graph.mixerUnit->setEnabled(TRUE, 0);
-    _audio.graph.speedUnit->setPlaybackRate(1.0);
+    if (_audio.graph.speedUnit != NULL)
+        _audio.graph.speedUnit->setPlaybackRate(1.0);
     
     _audio.graph.graph->inititializeAndUpdate();
     
