@@ -15,7 +15,6 @@
 #include "AudioConverter.h"
 #include "AudioQueue.h"
 #include "AudioGraph.h"
-#include "AudioUnitConverter.h"
 #include "AudioUnitMixer.h"
 #include "AudioUnitVariSpeed.h"
 #include "AudioUnitOutput.h"
