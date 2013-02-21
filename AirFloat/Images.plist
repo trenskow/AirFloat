@@ -6,7 +6,7 @@
 		<key>AirFloatAdTextPosition</key>
 		<dict>
 			<key>AirFloatHorizontal</key>
-			<string>right</string>
+			<string>left</string>
 			<key>AirFloatVertical</key>
 			<string>top</string>
 		</dict>
@@ -38,9 +38,9 @@
 		<key>AirFloatAdImageCenter</key>
 		<dict>
 			<key>x</key>
-			<integer>324</integer>
+			<integer>250</integer>
 			<key>y</key>
-			<integer>348</integer>
+			<integer>300</integer>
 		</dict>
 		<key>AirFloatAdScreenCenter</key>
 		<dict>

@@ -46,6 +46,7 @@ AudioPlayer::AudioPlayer(int* fmts, int fmtsSize) {
     
     _clientServerDifference = 0;
     _outputIsHomed = false;
+    _synchronizationEnabled = true;
     
     bzero(_clientServerDifferenceHistory, sizeof(double) * CLIENT_SERVER_DIFFERENCE_BACKLOG);
     _clientServerDifferenceHistoryCount = 0;
@@ -135,6 +136,11 @@ void AudioPlayer::setVolume(double volume) {
     _audio.graph.mixerUnit->setVolume(volume, 0);
     
 }
+
+void AudioPlayer::disableSynchronization() {
+    
+    _synchronizationEnabled = false;
+    _audioQueue->_disableSynchronization();
     
 }
 
@@ -184,6 +190,8 @@ OSStatus AudioPlayer::_renderCallback (AudioUnitRenderActionFlags *ioActionFlags
         
         if (!_outputIsHomed) {
             
+            if (_synchronizationEnabled) {
+                                
                 /* We calculate for next frame */
                 double packetEndTime = packetStartTime + packetDuration;
                 
@@ -201,6 +209,9 @@ OSStatus AudioPlayer::_renderCallback (AudioUnitRenderActionFlags *ioActionFlags
                     log(LOG_INFO, "Output is homed - without catching the exact moment.");
                     
                 }
+                
+            } else
+                _outputIsHomed = true;
             
         }
         
@@ -266,7 +277,7 @@ int AudioPlayer::addAudio(void* buffer, uint32_t size, int seqNo, uint32_t sampl
     if (outsize == 0)
         log(LOG_ERROR, "DECODING ERROR!");
     
-    if (size > 0)
+    if (size > 0 && _audioQueue->awaitAvailabilty())
         ret = _audioQueue->_addAudioPacket(rawBuffer, outsize, seqNo, sampleTime);
     
     free(rawBuffer);

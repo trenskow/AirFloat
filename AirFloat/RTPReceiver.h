@@ -17,7 +17,7 @@
 #include "Mutex.h"
 #include "Condition.h"
 #include "AudioPlayer.h"
-#include "Socket.h"
+#include "RTPSocket.h"
 
 typedef struct {
     
@@ -62,7 +62,7 @@ private:
     
     void _processSyncPacket(RTPPacket* packet);
     void _processTimingResponsePacket(RTPPacket* packet);
-    void _sendPacket(const char* buffer, size_t len, SocketEndPoint* remoteEndPoint, Socket* sock);
+    void _sendPacket(const char* buffer, size_t len, SocketEndPoint* remoteEndPoint, RTPSocket* sock);
     void _sendTimingRequest();
     void _sendResendRequest(unsigned short seqNum, unsigned short count);
     void _startSynchronizationLoop();
@@ -73,17 +73,15 @@ private:
     void _synchronizationLoop();
     static void* _synchronizationLoopKickStarter(void* t);
     
+    uint32_t _dataReceivedTCP(RTPSocket* rtpSocket, Socket* socket, const char* buffer, uint32_t size);
+    uint32_t _dataReceivedUDP(RTPSocket* rtpSocket, Socket* socket, const char* buffer, uint32_t size);
+    static uint32_t _dataReceivedHelper(RTPSocket* rtpSocket, Socket* socket, const char* buffer, uint32_t size, void* ctx);
+    
     void _processAudioPacket(RTPPacket* packet);
     
-    static void* _streamLoopKickStarter(void* t);
-    void _streamLoop(Socket* sock);
-    pthread_t _start(Socket* sock, const char* name);
-    
-    Socket* _setupSocket(unsigned short* port);
+    RTPSocket* _setupSocket(char* name, unsigned short* port);
     
     RAOPConnection* _connection;
-    
-    pthread_t _serverSockThread, _timingSockThread, _controlSockThread;
     
     Mutex _timerMutex;
     Condition _timerCond;
@@ -93,9 +91,9 @@ private:
     bool _timerRunning;
     int _timeResponseCount;
     
-    Socket* _serverSock;
-    Socket* _timingSock;
-    Socket* _controlSock;
+    RTPSocket* _serverSock;
+    RTPSocket* _timingSock;
+    RTPSocket* _controlSock;
     
     SocketEndPoint* _localEndPoint;
     SocketEndPoint* _remoteTimingEndPoint;
@@ -105,6 +103,7 @@ private:
     AES_KEY _aes;
     unsigned char _aesKey[16];
     unsigned char _aesIv[16];
+    uint16_t _emulatedSeqNo;
     
     unsigned char _session[4];
     

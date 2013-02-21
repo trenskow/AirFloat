@@ -15,7 +15,7 @@
 #include "Log.h"
 #include "AudioQueue.h"
 
-#define MAX_QUEUE_COUNT 300
+#define MAX_QUEUE_COUNT 500
 #define UINT16_MIDDLE (0xFFFF > 1)
 #define LoopFrom(x, y, d, c) for (AudioPacket* x = y ; x != c ; x = x->d)
 #define MIN(x,y) (x < y ? x : y)
@@ -61,13 +61,19 @@ AudioQueue::AudioQueue(double packetSize, double frameSize, double sampleRate) {
     _frameSize = frameSize;
     _sampleRate = sampleRate;
     
+    _synchronizationEnabled = true;
+    _synchronizationNotificationSent = false;
+    
     _foldCount = 0;
     _queueCount = 0;
     _missingCount = 0;
+    _queueFrameCount = 0;
     
     _queueHead = _queueTail = NULL;
     
     _lastKnowSampleTime = _lastKnowSampleTimesTime = 0;
+    
+    _disposed = false;
     
 }
 
@@ -80,6 +86,10 @@ AudioQueue::~AudioQueue() {
         _queueHead = _queueHead->next;
         delete packet;
     }
+    
+    _disposed = true;
+    
+    _condition.broadcast();
     
     _mutex.unlock();
     
@@ -157,6 +167,8 @@ AudioPacket* AudioQueue::_addEmptyPacket() {
     bzero(emptyBuffer, size);
     newPacket->setBuffer(emptyBuffer, size);
     
+    _queueFrameCount += _frameSize;
+    
     _addPacketToQueueTail(newPacket);
     
     return newPacket;
@@ -181,10 +193,13 @@ AudioPacket* AudioQueue::_popQueueFromHead(bool keepQueueFilled) {
             _missingCount--;
         
         _queueCount--;
+        _queueFrameCount -= headPacket->getBufferSize() / _frameSize;
         
         if (_queueCount < 2 && keepQueueFilled)
             while (_queueCount < 2)
                 _addEmptyPacket();
+        
+        _condition.signal();
         
         return headPacket;
     
@@ -259,7 +274,9 @@ int AudioQueue::_addAudioPacket(void* buffer, uint32_t size, int seqNo, uint32_t
         newPacket->sampleTime = sampleTime;
         newPacket->seqNo = seqNo;
         newPacket->setBuffer(buffer, size);
-
+        
+        _queueFrameCount += size / _frameSize;
+        
         _addPacketToQueueTail(newPacket);
         
     } else {
@@ -299,10 +316,41 @@ int AudioQueue::_addAudioPacket(void* buffer, uint32_t size, int seqNo, uint32_t
     
 }
 
+void AudioQueue::_disableSynchronization() {
+    
+    _mutex.lock();
+    
+    log(LOG_INFO, "Synchronization is disabled");
+    NotificationCenter::defaultCenter()->postNotification(AudioQueue::syncNotificationName, this, NULL);
+    _synchronizationEnabled = false;
+    
+    _mutex.unlock();
+    
+}
+
 bool AudioQueue::hasAvailablePacket() {
     
     _mutex.lock();
-    bool ret = (_queueHead != NULL && _lastKnowSampleTime > 0 && _lastKnowSampleTimesTime > 0);
+    
+    bool ret = (_queueHead != NULL);
+    
+    if (_synchronizationEnabled)
+        ret = ret && (_lastKnowSampleTime > 0 && _lastKnowSampleTimesTime > 0);
+    else {
+        
+        ret = ret && (_queueFrameCount >= _sampleRate * 2);
+        
+        if (ret && !_synchronizationNotificationSent) {
+            
+            _synchronizationNotificationSent = true;
+            
+            log(LOG_INFO, "Queue was synced");
+            NotificationCenter::defaultCenter()->postNotification(AudioQueue::syncNotificationName, this, NULL);
+            
+        }
+        
+    }
+        
     _mutex.unlock();
     
     return ret;
@@ -354,6 +402,8 @@ void AudioQueue::getAudio(void* buffer, uint32_t* size, double* time, uint32_t* 
                 }
                 
                 uint32_t written = audioPacket->getBuffer(bufWriteHead, bufWriteSize);
+                
+                _queueFrameCount -= written / _frameSize;
                 
                 audioPacket->shiftBuffer(written);
                 
@@ -465,5 +515,31 @@ int AudioQueue::getNextMissingWindow(int* seqNo) {
         return MIN(ret, _missingCount);
     
     return 0;
+    
+}
+
+int AudioQueue::getQueuePacketCount() {
+    
+    int ret = 0;
+    _mutex.lock();
+    ret = _queueCount;
+    _mutex.unlock();
+    
+    return ret;
+    
+}
+
+bool AudioQueue::awaitAvailabilty() {
+    
+    _mutex.lock();
+    
+    while ((_synchronizationEnabled && _queueCount == MAX_QUEUE_COUNT) || (!_synchronizationEnabled && (_queueFrameCount >= _sampleRate * 4)))
+        _condition.wait(&_mutex);
+    
+    bool ret = !_disposed;
+    
+    _mutex.unlock();
+    
+    return ret;
     
 }
