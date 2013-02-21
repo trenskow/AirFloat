@@ -12,6 +12,7 @@
 #include <stdint.h>
 
 #include "Mutex.h"
+#include "Condition.h"
 #include "AudioPacket.h"
 
 class AudioPlayer;
@@ -30,6 +31,8 @@ public:
     void discardPacket();
     void synchronize(uint32_t currentSampleTime, double currentTime, uint32_t nextSampleTime);
     int getNextMissingWindow(int* seqNo);
+    int getQueuePacketCount();
+    bool awaitAvailabilty();
     
     static const char* flushNotificationName;
     static const char* syncNotificationName;
@@ -45,9 +48,10 @@ private:
     AudioPacket* _popQueueFromHead(bool keepQueueFilled = true);
     void _flush();
     int _handleSequenceOverflow(int seqNo);
+    void _disableSynchronization();
     
     double _convertTime(uint32_t fromSampleTime, double fromTime, uint32_t toSampleTime);
-
+    
     AudioPacket* _queueHead;
     AudioPacket* _queueTail;
     
@@ -55,15 +59,22 @@ private:
     double _frameSize;  // Size of frame
     double _sampleRate;
     
+    bool _synchronizationEnabled;
+    bool _synchronizationNotificationSent;
+    
     int _foldCount;
     
     int _queueCount;
     int _missingCount;
+    int _queueFrameCount;
     
     double _lastKnowSampleTime;
     double _lastKnowSampleTimesTime;
     
     Mutex _mutex;
+    Condition _condition;
+    
+    bool _disposed;
     
 };
 

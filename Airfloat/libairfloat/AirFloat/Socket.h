@@ -29,6 +29,7 @@ public:
     
     SocketEndPoint* GetLocalEndPoint();
     SocketEndPoint* GetRemoteEndPoint();
+    bool IsUDP();
     
 private:
     

@@ -189,3 +189,9 @@ SocketEndPoint* Socket::GetRemoteEndPoint() {
     return _remoteEndPoint;
     
 }
+
+bool Socket::IsUDP() {
+    
+    return _isUDP;
+    
+}

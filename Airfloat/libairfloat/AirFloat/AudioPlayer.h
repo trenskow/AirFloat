@@ -36,6 +36,7 @@ public:
     void setClientTime(double time);
     
     void setVolume(double volume);
+    void disableSynchronization();
     
     int addAudio(void* buffer, uint32_t size, int seqNo, uint32_t sampleTime);
     

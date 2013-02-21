@@ -155,6 +155,7 @@
 		A1C7F7981500CB0100D7DE52 /* WiFi@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1C7F7971500CB0100D7DE52 /* WiFi@2x.png */; };
 		A1C7F79A1500D22100D7DE52 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1C7F7991500D22100D7DE52 /* Default@2x.png */; };
 		A1C7F79C1500D2B600D7DE52 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = A1C7F79B1500D2B600D7DE52 /* Default.png */; };
+		A1D490C116D4EB000082AFDD /* RTPSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1D490BF16D4EB000082AFDD /* RTPSocket.cpp */; };
 		A1DA80C914F3D77A006B18D9 /* AirFloatSongCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A1DA80C814F3D77A006B18D9 /* AirFloatSongCell.xib */; };
 		A1DA80CD14F3D8F0006B18D9 /* AirFloatSongCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A1DA80CC14F3D8F0006B18D9 /* AirFloatSongCell.m */; };
 		A1DE598714CF163500A6767D /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1DE598614CF163500A6767D /* MediaPlayer.framework */; };
@@ -421,6 +422,8 @@
 		A1C7F7971500CB0100D7DE52 /* WiFi@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WiFi@2x.png"; sourceTree = "<group>"; };
 		A1C7F7991500D22100D7DE52 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "../Default@2x.png"; sourceTree = "<group>"; };
 		A1C7F79B1500D2B600D7DE52 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = ../Default.png; sourceTree = "<group>"; };
+		A1D490BF16D4EB000082AFDD /* RTPSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RTPSocket.cpp; sourceTree = "<group>"; };
+		A1D490C016D4EB000082AFDD /* RTPSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTPSocket.h; sourceTree = "<group>"; };
 		A1DA80C814F3D77A006B18D9 /* AirFloatSongCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AirFloatSongCell.xib; sourceTree = "<group>"; };
 		A1DA80CB14F3D8F0006B18D9 /* AirFloatSongCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFloatSongCell.h; sourceTree = "<group>"; };
 		A1DA80CC14F3D8F0006B18D9 /* AirFloatSongCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFloatSongCell.m; sourceTree = "<group>"; };
@@ -938,6 +941,8 @@
 				A19E4B0E16CA95BB00E5D60F /* Web Server */,
 				A19E4B2E16CA95E200E5D60F /* Base64.h */,
 				A19E4B2F16CA95E200E5D60F /* Base64.cpp */,
+				A1D490C016D4EB000082AFDD /* RTPSocket.h */,
+				A1D490BF16D4EB000082AFDD /* RTPSocket.cpp */,
 				A19E4B3016CA95E200E5D60F /* RTPReceiver.h */,
 				A19E4B3116CA95E200E5D60F /* RTPReceiver.cpp */,
 				A19E4B3216CA95E200E5D60F /* RAOPParameters.h */,
@@ -1375,6 +1380,7 @@
 				A1F432AC16D23A2700229FF3 /* AudioUnitOutput.cpp in Sources */,
 				A1F432AF16D2460000229FF3 /* AudioUnitMixer.cpp in Sources */,
 				A11222FF16D3B3E5009D5FAE /* AudioUnitVarispeed.cpp in Sources */,
+				A1D490C116D4EB000082AFDD /* RTPSocket.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
