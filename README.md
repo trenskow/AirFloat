@@ -8,10 +8,6 @@ Download, open in Xcode and build.
 
 ## License
 
-In the original BSD license, both occurrences of the phrase "COPYRIGHT HOLDERS AND CONTRIBUTORS" in the disclaimer read "REGENTS AND CONTRIBUTORS".
-
-Here is the license template:
-
 Copyright (c) 2013, Kristian Trenskow
 All rights reserved.
 
