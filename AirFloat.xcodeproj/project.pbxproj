@@ -1417,7 +1417,7 @@
 		4898FA0D13CDAAD1006EC97E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = armv6;
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1429,7 +1429,7 @@
 				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
 				SDKROOT = iphoneos;
@@ -1439,7 +1439,7 @@
 		4898FA0E13CDAAD1006EC97E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = armv6;
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_THUMB_SUPPORT = NO;
@@ -1448,7 +1448,7 @@
 				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
@@ -1458,7 +1458,7 @@
 		4898FA1013CDAAD1006EC97E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv7;
+				ARCHS = armv6;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1468,7 +1468,7 @@
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
@@ -1482,14 +1482,14 @@
 		4898FA1113CDAAD1006EC97E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv7;
+				ARCHS = armv6;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
@@ -1504,7 +1504,7 @@
 		A149209414E7323900849DC3 /* Debug (Server Logs) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = armv6;
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1516,7 +1516,7 @@
 				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "-DLOG_SERVER";
 				SDKROOT = iphoneos;
@@ -1526,7 +1526,7 @@
 		A149209514E7323900849DC3 /* Debug (Server Logs) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv7;
+				ARCHS = armv6;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1536,7 +1536,7 @@
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
@@ -1550,7 +1550,7 @@
 		A1A76011151B56B800728C9C /* App Store Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = armv6;
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_THUMB_SUPPORT = NO;
@@ -1559,7 +1559,7 @@
 				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
@@ -1569,14 +1569,14 @@
 		A1A76012151B56B800728C9C /* App Store Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv7;
+				ARCHS = armv6;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
@@ -1591,7 +1591,7 @@
 		A1C7F7AA1501048400D7DE52 /* Ad Hoc Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = armv6;
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
@@ -1601,7 +1601,7 @@
 				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = (
 					"-DNS_BLOCK_ASSERTIONS=1",
@@ -1614,14 +1614,14 @@
 		A1C7F7AB1501048400D7DE52 /* Ad Hoc Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv7;
+				ARCHS = armv6;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
