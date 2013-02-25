@@ -13,54 +13,58 @@
 
 #include "RTPSocket.h"
 
-RTPSocket::RTPSocket(const char* name, SocketEndPoint *allowedRemoteEndPoint) {
+RTPSocket::RTPSocket(const char* name, struct sockaddr* allowedRemoteEndPoint) {
     
     _callback = NULL;
     _ctx = NULL;
     _sockets = NULL;
     _socketsCount = 0;
     
-    _allowedRemoteEndPoint = allowedRemoteEndPoint->copy();
+    _allowedRemoteEndPoint = sockaddr_copy(allowedRemoteEndPoint);
     
     _name = (char *)malloc(strlen(name) + 1);
     strcpy(_name, name);
+    
+    _mutex = mutex_create();
     
 }
 
 RTPSocket::~RTPSocket() {
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     for (uint32_t i = 0 ; i < _socketsCount ; i++)
-        _sockets[i]->socket->Close();
+        socket_close(_sockets[i]->socket);
     while (_socketsCount > 0) {
-        _mutex.unlock();
-        pthread_join(_sockets[0]->thread, NULL);
-        _mutex.lock();
+        mutex_unlock(_mutex);
+        thread_join(_sockets[0]->thread);
+        mutex_lock(_mutex);
     }
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
-    delete _allowedRemoteEndPoint;
+    sockaddr_destroy(_allowedRemoteEndPoint);
     free(_name);
     if (_sockets)
         free(_sockets);
-        
+    
+    mutex_destroy(_mutex);
+    
 }
 
-bool RTPSocket::setup(SocketEndPoint *localEndPoint) {
+bool RTPSocket::setup(struct sockaddr* localEndPoint) {
     
-    Socket* udpSocket = new Socket(true);
-    Socket* tcpSocket = new Socket();
+    socket_p udpSocket = socket_create(true);
+    socket_p tcpSocket = socket_create(false);
     
-    if (udpSocket->Bind(localEndPoint) && tcpSocket->Bind(localEndPoint) && tcpSocket->Listen()) {
+    if (socket_bind(udpSocket, localEndPoint) && socket_bind(tcpSocket, localEndPoint) && socket_listen(tcpSocket)) {
         _kickStart("UDP", udpSocket, true);
         _kickStart("TCP Listener", tcpSocket, false);
         return true;
     }
     
-    delete udpSocket;
-    delete tcpSocket;
+    socket_destroy(udpSocket);
+    socket_destroy(tcpSocket);
     
     return false;
     
@@ -73,35 +77,35 @@ void RTPSocket::setDataReceivedCallback(dataReceivedCallback callback, void* ctx
     
 }
 
-void RTPSocket::sendTo(SocketEndPoint* dst, const char* buffer, long size) {
+void RTPSocket::sendTo(struct sockaddr* dst, const char* buffer, long size) {
     
     for (uint32_t i = 0 ; i < _socketsCount ; i++)
         if (_sockets[i]->dataSocket)
-            _sockets[i]->socket->SendTo(dst, buffer, size);
+            socket_send_to(_sockets[i]->socket, dst, buffer, size);
     
 }
 
-void RTPSocket::_acceptLoop(Socket* socket) {
+void RTPSocket::_acceptLoop(socket_p socket) {
     
     for (;;) {
         
-        Socket* newSocket = socket->Accept();
+        socket_p newSocket = socket_accept(socket);
         
         if (!newSocket)
             break;
         
-        if (newSocket->GetRemoteEndPoint()->compareWithAddress(_allowedRemoteEndPoint))
+        if (sockaddr_equals_host(socket_get_remote_end_point(newSocket), _allowedRemoteEndPoint))
             _kickStart("TCP Connection", newSocket, true);
         else {
-            newSocket->Close();
-            delete newSocket;
+            socket_close(newSocket);
+            socket_destroy(newSocket);
         }
         
     }
     
 }
 
-void RTPSocket::_receiveLoop(Socket* socket) {
+void RTPSocket::_receiveLoop(socket_p socket) {
     
     uint32_t offset = 0;
     unsigned char buffer[32768];
@@ -111,14 +115,14 @@ void RTPSocket::_receiveLoop(Socket* socket) {
         if (offset == 32768)
             break;
         
-        int read = socket->Receive(&buffer[offset], 32768 - offset);
+        int read = socket_receive(socket, &buffer[offset], 32768 - offset);
         
         if (read <= 0)
             break;
         
         uint32_t used = read;
         
-        if (socket->GetRemoteEndPoint()->compareWithAddress(_allowedRemoteEndPoint) && _callback != NULL)
+        if (sockaddr_equals_host(socket_get_remote_end_point(socket), _allowedRemoteEndPoint) && _callback != NULL)
             used = _callback(this, socket, (const char*)buffer, read + offset, _ctx);
         
         assert(used <= read + offset);
@@ -131,7 +135,7 @@ void RTPSocket::_receiveLoop(Socket* socket) {
     
 }
 
-void* RTPSocket::_loopKickStarter(void* ctx) {
+void RTPSocket::_loopKickStarter(void* ctx) {
     
     SocketInfo* info = (SocketInfo*)ctx;
     RTPSocket* owner = info->owner;
@@ -149,7 +153,7 @@ void* RTPSocket::_loopKickStarter(void* ctx) {
     
 }
 
-void RTPSocket::_kickStart(const char *name, Socket* socket, bool dataSocket) {
+void RTPSocket::_kickStart(const char *name, socket_p socket, bool dataSocket) {
     
     SocketInfo* info = (SocketInfo*)malloc(sizeof(SocketInfo));
     bzero(info, sizeof(SocketInfo));
@@ -159,21 +163,21 @@ void RTPSocket::_kickStart(const char *name, Socket* socket, bool dataSocket) {
     info->name = (char*)malloc(strlen(_name) + 4 + strlen(name));
     sprintf(info->name, "%s - %s", _name, name);
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     _sockets = (SocketInfo**)realloc(_sockets, sizeof(SocketInfo*) * (_socketsCount + 1));
     _sockets[_socketsCount] = info;
     _socketsCount++;
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
-    pthread_create(&info->thread, NULL, _loopKickStarter, info);
+    info->thread = thread_create(RTPSocket::_loopKickStarter, info);
     
 }
 
 void RTPSocket::_removeSocket(SocketInfo* info) {
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     for (uint32_t i = 0 ; i < _socketsCount ; i++)
         if (_sockets[i] == info) {
@@ -183,9 +187,9 @@ void RTPSocket::_removeSocket(SocketInfo* info) {
             break;
         }
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
-    delete info->socket;
+    socket_destroy(info->socket);
     free(info->name);
     free(info);
     

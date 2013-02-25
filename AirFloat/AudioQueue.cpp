@@ -11,8 +11,11 @@
 #include <assert.h>
 #include <sys/time.h>
 
-#include "NotificationCenter.h"
-#include "Log.h"
+extern "C" {
+#include "log.h"
+#include "notificationcenter.h"
+}
+
 #include "AudioQueue.h"
 
 #define MAX_QUEUE_COUNT 500
@@ -46,7 +49,7 @@ static void dumpqueue(AudioPacket* head) {
     assert(head != NULL);
     
     LoopFrom(currentPacket, head, next, NULL)
-        log(LOG_ERROR, " %05d --> %s", currentPacket->seqNo, statestr(currentPacket->state));
+        log_message(LOG_ERROR, " %05d --> %s", currentPacket->seqNo, statestr(currentPacket->state));
     
 }
 
@@ -75,11 +78,14 @@ AudioQueue::AudioQueue(double packetSize, double frameSize, double sampleRate) {
     
     _disposed = false;
     
+    _mutex = mutex_create();
+    _condition = condition_create();
+    
 }
 
 AudioQueue::~AudioQueue() {
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     while (_queueHead != NULL) {
         AudioPacket* packet = _queueHead;
@@ -89,9 +95,12 @@ AudioQueue::~AudioQueue() {
     
     _disposed = true;
     
-    _condition.broadcast();
+    condition_broadcast(_condition);
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
+    
+    mutex_destroy(_mutex);
+    condition_destroy(_condition);
     
 }
 
@@ -108,7 +117,7 @@ void AudioQueue::_checkQueueConsistency() {
     }
     
     if (count != _queueCount || missing != _missingCount) {
-        log(LOG_ERROR, "Queue is currupted (Missing %d/%d - Count %d/%d)!", _missingCount, missing, _queueCount, count);
+        log_message(LOG_ERROR, "Queue is currupted (Missing %d/%d - Count %d/%d)!", _missingCount, missing, _queueCount, count);
         dumpqueue(_queueHead);
         assert(0);
     }
@@ -199,7 +208,7 @@ AudioPacket* AudioQueue::_popQueueFromHead(bool keepQueueFilled) {
             while (_queueCount < 2)
                 _addEmptyPacket();
         
-        _condition.signal();
+        condition_signal(_condition);
         
         return headPacket;
     
@@ -211,7 +220,7 @@ AudioPacket* AudioQueue::_popQueueFromHead(bool keepQueueFilled) {
 
 void AudioQueue::_flush() {
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     while (_queueHead != NULL)
         _disposePacket(_popQueueFromHead(false));
@@ -221,11 +230,11 @@ void AudioQueue::_flush() {
     _foldCount = 0;
     _lastKnowSampleTime = _lastKnowSampleTimesTime = 0;
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
-    log(LOG_INFO, "Queue flushed");
+    log_message(LOG_INFO, "Queue flushed");
     
-    NotificationCenter::defaultCenter()->postNotification(AudioQueue::flushNotificationName, this, NULL);
+    notification_center_post_notification(AudioQueue::flushNotificationName, this, NULL);
     
 }
 
@@ -258,7 +267,7 @@ int AudioQueue::_addAudioPacket(void* buffer, uint32_t size, int seqNo, uint32_t
     
     int ret = 0;
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     seqNo = _handleSequenceOverflow(seqNo);
     
@@ -292,7 +301,7 @@ int AudioQueue::_addAudioPacket(void* buffer, uint32_t size, int seqNo, uint32_t
                     currentPacket->state = kAudioPacketStateComplete;
                     
                 } else
-                    log(LOG_INFO, "Packet %d already in queue", seqNo);
+                    log_message(LOG_INFO, "Packet %d already in queue", seqNo);
                 
                 found = true;
                 break;
@@ -301,13 +310,13 @@ int AudioQueue::_addAudioPacket(void* buffer, uint32_t size, int seqNo, uint32_t
         }
         
         if (!found)
-            log(LOG_INFO, "Packet %d came too late", seqNo);
+            log_message(LOG_INFO, "Packet %d came too late", seqNo);
         
     }
     
     //_checkQueueConsistency();
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
     if (_missingCount < _queueCount / 2)
         return MIN(ret, _missingCount);
@@ -318,19 +327,19 @@ int AudioQueue::_addAudioPacket(void* buffer, uint32_t size, int seqNo, uint32_t
 
 void AudioQueue::_disableSynchronization() {
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
-    log(LOG_INFO, "Synchronization is disabled");
-    NotificationCenter::defaultCenter()->postNotification(AudioQueue::syncNotificationName, this, NULL);
+    log_message(LOG_INFO, "Synchronization is disabled");
+    notification_center_post_notification(AudioQueue::syncNotificationName, this, NULL);
     _synchronizationEnabled = false;
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
 }
 
 bool AudioQueue::hasAvailablePacket() {
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     bool ret = (_queueHead != NULL);
     
@@ -344,14 +353,14 @@ bool AudioQueue::hasAvailablePacket() {
             
             _synchronizationNotificationSent = true;
             
-            log(LOG_INFO, "Queue was synced");
-            NotificationCenter::defaultCenter()->postNotification(AudioQueue::syncNotificationName, this, NULL);
+            log_message(LOG_INFO, "Queue was synced");
+            notification_center_post_notification(AudioQueue::syncNotificationName, this, NULL);
             
         }
         
     }
         
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
     return ret;
     
@@ -362,9 +371,9 @@ double AudioQueue::getPacketTime() {
     double ret = 0;
     
     if (hasAvailablePacket()) {
-        _mutex.lock();
+        mutex_lock(_mutex);
         ret = _convertTime(_lastKnowSampleTime, _lastKnowSampleTimesTime, _queueHead->sampleTime);
-        _mutex.unlock();
+        mutex_unlock(_mutex);
     }
     
     return ret;
@@ -375,7 +384,7 @@ void AudioQueue::getAudio(void* buffer, uint32_t* size, double* time, uint32_t* 
     
     assert(buffer != NULL && size != NULL);
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     char* bufWriteHead = (char*)buffer;
     uint32_t bufWriteSize = *size;
@@ -418,7 +427,7 @@ void AudioQueue::getAudio(void* buffer, uint32_t* size, double* time, uint32_t* 
                 outSize += written;
                 
                 if (audioPacket->seqNo % 100 == 0)
-                    log(LOG_INFO, "%d packages in queue (%d missing / seq %d)", _queueCount, _missingCount, audioPacket->seqNo);
+                    log_message(LOG_INFO, "%d packages in queue (%d missing / seq %d)", _queueCount, _missingCount, audioPacket->seqNo);
                 
                 if (audioPacket->getBufferSize() == 0)
                     _disposePacket(_popQueueFromHead(false));
@@ -438,7 +447,7 @@ void AudioQueue::getAudio(void* buffer, uint32_t* size, double* time, uint32_t* 
     if (_queueCount == 0)
         _lastKnowSampleTime = _lastKnowSampleTimesTime = 0;
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
     *size = outSize;
     
@@ -446,18 +455,18 @@ void AudioQueue::getAudio(void* buffer, uint32_t* size, double* time, uint32_t* 
 
 void AudioQueue::discardPacket() {
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     if (_queueHead != NULL)
         _disposePacket(_popQueueFromHead()); 
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
 }
 
 void AudioQueue::synchronize(uint32_t currentSampleTime, double currentTime, uint32_t nextSampleTime) {
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     currentSampleTime -= 11025;
     
@@ -466,14 +475,14 @@ void AudioQueue::synchronize(uint32_t currentSampleTime, double currentTime, uin
         while (_queueHead && _queueHead->sampleTime < currentSampleTime)
             _disposePacket(_popQueueFromHead());
         
-        log(LOG_INFO, "Queue was synced");
-        NotificationCenter::defaultCenter()->postNotification(AudioQueue::syncNotificationName, this, NULL);
+        log_message(LOG_INFO, "Queue was synced");
+        notification_center_post_notification(AudioQueue::syncNotificationName, this, NULL);
     }
     
     _lastKnowSampleTime = currentSampleTime;
     _lastKnowSampleTimesTime = currentTime;
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
 }
 
@@ -484,7 +493,7 @@ int AudioQueue::getNextMissingWindow(int* seqNo) {
     int ret = 0;
     int count = 0;
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     LoopFrom(currentPacket, _queueHead, next, NULL) {
         
@@ -509,7 +518,7 @@ int AudioQueue::getNextMissingWindow(int* seqNo) {
         
     }
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
     if (_missingCount < _queueCount / 2)
         return MIN(ret, _missingCount);
@@ -521,9 +530,9 @@ int AudioQueue::getNextMissingWindow(int* seqNo) {
 int AudioQueue::getQueuePacketCount() {
     
     int ret = 0;
-    _mutex.lock();
+    mutex_lock(_mutex);
     ret = _queueCount;
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
     return ret;
     
@@ -531,14 +540,14 @@ int AudioQueue::getQueuePacketCount() {
 
 bool AudioQueue::awaitAvailabilty() {
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     while ((_synchronizationEnabled && _queueCount == MAX_QUEUE_COUNT) || (!_synchronizationEnabled && (_queueFrameCount >= _sampleRate * 4)))
-        _condition.wait(&_mutex);
+        condition_wait(_condition, _mutex);
     
     bool ret = !_disposed;
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
     return ret;
     

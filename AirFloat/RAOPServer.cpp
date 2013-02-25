@@ -16,10 +16,13 @@
 #include <stdlib.h>
 
 #include "NotificationCenter.h"
-#include "Log.h"
-#include "WebConnection.h"
 #include "RAOPConnection.h"
 #include "RAOPServer.h"
+
+extern "C" {
+#include "log.h"
+#include "webconnection.h"
+}
 
 const char* RAOPServer::localhostConnectedErrorNotificationName = "serverLocalhostConnectedError";
 
@@ -27,8 +30,8 @@ RAOPServer::RAOPServer(uint16_t port) {
     
     _port = port;
     
-    _server = new WebServer((SocketEndPointType)(kSocketEndPointTypeIPv4 | kSocketEndPointTypeIPv6));
-    _server->setAcceptConnectionCallback(RAOPServer::_acceptConnectionCallback, this);
+    _server = web_server_create((sockaddr_type)(sockaddr_type_inet_4 | sockaddr_type_inet_6));
+    web_server_set_accept_callback(_server, RAOPServer::_acceptConnectionCallback, this);
     
 }
 
@@ -37,18 +40,18 @@ RAOPServer::~RAOPServer() {
     stopServer();
     waitServer();
     
-    delete _server;
+    web_server_destroy(_server);
     
 }
 
 bool RAOPServer::startServer() {
     
-    bool ret = _server->startServer(_port, 10);
+    bool ret = web_server_start(_server, _port, 10);
     
     if (ret)
-        log(LOG_INFO, "Server started at port %d", _server->getLocalEndPoint()->getPort());
+        log_message(LOG_INFO, "Server started at port %d", sockaddr_get_port(web_server_get_local_end_point(_server, sockaddr_type_inet_4)));
     else
-        log(LOG_INFO, "Unable to start server");
+        log_message(LOG_INFO, "Unable to start server");
     
     return ret;
     
@@ -56,55 +59,51 @@ bool RAOPServer::startServer() {
 
 void RAOPServer::waitServer() {
     
-    _server->waitServer();
-        
+    web_server_wait_stop(_server);
+    
 }
 
 void RAOPServer::stopServer() {
     
-    _server->stopServer();
+    web_server_stop(_server);
     
 }
 
 bool RAOPServer::isRunning() {
     
-    return _server->isRunning();
+    return web_server_is_running(_server);
     
 }
 
 uint32_t RAOPServer::getConnectionCount() {
     
-    return _server->getConnectionCount();
+    return web_server_get_connection_count(_server);
     
 }
 
-SocketEndPoint* RAOPServer::getLocalEndPoint() {
+struct sockaddr* RAOPServer::getLocalEndPoint() {
     
-    return _server->getLocalEndPoint();
+    return web_server_get_local_end_point(_server, sockaddr_type_inet_4);
     
 }
 
-bool RAOPServer::_acceptConnectionCallback(WebServer* server, WebConnection* newConnection, void* ctx) {
+bool RAOPServer::_acceptConnectionCallback(web_server_p server, web_connection_p newConnection, void* ctx) {
     
-    char localIp[50];
-    char remoteIp[50];
-    
-    newConnection->getLocalEndPoint()->getHost(localIp, 50);
-    newConnection->getRemoteEndPoint()->getHost(remoteIp, 50);
-
-//    if (strcmp(localIp, remoteIp) == 0 && RTPReceiver::getStreamingReceiver() == NULL) {
+#ifndef DEBUG
+    if (sockaddr_equals_host(newConnection->getLocalEndPoint(), newConnection->getRemoteEndPoint()) && RTPReceiver::getStreamingReceiver() == NULL) {
         
-//        log(LOG_ERROR, "Refused connection from localhost.");
-//        NotificationCenter::defaultCenter()->postNotification(RAOPServer::localhostConnectedErrorNotificationName, ctx, NULL);
+        log_message(LOG_ERROR, "Refused connection from localhost");
+        NotificationCenter::defaultCenter()->postNotification(RAOPServer::localhostConnectedErrorNotificationName, ctx, NULL);
         
-//        return false;
+        return false;
         
-//    } else {
-
+    } else {
+#endif
         new RAOPConnection(newConnection);
         
         return true;
-        
-//    }
+#ifndef DEBUG
+    }
+#endif
     
 }

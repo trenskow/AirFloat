@@ -16,8 +16,11 @@
 
 #include <QuartzCore/QuartzCore.h>
 
-#include "Mutex.h"
-#include "Log.h"
+extern "C" {
+#include "log.h"
+#include "mutex.h"
+}
+
 #include "RAOPConnection.h"
 #include "RTPReceiver.h"
 
@@ -38,7 +41,7 @@
 #define MIN(x, y) (x < y ? x : y)
 #endif
 
-static Mutex __globalMutex;
+static mutex_p __globalMutex = NULL;
 static RTPReceiver* __globalReceiver = NULL;
 
 typedef struct {
@@ -51,7 +54,7 @@ typedef struct {
 typedef struct {
     
     RTPReceiver* t;
-    Socket* sock;
+    socket_p sock;
     char name[255];
     
 } _streamLoopKickStarterHelper;
@@ -163,7 +166,14 @@ RTPReceiver::~RTPReceiver() {
     delete _audioPlayer;
 
     _connection = NULL;
-    stop();    
+    stop();
+    
+    mutex_destroy(_timerMutex);
+    condition_destroy(_timerCond);
+    condition_destroy(_syncCond);
+    thread_destroy(_timerThread);
+    
+    notification_center_remove_observer(NULL, this);
     
 }
 
@@ -189,8 +199,15 @@ void RTPReceiver::_setup(RAOPConnection* connection, int* fmtp, int fmtpLen) {
     
     _emulatedSeqNo = 0;
     
-    NotificationCenter::defaultCenter()->addObserver(this, AudioQueue::flushNotificationName, NULL);
-    NotificationCenter::defaultCenter()->addObserver(this, AudioQueue::syncNotificationName, NULL);
+    _timerMutex = mutex_create();
+    _timerCond = condition_create();
+    _syncCond = condition_create();
+    
+    if (__globalMutex == NULL)
+        __globalMutex = mutex_create();
+    
+    notification_center_add_observer(RTPReceiver::_notificationReceived, this, AudioQueue::flushNotificationName, NULL);
+    notification_center_add_observer(RTPReceiver::_notificationReceived, this, AudioQueue::syncNotificationName, NULL);
     
 }
 
@@ -211,9 +228,9 @@ bool RTPReceiver::started() {
 
 bool RTPReceiver::isAvailable() {
     
-    __globalMutex.lock();
+    mutex_lock(__globalMutex);
     bool ret = !(__globalReceiver != NULL && __globalReceiver->started());
-    __globalMutex.unlock();
+    mutex_unlock(__globalMutex);
     
     return ret;
     
@@ -221,9 +238,12 @@ bool RTPReceiver::isAvailable() {
 
 RTPReceiver* RTPReceiver::getStreamingReceiver() {
     
-    __globalMutex.lock();
+    if (__globalMutex == NULL)
+        __globalMutex = mutex_create();
+    
+    mutex_lock(__globalMutex);
     RTPReceiver* ret = __globalReceiver;
-    __globalMutex.unlock();
+    mutex_unlock(__globalMutex);
     
     return ret;
     
@@ -249,7 +269,7 @@ void RTPReceiver::_processSyncPacket(RTPPacket* packet) {
     double currentTime = ntpTimeToDouble(*((NTPTime*)&packet->packet_data[4]));
     uint32_t nextRTPTime = ntohl(*(uint32_t*)&packet->packet_data[12]);
     
-    log(LOG_INFO, "Sync packet (Playhead frame: %u - current time: %1.6f - next frame: %u)", currentRTPTime, currentTime, nextRTPTime);
+    log_message(LOG_INFO, "Sync packet (Playhead frame: %u - current time: %1.6f - next frame: %u)", currentRTPTime, currentTime, nextRTPTime);
     
     _audioPlayer->getAudioQueue()->synchronize(currentRTPTime, currentTime, nextRTPTime);
     
@@ -267,7 +287,7 @@ void RTPReceiver::_processTimingResponsePacket(RTPPacket* packet) {
     double delay = ((currentTime - referenceTime) - (sendTime - receivedTime)) / 2;
     double clientTime = receivedTime + (sendTime - receivedTime) + delay;
         
-    log(LOG_INFO, "Client time is %1.6f (peer delay: %1.6f)", clientTime, delay);
+    log_message(LOG_INFO, "Client time is %1.6f (peer delay: %1.6f)", clientTime, delay);
     
     _audioPlayer->setClientTime(clientTime);
     
@@ -277,11 +297,11 @@ void RTPReceiver::_processTimingResponsePacket(RTPPacket* packet) {
         this->_sendTimingRequest();
     else
         if (_timeResponseCount == 3)
-            _timerCond.signal();
+            condition_signal(_timerCond);
     
 }
 
-void RTPReceiver::_sendPacket(const char* buffer, size_t len, SocketEndPoint* remoteEndPoint, RTPSocket* sock) {
+void RTPReceiver::_sendPacket(const char* buffer, size_t len, struct sockaddr* remoteEndPoint, RTPSocket* sock) {
     
     assert(buffer != NULL && len > 0 && remoteEndPoint != NULL && sock != NULL);
     
@@ -305,7 +325,7 @@ void RTPReceiver::_sendTimingRequest() {
     
     _sendPacket((char*)&pckt, RTPTimingPacketSize, _remoteTimingEndPoint, _timingSock);
     
-    log(LOG_INFO, "Timing synchronization request sent (@ %1.6f)", send_time);
+    log_message(LOG_INFO, "Timing synchronization request sent (@ %1.6f)", send_time);
     
 }
 
@@ -324,11 +344,11 @@ void RTPReceiver::_sendResendRequest(unsigned short seqNum, unsigned short count
     
     _sendPacket((char*)&pckt, RTPResendPacketSize, _remoteControlEndPoint, _controlSock);
     
-    log(LOG_INFO, "Requested packet resend (seq: %d / count %d)", seqNum, count);
+    log_message(LOG_INFO, "Requested packet resend (seq: %d / count %d)", seqNum, count);
     
 }
 
-void* RTPReceiver::_synchronizationLoopKickStarter(void* t) {
+void RTPReceiver::_synchronizationLoopKickStarter(void* t) {
     
     assert(t != NULL);
     
@@ -339,52 +359,52 @@ void* RTPReceiver::_synchronizationLoopKickStarter(void* t) {
 }
 
 void RTPReceiver::_synchronizationLoop() {
-
-    _timerMutex.lock();
+    
+    mutex_lock(_timerMutex);
 
     while (_timerRunning) {
         
         _sendTimingRequest();
         
-        _syncCond.timedWait(&_timerMutex, 2000);
+        condition_times_wait(_timerCond, _timerMutex, 2000);
         
     }
     
-    _timerMutex.unlock();
+    mutex_unlock(_timerMutex);
     
 }
 
 void RTPReceiver::_startSynchronizationLoop() {
     
-    _timerMutex.lock();
+    mutex_lock(_timerMutex);
     
     if (!_timerRunning) {
         
         _timerRunning = true;
-        pthread_create(&_timerThread, NULL, _synchronizationLoopKickStarter, this);
+        _timerThread = thread_create(_synchronizationLoopKickStarter, this);
         
-        log(LOG_INFO, "Synchronization loop started");
+        log_message(LOG_INFO, "Synchronization loop started");
         
     }
     
-    _timerMutex.unlock();
+    mutex_unlock(_timerMutex);
     
 }
 
 void RTPReceiver::_stopSynchronizationLoop() {
     
-    _timerMutex.lock();
+    mutex_lock(_timerMutex);
     
     if (_timerRunning) {
         _timerRunning = false;
-        _syncCond.signal();
-        log(LOG_INFO, "Synchronization loop stopped");
+        condition_signal(_syncCond);
+        log_message(LOG_INFO, "Synchronization loop stopped");
     }
     
-    _timerMutex.unlock();
+    mutex_unlock(_timerMutex);
     
-    pthread_join(_timerThread, NULL);
-
+    thread_join(_timerThread);
+    
 }
 
 void RTPReceiver::_processAudioPacket(RTPPacket* packet) {
@@ -420,17 +440,17 @@ void RTPReceiver::_processAudioPacket(RTPPacket* packet) {
     
 }
 
-uint32_t RTPReceiver::_dataReceivedHelper(RTPSocket* rtpSocket, Socket* socket, const char* buffer, uint32_t size, void* ctx) {
+uint32_t RTPReceiver::_dataReceivedHelper(RTPSocket* rtpSocket, socket_p socket, const char* buffer, uint32_t size, void* ctx) {
     
     /* AirTunes v2 runs UDP. */
-    if (socket->IsUDP())
+    if (socket_is_udp(socket))
         return ((RTPReceiver*)ctx)->_dataReceivedUDP(rtpSocket, socket, buffer, size);
     
     return ((RTPReceiver*)ctx)->_dataReceivedTCP(rtpSocket, socket, buffer, size);
     
 }
 
-uint32_t RTPReceiver::_dataReceivedTCP(RTPSocket* rtpSocket, Socket* socket, const char* buffer, uint32_t size) {
+uint32_t RTPReceiver::_dataReceivedTCP(RTPSocket* rtpSocket, socket_p socket, const char* buffer, uint32_t size) {
     
     uint32_t read = 0;
     
@@ -463,7 +483,7 @@ uint32_t RTPReceiver::_dataReceivedTCP(RTPSocket* rtpSocket, Socket* socket, con
     
 }
 
-uint32_t RTPReceiver::_dataReceivedUDP(RTPSocket* rtpSocket, Socket* socket, const char* buffer, uint32_t size) {
+uint32_t RTPReceiver::_dataReceivedUDP(RTPSocket* rtpSocket, socket_p socket, const char* buffer, uint32_t size) {
     
     RTPPacket packet = readHeader((const unsigned char*)buffer, size);
     
@@ -481,7 +501,7 @@ uint32_t RTPReceiver::_dataReceivedUDP(RTPSocket* rtpSocket, Socket* socket, con
             _processAudioPacket(&packet);
             break;
         default:
-            log(LOG_ERROR, "Received unknown packet");
+            log_message(LOG_ERROR, "Received unknown packet");
             break;
     }
     
@@ -497,18 +517,19 @@ RTPSocket* RTPReceiver::_setupSocket(char* name, unsigned short* port) {
     
     unsigned short p;
     for (p = 6000 ; p < 6100 ; p++) {
-        SocketEndPoint* ep = _connection->getLocalEndPoint()->copy(p);
+        struct sockaddr* ep = sockaddr_copy(_connection->getLocalEndPoint());
+        sockaddr_set_port(ep, p);
         if (ret->setup(ep)) {
             ret->setDataReceivedCallback(_dataReceivedHelper, this);
             SafeDR(port, p);
-            log(LOG_INFO, "Setup socket on port %u", p);
-            delete ep;
+            log_message(LOG_INFO, "Setup socket on port %u", p);
+            sockaddr_destroy(ep);
             return ret;
         }
-        delete ep;
+        sockaddr_destroy(ep);
     }
     
-    log(LOG_ERROR, "Unable to bind socket.");
+    log_message(LOG_ERROR, "Unable to bind socket.");
     
     delete ret;
     
@@ -519,21 +540,23 @@ RTPSocket* RTPReceiver::_setupSocket(char* name, unsigned short* port) {
 unsigned short RTPReceiver::setup(unsigned short* timingPort, unsigned short* controlPort) {
     
     unsigned short ret = 0;
-    log(LOG_INFO, "Setting up server socket");
+    log_message(LOG_INFO, "Setting up server socket");
     if ((_serverSock = _setupSocket((char*)"Stream socket", &ret)) != NULL) {
         
         if (controlPort != NULL && *controlPort > 0) {
             
-            _remoteControlEndPoint = _connection->getRemoteEndPoint()->copy(*controlPort);
-            log(LOG_INFO, "Setting up control socket");
+            _remoteControlEndPoint = sockaddr_copy(_connection->getRemoteEndPoint());
+            sockaddr_set_port(_remoteControlEndPoint, *controlPort);
+            log_message(LOG_INFO, "Setting up control socket");
             _controlSock = _setupSocket((char*)"Control socket", controlPort);
             
         }
         
         if (timingPort != NULL && *timingPort > 0) {
             
-            _remoteTimingEndPoint = _connection->getRemoteEndPoint()->copy(*timingPort);
-            log(LOG_INFO, "Setting up timing socket");
+            _remoteTimingEndPoint = sockaddr_copy(_connection->getRemoteEndPoint());
+            sockaddr_set_port(_remoteTimingEndPoint, *timingPort);
+            log_message(LOG_INFO, "Setting up timing socket");
             _timingSock = _setupSocket((char*)"Timing socket", timingPort);
             
         } else
@@ -547,13 +570,13 @@ unsigned short RTPReceiver::setup(unsigned short* timingPort, unsigned short* co
 
 bool RTPReceiver::start(unsigned short startSeq) {
     
-    __globalMutex.lock();
+    mutex_lock(__globalMutex);
     __globalReceiver = this;
-    __globalMutex.unlock();
+    mutex_unlock(__globalMutex);
     
     _audioPlayer->start();
         
-    log(LOG_INFO, "Started RTP receiver with initial sequence number: %d", startSeq);
+    log_message(LOG_INFO, "Started RTP receiver with initial sequence number: %d", startSeq);
 
     if (_serverSock != NULL) {
         
@@ -561,15 +584,15 @@ bool RTPReceiver::start(unsigned short startSeq) {
         
             _sendTimingRequest();
             
-            log(LOG_INFO, "Waiting for synchronization");
+            log_message(LOG_INFO, "Waiting for synchronization");
             
-            _timerMutex.lock();
-            bool ret = !_timerCond.timedWait(&_timerMutex, 5000);
+            mutex_lock(_timerMutex);
+            bool ret = !condition_times_wait(_timerCond, _timerMutex, 5000);
             if (!ret)
-                log(LOG_INFO, "Synchronization incomplete");
+                log_message(LOG_INFO, "Synchronization incomplete");
             else
-                log(LOG_INFO, "Synchronization complete");
-            _timerMutex.unlock();
+                log_message(LOG_INFO, "Synchronization complete");
+            mutex_unlock(_timerMutex);
             
             return ret;
             
@@ -578,7 +601,7 @@ bool RTPReceiver::start(unsigned short startSeq) {
         return true;
         
     } else
-        log(LOG_ERROR, "RTP receiver was not setup before start");
+        log_message(LOG_ERROR, "RTP receiver was not setup before start");
     
     return true;
     
@@ -597,26 +620,30 @@ void RTPReceiver::stop() {
     if (_controlSock != NULL)
         delete _controlSock;
     
-    delete _remoteTimingEndPoint;
-    delete _remoteControlEndPoint;
+    if (_remoteTimingEndPoint)
+        sockaddr_destroy(_remoteTimingEndPoint);
+    if (_remoteControlEndPoint)
+        sockaddr_destroy(_remoteControlEndPoint);
     
     _serverSock = _timingSock = _controlSock = NULL;
     _remoteTimingEndPoint = _remoteControlEndPoint = NULL;
     
-    __globalMutex.lock();
+    mutex_lock(__globalMutex);
     __globalReceiver = NULL;
-    __globalMutex.unlock();
+    mutex_unlock(__globalMutex);
     
 }
 
-void RTPReceiver::_notificationReceived(Notification* notification) {
+void RTPReceiver::_notificationReceived(notification_p notification, void* ctx) {
     
-    if (_timingSock) {
+    RTPReceiver* i = (RTPReceiver*)ctx;
+    
+    if (i->_timingSock) {
         
-        if (*notification == AudioQueue::flushNotificationName)
-            _stopSynchronizationLoop();
-        else if (*notification == AudioQueue::syncNotificationName)
-            _startSynchronizationLoop();
+        if (notification_get_name(notification) == AudioQueue::flushNotificationName)
+            i->_stopSynchronizationLoop();
+        else if (notification_get_name(notification) == AudioQueue::syncNotificationName)
+            i->_startSynchronizationLoop();
         
     }
     

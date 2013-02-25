@@ -8,33 +8,32 @@
 
 #import "Server.h"
 
-#import "NotificationCenter.h"
 #import "AirFloatAdditions.h"
 #import "AirFloatNotificationsHub.h"
 
 static struct AirFloatNotificationBridge {
-    const char* raopName;
+    NSString* raopName;
     NSString* foundationName;
 } _airFloatNotificationBridge[5] = {
     
     {
-        RAOPConnection::clientConnectedNotificationName,
+        [[NSString alloc] initWithCString:RAOPConnection::clientConnectedNotificationName encoding:NSASCIIStringEncoding],
         AirFloatClientConnectedNotification
     },
     {
-        RAOPConnection::clientDisconnectedNotificationName,
+        [[NSString alloc] initWithCString:RAOPConnection::clientDisconnectedNotificationName encoding:NSASCIIStringEncoding],
         AirFloatClientDisconnectedNotification
     },
     {
-        AudioQueue::flushNotificationName,
+        [[NSString alloc] initWithCString:AudioQueue::flushNotificationName encoding:NSASCIIStringEncoding],
         AirFloatRecordingEndedNotification
     },
     {
-        AudioQueue::syncNotificationName,
+        [[NSString alloc] initWithCString:AudioQueue::syncNotificationName encoding:NSASCIIStringEncoding],
         AirFloatRecordingStartedNotification
     },
     {
-        RAOPServer::localhostConnectedErrorNotificationName,
+        [[NSString alloc] initWithCString:RAOPServer::localhostConnectedErrorNotificationName encoding:NSASCIIStringEncoding],
         AirFloatLocalhostConnectedErrorNotification
     }
     
@@ -43,17 +42,19 @@ static uint32_t _airFloatNotificationBridgeCount = sizeof(_airFloatNotificationB
 
 @interface AirFloatNotificationsHub (Private)
 
-- (void)_notificationReceived:(void*)sender name:(const char*)name notificationInfo:(void*)notificationInfo;
+- (void)_notificationReceived:(void*)sender name:(NSString*)name notificationInfo:(void*)notificationInfo;
 
 @end
 
-static void notificationCallback(void* sender, const char* name, void* notificationInfo, void* callbackContext) {
+static void notificationCallback(notification_p notification, void* ctx) {
     
     dispatch_block_t routeBlock = ^{
-        [(AirFloatNotificationsHub*)callbackContext _notificationReceived:sender name:name notificationInfo:notificationInfo];
+        [(AirFloatNotificationsHub*)ctx _notificationReceived:notification_get_sender(notification)
+                                                         name:[NSString stringWithCString:notification_get_name(notification) encoding:NSASCIIStringEncoding]
+                                             notificationInfo:notification_get_info(notification)];
     };
     
-    if (notificationInfo == NULL)
+    if (notification_get_info(notification) == NULL)
         dispatch_async(dispatch_get_main_queue(), routeBlock);
     else
         dispatch_sync(dispatch_get_main_queue(), routeBlock);
@@ -65,7 +66,7 @@ static void notificationCallback(void* sender, const char* name, void* notificat
 - (id)init {
     
     if ((self = [super init]))
-        NotificationCenter::defaultCenter()->addObserver(notificationCallback, self, NULL, NULL);
+        notification_center_add_observer(notificationCallback, self, NULL, NULL);
     
     return self;
     
@@ -73,7 +74,7 @@ static void notificationCallback(void* sender, const char* name, void* notificat
 
 - (void)dealloc {
     
-    NotificationCenter::defaultCenter()->removeObserver(self);
+    notification_center_remove_observer(NULL, self);
     
     [super dealloc];
     
@@ -81,30 +82,30 @@ static void notificationCallback(void* sender, const char* name, void* notificat
 
 #pragma mark - Notification handling
 
-- (void)_notificationReceived:(void *)sender name:(const char *)name notificationInfo:(void *)notificationInfo {
+- (void)_notificationReceived:(void *)sender name:(NSString*)name notificationInfo:(void *)notificationInfo {
     
     NSMutableDictionary* infoDictionary = [NSMutableDictionary dictionaryWithObject:[NSValue valueWithPointer:sender] forKey:kAirFloatSenderOriginKey];
     
     for (uint32_t i = 0 ; i < _airFloatNotificationBridgeCount ; i++)
-        if (strcmp(name, _airFloatNotificationBridge[i].raopName) == 0) {
+        if ([name isEqualToString:_airFloatNotificationBridge[i].raopName]) {
             [NSDefaultNotificationCenter postNotificationName:_airFloatNotificationBridge[i].foundationName object:self userInfo:infoDictionary];
             return;
         }
     
-    if (strcmp(name, RAOPConnection::clientUpdatedTrackInfoNofificationName) == 0) {
+    if ([name isEqualToString:[NSString stringWithCString:RAOPConnection::clientUpdatedTrackInfoNofificationName encoding:NSASCIIStringEncoding]]) {
 
-        DMAP* tags = (DMAP*)notificationInfo;
+        dmap_p tags = (dmap_p)notificationInfo;
         
         [infoDictionary addEntriesFromDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                  [NSString stringWithCString:tags->stringForAtom("dmap.itemname") encoding:NSUTF8StringEncoding], kAirFloatTrackInfoTrackTitleKey, 
-                                                  [NSString stringWithCString:tags->stringForAtom("daap.songartist") encoding:NSUTF8StringEncoding], kAirFloatTrackInfoArtistNameKey, 
-                                                  [NSString stringWithCString:tags->stringForAtom("daap.songalbum") encoding:NSUTF8StringEncoding], kAirFloatTrackInfoAlbumNameKey, nil]];
+                                                  [NSString stringWithCString:dmap_string_for_atom_identifer(tags, "dmap.itemname") encoding:NSUTF8StringEncoding], kAirFloatTrackInfoTrackTitleKey,
+                                                  [NSString stringWithCString:dmap_string_for_atom_identifer(tags, "daap.songartist") encoding:NSUTF8StringEncoding], kAirFloatTrackInfoArtistNameKey,
+                                                  [NSString stringWithCString:dmap_string_for_atom_identifer(tags, "daap.songalbum") encoding:NSUTF8StringEncoding], kAirFloatTrackInfoAlbumNameKey, nil]];
         
         [NSDefaultNotificationCenter postNotificationName:AirFloatTrackInfoUpdatedNotification object:self userInfo:infoDictionary];
 
         return;
         
-    } else if (strcmp(name, RAOPConnection::clientUpdatedMetadataNotificationName) == 0) {
+    } else if ([name isEqualToString:[NSString stringWithCString:RAOPConnection::clientUpdatedMetadataNotificationName encoding:NSASCIIStringEncoding]]) {
         
         RAOPConnectionClientUpdatedMetadataNotificationInfo* info = (RAOPConnectionClientUpdatedMetadataNotificationInfo*)notificationInfo;
         

@@ -6,11 +6,14 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#include "Log.h"
+extern "C" {
+#include "log.h"
+}
+
 #include "CAXException.h"
 #include "AppleLosslessAudioConverter.h"
 
-static int isBigEndian() 
+static int isBigEndian()
 {
     
     int no = 1;
@@ -117,7 +120,7 @@ void AppleLosslessAudioConverter::convert(void* srcBuffer, uint32_t srcSize, voi
     
     assert(srcBuffer != NULL && srcSize > 0 && destBuffer != NULL && destSize != NULL && *destSize > 0);
     
-    _decoderMutex.lock();
+    mutex_lock(_decoderMutex);
     
     UInt32 outSize = _destDesc.mBytesPerFrame * _srcDesc.mFramesPerPacket;
 
@@ -141,6 +144,6 @@ void AppleLosslessAudioConverter::convert(void* srcBuffer, uint32_t srcSize, voi
     OSStatus err = AudioConverterFillComplexBuffer(_converter, AudioConverter::_audioConverterComplexInputDataProc, this, &ioOutputDataPackets, &outBufferList, NULL);
     *destSize = (err == noErr ? _srcDesc.mFramesPerPacket * _destDesc.mBytesPerFrame : 0);
     
-    _decoderMutex.unlock();
+    mutex_unlock(_decoderMutex);
     
 }

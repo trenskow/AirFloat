@@ -6,13 +6,12 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#import "Server.h"
 #import "AirFloatSocketEndPoint.h"
 
 @interface AirFloatSocketEndPoint (Private)
 
-@property (nonatomic,readonly) SocketEndPoint* _endPoint;
+@property (nonatomic,readonly) struct sockaddr* _endPoint;
 
-- (id)_initWithEndPoint:(SocketEndPoint*)endPoint;
+- (id)_initWithEndPoint:(struct sockaddr*)endPoint;
 
 @end

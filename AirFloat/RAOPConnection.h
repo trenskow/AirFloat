@@ -13,7 +13,14 @@
 
 #include <pthread.h>
 #include "RTPReceiver.h"
-#include "Socket.h"
+
+extern "C" {
+#include "socket.h"
+#include "sockaddr.h"
+#include "webtools.h"
+#include "webrequest.h"
+#include "webconnection.h"
+}
 
 #define DACPID_MAXLENGTH 200
 #define ACTIVEREMOTE_MAXLENGTH 50
@@ -37,32 +44,28 @@ typedef struct {
     double total;
 } RAOPConnectionClientUpdatedProgressNotificationInfo;
 
-#include "WebTools.h"
-
 class WebConnection;
 class WebRequest;
 class RAOPConnection;
 
-class RAOPConnection : public WebTools {
+class RAOPConnection {
 
     friend class RAOPServer;
     
 public:
-    RAOPConnection(WebConnection* connection);
+    RAOPConnection(web_connection_p connection);
     ~RAOPConnection();
     
     RTPReceiver* getRTPReceiver();
     
-    SocketEndPoint* getLocalEndPoint();
-    SocketEndPoint* getRemoteEndPoint();
+    struct sockaddr* getLocalEndPoint();
+    struct sockaddr* getRemoteEndPoint();
     
     const char* getDacpId();
     const char* getActiveRemote();
     const char* getSessionId();
     
     const char* getUserAgent();
-    
-    unsigned int getNetworkScopeId();
     
     bool isConnected();
     
@@ -79,14 +82,14 @@ private:
     void _appleResponse(const char* challenge, long length, char* response, long* resLength);
     bool _checkAuthentication(const char* method, const char* uri, const char* authenticationParameter);
     
-    void _processRequestCallback(WebConnection* connection, WebRequest* request);
-    static void _processRequestCallbackHelper(WebConnection* connection, WebRequest* request, void* ctx);
-    void _connectionClosedCallback(WebConnection* connection);
-    static void _connectionClosedCallbackHelper(WebConnection* connection, void* ctx);
+    void _processRequestCallback(web_connection_p connection, web_request_p request);
+    static void _processRequestCallbackHelper(web_connection_p connection, web_request_p request, void* ctx);
+    void _connectionClosedCallback(web_connection_p connection);
+    static void _connectionClosedCallbackHelper(web_connection_p connection, void* ctx);
     
     RAOPConnectionAudioRoute _getAudioRoute();
     
-    WebConnection* _connection;
+    web_connection_p _connection;
     
     RSA* _applePrivateKey;
     

@@ -9,7 +9,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "Log.h"
+extern "C" {
+#include "log.h"
+}
+
 #include "RAOPParameters.h"
 
 RAOPParameters::RAOPParameters(const char* buffer, long length, ParameterType type, char delimiter) {
@@ -36,7 +39,7 @@ RAOPParameters::RAOPParameters(const char* buffer, long length, ParameterType ty
     else if (type == ParameterTypeDigest)
         _parseBufferDigest(parseBuf, length);
     else
-        log(LOG_ERROR, "RAOPParameters cannot parse data of type 0x%XX", type);
+        log_message(LOG_ERROR, "RAOPParameters cannot parse data of type 0x%XX", type);
     
 }
 
