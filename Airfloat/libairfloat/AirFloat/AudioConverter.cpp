@@ -6,7 +6,10 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#include "Log.h"
+extern "C" {
+#include "log.h"
+}
+
 #include "AudioConverter.h"
 
 AudioConverter::AudioConverter(uint32_t channels, double sampleRate, uint32_t bitDepth) {
@@ -20,12 +23,16 @@ AudioConverter::AudioConverter(uint32_t channels, double sampleRate, uint32_t bi
     
     _converter = NULL;
     
+    _decoderMutex = mutex_create();
+    
 }
 
 AudioConverter::~AudioConverter() {
     
     if (_converter != NULL)
         AudioConverterDispose(_converter);
+    
+    mutex_destroy(_decoderMutex);
     
 }
 
@@ -50,7 +57,7 @@ void AudioConverter::_setupAudioDescription(AudioStreamBasicDescription* desc, u
     UInt32 size = sizeof(*desc);
     OSStatus err = AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, desc);
     if (err != noErr)
-        log(LOG_ERROR, "Error");
+        log_message(LOG_ERROR, "Error");
     
 }
 
@@ -75,7 +82,7 @@ void AudioConverter::convert(void* srcBuffer, uint32_t srcSize, void* destBuffer
     
     assert(srcBuffer != NULL && srcSize > 0 && destBuffer != NULL && destSize != NULL && *destSize > 0);
     
-    _decoderMutex.lock();
+    mutex_lock(_decoderMutex);
     
     if (!_converter) {
         if (noErr != AudioConverterNew(&_srcDesc, &_destDesc, &_converter))
@@ -104,7 +111,7 @@ void AudioConverter::convert(void* srcBuffer, uint32_t srcSize, void* destBuffer
     UInt32 ioOutputDataPackets = srcSize / _srcDesc.mBytesPerPacket;
     
     if (noErr != AudioConverterFillComplexBuffer(_converter, AudioConverter::_audioConverterComplexInputDataProc, this, &ioOutputDataPackets, &outBufferList, NULL))
-        log(LOG_ERROR, "Unable to convert sample rate");
+        log_message(LOG_ERROR, "Unable to convert sample rate");
     else {
         
         *destSize = ioOutputDataPackets * _destDesc.mBytesPerFrame;
@@ -117,10 +124,10 @@ void AudioConverter::convert(void* srcBuffer, uint32_t srcSize, void* destBuffer
                 equal = equal && (((char*)srcBuffer)[i] == ((char*)destBuffer)[i]);
         
         if (equal)
-            log(LOG_ERROR, "Converter did not change packet");
+            log_message(LOG_ERROR, "Converter did not change packet");
     }
     
-    _decoderMutex.unlock();
+    mutex_unlock(_decoderMutex);
     
 }
 

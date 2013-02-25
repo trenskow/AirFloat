@@ -9,18 +9,14 @@
 #ifndef __LIBRARY_H
 #define __LIBRARY_H
 
-#include "Settings.h"
-
-#include "DMAP.h"
-
-#include "Log.h"
-
-#include "Mutex.h"
-#include "Condition.h"
-
-#include "Notification.h"
-#include "NotificationCenter.h"
-#include "NotificationObserver.h"
+extern "C" {
+#include "settings.h"
+#include "dmap.h"
+#include "log.h"
+#include "mutex.h"
+#include "condition.h"
+#include "notificationcenter.h"
+}
 
 #include "AudioConverter.h"
 #include "AppleLosslessAudioConverter.h"
@@ -29,19 +25,17 @@
 #include "AudioPacket.h"
 #include "AudioQueue.h"
 
-#include "Socket.h"
-#include "SocketEndPoint.h"
-#include "SocketEndPointIPv4.h"
-#include "SocketEndPointIPv6.h"
+extern "C" {
+#include "base64.h"
+#include "socket.h"
+#include "sockaddr.h"
+#include "webheaders.h"
+#include "webresponse.h"
+#include "webrequest.h"
+#include "webconnection.h"
+#include "webserver.h"
+}
 
-#include "WebTools.h"
-#include "WebHeaders.h"
-#include "WebResponse.h"
-#include "WebRequest.h"
-#include "WebConnection.h"
-#include "WebServer.h"
-
-#include "Base64.h"
 #include "RTPReceiver.h"
 #include "RAOPParameters.h"
 #include "RAOPConnection.h"

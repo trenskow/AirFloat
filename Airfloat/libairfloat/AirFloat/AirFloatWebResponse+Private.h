@@ -6,13 +6,14 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#import "Server.h"
+#import "webresponse.h"
+
 #import "AirFloatWebResponse.h"
 
 @interface AirFloatWebResponse (Private)
 
-@property (nonatomic,readonly) WebResponse* _response;
+@property (nonatomic,readonly) web_response_p _response;
 
-- (id)_initWithResponse:(WebResponse*)response;
+- (id)_initWithResponse:(web_response_p)response;
 
 @end

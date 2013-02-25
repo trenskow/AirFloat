@@ -13,11 +13,15 @@
 
 #define SYNC_BACKLOG 10
 
-#include "NotificationCenter.h"
-#include "Mutex.h"
-#include "Condition.h"
 #include "AudioPlayer.h"
 #include "RTPSocket.h"
+
+extern "C" {
+#include "mutex.h"
+#include "condition.h"
+#include "thread.h"
+#include "notificationcenter.h"
+}
 
 typedef struct {
     
@@ -35,7 +39,7 @@ typedef struct {
 
 class RAOPConnection;
 
-class RTPReceiver : public NotificationObserver {
+class RTPReceiver {
     
 public:
     RTPReceiver(const unsigned char aesKey[16], const unsigned char aesIv[16], RAOPConnection* connection, int* fmtp, int fmtpLen);
@@ -54,15 +58,13 @@ public:
     RAOPConnection* getConnection();
     AudioPlayer* getAudioPlayer();
     
-    void _notificationReceived(Notification* notification);
-    
 private:
     
     void _setup(RAOPConnection* connection, int* fmtp, int fmtpLen);
     
     void _processSyncPacket(RTPPacket* packet);
     void _processTimingResponsePacket(RTPPacket* packet);
-    void _sendPacket(const char* buffer, size_t len, SocketEndPoint* remoteEndPoint, RTPSocket* sock);
+    void _sendPacket(const char* buffer, size_t len, struct sockaddr* remoteEndPoint, RTPSocket* sock);
     void _sendTimingRequest();
     void _sendResendRequest(unsigned short seqNum, unsigned short count);
     void _startSynchronizationLoop();
@@ -71,22 +73,24 @@ private:
     static void _queueSyncCalback(AudioQueue* queue, void* ctx);
     
     void _synchronizationLoop();
-    static void* _synchronizationLoopKickStarter(void* t);
+    static void _synchronizationLoopKickStarter(void* t);
     
-    uint32_t _dataReceivedTCP(RTPSocket* rtpSocket, Socket* socket, const char* buffer, uint32_t size);
-    uint32_t _dataReceivedUDP(RTPSocket* rtpSocket, Socket* socket, const char* buffer, uint32_t size);
-    static uint32_t _dataReceivedHelper(RTPSocket* rtpSocket, Socket* socket, const char* buffer, uint32_t size, void* ctx);
+    uint32_t _dataReceivedTCP(RTPSocket* rtpSocket, socket_p socket, const char* buffer, uint32_t size);
+    uint32_t _dataReceivedUDP(RTPSocket* rtpSocket, socket_p socket, const char* buffer, uint32_t size);
+    static uint32_t _dataReceivedHelper(RTPSocket* rtpSocket, socket_p socket, const char* buffer, uint32_t size, void* ctx);
     
     void _processAudioPacket(RTPPacket* packet);
     
     RTPSocket* _setupSocket(char* name, unsigned short* port);
     
+    static void _notificationReceived(notification_p notification, void* ctx);
+    
     RAOPConnection* _connection;
     
-    Mutex _timerMutex;
-    Condition _timerCond;
-    Condition _syncCond;
-    pthread_t _timerThread;
+    mutex_p _timerMutex;
+    condition_p _timerCond;
+    condition_p _syncCond;
+    thread_p _timerThread;
     
     bool _timerRunning;
     int _timeResponseCount;
@@ -95,9 +99,9 @@ private:
     RTPSocket* _timingSock;
     RTPSocket* _controlSock;
     
-    SocketEndPoint* _localEndPoint;
-    SocketEndPoint* _remoteTimingEndPoint;
-    SocketEndPoint* _remoteControlEndPoint;
+    struct sockaddr* _localEndPoint;
+    struct sockaddr* _remoteTimingEndPoint;
+    struct sockaddr* _remoteControlEndPoint;
     
     bool _streamIsEncrypted;
     AES_KEY _aes;

@@ -84,7 +84,7 @@
     if (self._server->startServer()) {
         
         [_bonjour release];
-        _bonjour = [[AirFloatBonjourController alloc] initWithMacAddress:[[AirFloatInterfaces wifiInterface] objectForKey:@"mac"] andPort:self._server->getLocalEndPoint()->getPort()];
+        _bonjour = [[AirFloatBonjourController alloc] initWithMacAddress:[[AirFloatInterfaces wifiInterface] objectForKey:@"mac"] andPort:sockaddr_get_port(self._server->getLocalEndPoint())];
         
         [NSDefaultNotificationCenter addObserver:self selector:@selector(_clientConnected) name:AirFloatClientConnectedNotification object:nil];
         [NSDefaultNotificationCenter addObserver:self selector:@selector(_clientDisconnected) name:AirFloatClientDisconnectedNotification object:nil];
@@ -149,8 +149,7 @@
     
     if (self.status == kAirFloatServerControllerStatusReceiving) {
         
-        char ip[100];
-        RTPReceiver::getStreamingReceiver()->getConnection()->getRemoteEndPoint()->getHost(ip, 100);
+        const char* ip = sockaddr_get_host(RTPReceiver::getStreamingReceiver()->getConnection()->getRemoteEndPoint());
         return [NSString stringWithCString:ip encoding:NSASCIIStringEncoding];
         
     }
@@ -192,7 +191,7 @@
         for (NSData* addrData in addresses) {
             
             struct sockaddr* addr = (struct sockaddr*) [addrData bytes];
-            if (receiver->getConnection()->getRemoteEndPoint()->compareWithAddress(addr)) {
+            if (sockaddr_equals_host(receiver->getConnection()->getRemoteEndPoint(), addr)) {
                 
                 NSDLog(@"Found %@", [service type]);
                 

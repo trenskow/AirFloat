@@ -11,7 +11,6 @@
 
 #define BUFFER_COUNT 10
 
-#include "Mutex.h"
 #include "AudioConverter.h"
 #include "AudioQueue.h"
 #include "AudioGraph.h"
@@ -19,6 +18,10 @@
 #include "AudioUnitVariSpeed.h"
 #include "AudioUnitOutput.h"
 #include <AudioToolbox/AudioToolbox.h>
+
+extern "C" {
+#include "mutex.h"
+}
 
 #define CLIENT_SERVER_DIFFERENCE_BACKLOG 10
 
@@ -66,7 +69,7 @@ private:
     double _clientServerDifference;
     bool _outputIsHomed;
     
-    Mutex _timeMutex;
+    mutex_p _timeMutex;
     
     AudioQueueParameterValue _preFlushVolume;
     
@@ -77,8 +80,8 @@ private:
     
     bool _skipPacket;
     
-    Mutex _packetMutex;
-            
+    mutex_p _packetMutex;
+    
 };
 
 #endif

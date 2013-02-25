@@ -23,6 +23,8 @@ AudioPacket::AudioPacket(AudioPacketState initialState) {
     _buffer = NULL;
     
     next = prev = NULL;
+    
+    _mutex = mutex_create();
 
 }
 
@@ -30,11 +32,13 @@ AudioPacket::~AudioPacket() {
     
     setBuffer(NULL, 0);
     
+    mutex_destroy(_mutex);
+    
 }
 
 void AudioPacket::setBuffer(void* buffer, uint32_t size) {
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     if (_buffer != NULL)
         free(_buffer);
@@ -47,7 +51,7 @@ void AudioPacket::setBuffer(void* buffer, uint32_t size) {
     } else
         _buffer = NULL;
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
 }
 
@@ -55,13 +59,13 @@ uint32_t AudioPacket::getBuffer(void* buffer, uint32_t size) {
     
     uint32_t ret = 0;
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     ret = MIN(size, _bufferSize);
     if (_buffer != NULL && buffer != NULL)
         memcpy(buffer, _buffer, ret);
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
     return ret;
     
@@ -69,7 +73,7 @@ uint32_t AudioPacket::getBuffer(void* buffer, uint32_t size) {
 
 void AudioPacket::shiftBuffer(uint32_t size) {
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     if (size >= _bufferSize) {
         
@@ -85,17 +89,17 @@ void AudioPacket::shiftBuffer(uint32_t size) {
         
     }
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
 }
 
 uint32_t AudioPacket::getBufferSize() {
     
-    _mutex.lock();
+    mutex_lock(_mutex);
     
     bool ret = (_buffer != NULL && _bufferSize > 0);
     
-    _mutex.unlock();
+    mutex_unlock(_mutex);
     
     return ret;
     

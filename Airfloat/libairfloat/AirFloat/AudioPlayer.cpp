@@ -9,8 +9,11 @@
 #include <sys/utsname.h>
 #include <QuartzCore/QuartzCore.h>
 
+extern "C" {
+#include "log.h"
+}
+
 #include "CAHostTimeBase.h"
-#include "Log.h"
 
 #include "AppleLosslessSoftwareAudioConverter.h"
 #include "AppleLosslessAudioConverter.h"
@@ -90,6 +93,9 @@ AudioPlayer::AudioPlayer(int* fmts, int fmtsSize) {
     
     _audioQueue = new AudioQueue(fmts[0], _audio.outDesc.mBytesPerFrame, _audio.outDesc.mSampleRate);
     
+    _timeMutex = mutex_create();
+    _packetMutex = mutex_create();
+    
 }
 
 AudioPlayer::~AudioPlayer() {
@@ -104,6 +110,9 @@ AudioPlayer::~AudioPlayer() {
     delete _audioQueue;
     delete _audio.losslessConverter;
     
+    mutex_destroy(_timeMutex);
+    mutex_destroy(_packetMutex);
+    
 }
 
 void AudioPlayer::start() {
@@ -114,20 +123,20 @@ void AudioPlayer::start() {
 
 void AudioPlayer::flush(int lastSeq) {
     
-    _timeMutex.lock();
+    mutex_lock(_timeMutex);
     
-    _packetMutex.lock();
+    mutex_lock(_packetMutex);
     
     _audioQueue->_flush();
     _flushedSeq = lastSeq;
     
-    _packetMutex.unlock();
+    mutex_unlock(_packetMutex);
     
     _audio.graph.mixerUnit->setVolume(.0f, 0);
     
     _outputIsHomed = false;
     
-    _timeMutex.unlock();
+    mutex_unlock(_timeMutex);
         
 }
 
@@ -147,7 +156,7 @@ void AudioPlayer::disableSynchronization() {
 
 void AudioPlayer::setClientTime(double time) {
     
-    _timeMutex.lock();
+    mutex_lock(_timeMutex);
     
     UInt64 currentTime = CAHostTimeBase::GetCurrentTimeInNanos();
     
@@ -161,9 +170,9 @@ void AudioPlayer::setClientTime(double time) {
     
     _clientServerDifference /= (double)_clientServerDifferenceHistoryCount;
     
-    log(LOG_INFO, "Time difference: %1.5f", _clientServerDifference);
+    log_message(LOG_INFO, "Time difference: %1.5f", _clientServerDifference);
     
-    _timeMutex.unlock();
+    mutex_unlock(_timeMutex);
     
 }
 
@@ -177,7 +186,7 @@ OSStatus AudioPlayer::_renderCallback (AudioUnitRenderActionFlags *ioActionFlags
     
     static int run = 0;
     
-    _timeMutex.lock();
+    mutex_lock(_timeMutex);
     
     bzero(ioData->mBuffers[0].mData, ioData->mBuffers[0].mDataByteSize);
     
@@ -201,13 +210,13 @@ OSStatus AudioPlayer::_renderCallback (AudioUnitRenderActionFlags *ioActionFlags
                     double packetPos = packetEndTime - queueTime;
                     dataOffset = floor(inNumberFrames * packetPos) * _audio.outDesc.mBytesPerFrame;
                     _outputIsHomed = true;
-                    log(LOG_INFO, "Output is homed (%d - %d/%d)", run, dataOffset, ioData->mBuffers[0].mDataByteSize);
+                    log_message(LOG_INFO, "Output is homed (%d - %d/%d)", run, dataOffset, ioData->mBuffers[0].mDataByteSize);
                     
                 } else if (queueTime < packetStartTime) {
                     
                     _audioQueue->getAudio(ioData->mBuffers[0].mData, (uint32_t *)&ioData->mBuffers[0].mDataByteSize, NULL, NULL);
                     _outputIsHomed = true;
-                    log(LOG_INFO, "Output is homed - without catching the exact moment.");
+                    log_message(LOG_INFO, "Output is homed - without catching the exact moment.");
                     
                 }
                 
@@ -239,12 +248,12 @@ OSStatus AudioPlayer::_renderCallback (AudioUnitRenderActionFlags *ioActionFlags
         
     } else if (_outputIsHomed) {
         _outputIsHomed = false;
-        log(LOG_INFO, "Output lost synchronization");
+        log_message(LOG_INFO, "Output lost synchronization");
     }
     
     run++;
     
-    _timeMutex.unlock();
+    mutex_unlock(_timeMutex);
     
     return noErr;
     
@@ -258,16 +267,16 @@ OSStatus AudioPlayer::_renderCallbackHelper (void *inRefCon, AudioUnitRenderActi
 
 int AudioPlayer::addAudio(void* buffer, uint32_t size, int seqNo, uint32_t sampleTime) {
     
-    _packetMutex.lock();
+    mutex_lock(_packetMutex);
     if (seqNo <= _flushedSeq) {
-        log(LOG_INFO, "Audio packet (seq %d) ignored", seqNo);
-        _packetMutex.unlock();
+        log_message(LOG_INFO, "Audio packet (seq %d) ignored", seqNo);
+        mutex_unlock(_packetMutex);
         return 0;
     } else {
         _flushedSeq = -1;
         _audio.graph.mixerUnit->setVolume(_preFlushVolume, 0);
     }
-    _packetMutex.unlock();
+    mutex_unlock(_packetMutex);
     
     int ret = 0;
     
@@ -276,7 +285,7 @@ int AudioPlayer::addAudio(void* buffer, uint32_t size, int seqNo, uint32_t sampl
     
     _audio.losslessConverter->convert(buffer, size, rawBuffer, &outsize);
     if (outsize == 0)
-        log(LOG_ERROR, "DECODING ERROR!");
+        log_message(LOG_ERROR, "DECODING ERROR!");
     
     if (size > 0 && _audioQueue->awaitAvailabilty())
         ret = _audioQueue->_addAudioPacket(rawBuffer, outsize, seqNo, sampleTime);

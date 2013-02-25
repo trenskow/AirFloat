@@ -11,7 +11,7 @@
 
 @interface AirFloatSocketEndPoint : NSObject {
     
-    void* _endPoint;
+    struct sockaddr* _endPoint;
     
 }
 

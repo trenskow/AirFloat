@@ -9,8 +9,11 @@
 #ifndef AirFloat_AudioPacket_h
 #define AirFloat_AudioPacket_h
 
-#include "Mutex.h"
 #include <stdint.h>
+
+extern "C" {
+#include "mutex.h"
+}
 
 typedef enum {
     
@@ -47,7 +50,7 @@ private:
     void* _buffer;
     uint32_t _bufferSize;
     
-    Mutex _mutex;
+    mutex_p _mutex;
     
 };
 

@@ -25,15 +25,18 @@
 
 #include <AudioToolbox/AudioToolbox.h>
 
-#include "Settings.h"
-#include "DMAP.h"
-#include "NotificationCenter.h"
-#include "Log.h"
-#include "Base64.h"
-#include "WebConnection.h"
-#include "WebRequest.h"
 #include "RAOPParameters.h"
 #include "RAOPConnection.h"
+
+extern "C" {
+#include "log.h"
+#include "settings.h"
+#include "notificationcenter.h"
+#include "dmap.h"
+#include "base64.h"
+#include "webconnection.h"
+#include "webrequest.h"
+}
 
 #define AIRPORT_PRIVATE_KEY \
 "-----BEGIN RSA PRIVATE KEY-----\n" \
@@ -185,13 +188,12 @@ const char* RAOPConnection::clientUpdatedMetadataNotificationName = "connectionC
 const char* RAOPConnection::clientUpdatedProgressNotificationName = "connectionClientUpdatedProgress";
 const char* RAOPConnection::clientUpdatedTrackInfoNofificationName = "connectionClientUpdatedTrackInfo";
 
-RAOPConnection::RAOPConnection(WebConnection* connection) {
+RAOPConnection::RAOPConnection(web_connection_p connection) {
         
     _connection = connection;
     
-    _connection->setProcessRequestCallback(_processRequestCallbackHelper);
-    _connection->setConnectionClosed(_connectionClosedCallbackHelper);
-    _connection->setCallbackCtx(this);
+    web_connection_set_request_callback(_connection, _processRequestCallbackHelper, this);
+    web_connection_set_close_callback(_connection, _connectionClosedCallbackHelper, this);
     
     _rtp = NULL;
     
@@ -200,15 +202,13 @@ RAOPConnection::RAOPConnection(WebConnection* connection) {
     _applePrivateKey = PEM_read_bio_RSAPrivateKey(bio, NULL, NULL, NULL);
     BIO_free(bio);
     
-    bool authenticate = Settings::isAuthenticationEnabled();
+    const char *password;
     
-    _password = NULL;
-    
-    if (authenticate) {
-        const char* password = Settings::getPassword();
+    if ((password = settings_get_password())) {
         _password = (char*)malloc(strlen(password) + 1);
         strcpy(_password, password);
-    }
+    } else
+        _password = NULL;
 
     memset(_digestNonce, 0, 33);
     
@@ -222,15 +222,15 @@ RAOPConnection::~RAOPConnection() {
         _rtp->stop();
         delete _rtp;
         _rtp = NULL;
-        NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientDisconnectedNotificationName, this, NULL);
+        notification_center_post_notification(RAOPConnection::clientDisconnectedNotificationName, this, NULL);
     }
     
     if (_password != NULL)
-        CFRelease(_password);
+        free(_password);
     
     RSA_free(_applePrivateKey);
     
-    log(LOG_INFO, "Connection cleanup complete");
+    log_message(LOG_INFO, "Connection cleanup complete");
     
 }
 
@@ -240,15 +240,15 @@ RTPReceiver* RAOPConnection::getRTPReceiver() {
     
 }
 
-SocketEndPoint* RAOPConnection::getLocalEndPoint() {
+struct sockaddr* RAOPConnection::getLocalEndPoint() {
     
-    return _connection->getLocalEndPoint();
+    return web_connection_get_local_end_point(_connection);
     
 }
 
-SocketEndPoint* RAOPConnection::getRemoteEndPoint() {
+struct sockaddr* RAOPConnection::getRemoteEndPoint() {
     
-    return _connection->getRemoteEndPoint();
+    return web_connection_get_remote_end_point(_connection);
     
 }
 
@@ -258,9 +258,9 @@ void RAOPConnection::_appleResponse(const char* challenge, long length, char* re
     int actualLength = base64_decode(challenge, decodedChallenge);
     
     if (actualLength != 16)
-        log(LOG_ERROR, "Apple-Challenge: Expected 16 bytes - got %d", actualLength);
+        log_message(LOG_ERROR, "Apple-Challenge: Expected 16 bytes - got %d", actualLength);
     
-    struct sockaddr* localEndPoint = (struct sockaddr*)_connection->getLocalEndPoint()->getSocketAddress();
+    struct sockaddr* localEndPoint = web_connection_get_local_end_point(_connection);
     char* interface = interfaceForIp(localEndPoint);
     
     if (interface != NULL) {
@@ -290,7 +290,7 @@ void RAOPConnection::_appleResponse(const char* challenge, long length, char* re
             }
             
         } else
-            log(LOG_ERROR, "Error getting hardware ID");
+            log_message(LOG_ERROR, "Error getting hardware ID");
         
         int size = RSA_size(_applePrivateKey);
         unsigned char clearResponse[size];
@@ -316,13 +316,13 @@ void RAOPConnection::_appleResponse(const char* challenge, long length, char* re
             free(aEncryptedResponse);
             
         } else {
-            log(LOG_ERROR, "Unable to encrypt Apple response");
+            log_message(LOG_ERROR, "Unable to encrypt Apple response");
             if (resLength != NULL)
                 *resLength = 0;
         }
         
     } else {
-        log(LOG_ERROR, "Could not find interface for IP");
+        log_message(LOG_ERROR, "Could not find interface for IP");
         if (resLength != NULL)
             *resLength = 0;
     }
@@ -333,7 +333,7 @@ bool RAOPConnection::_checkAuthentication(const char* method, const char* uri, c
     
     assert(method != NULL && uri != NULL);
     
-    if (_authenticationEnabled && _password != NULL) {
+    if (_password != NULL) {
         
         if (authenticationParameter != NULL) {
             
@@ -383,7 +383,7 @@ bool RAOPConnection::_checkAuthentication(const char* method, const char* uri, c
                     }
                     
                     if (strcmp(hfinal, wResponse) == 0) {
-                        log(LOG_INFO, "Authentication success");
+                        log_message(LOG_INFO, "Authentication success");
                         return true;
                     }
                     
@@ -392,7 +392,7 @@ bool RAOPConnection::_checkAuthentication(const char* method, const char* uri, c
             }
             
         } else
-            log(LOG_INFO, "Authentication header missing");
+            log_message(LOG_INFO, "Authentication header missing");
         
         return false;
         
@@ -414,7 +414,7 @@ RAOPConnectionAudioRoute RAOPConnection::_getAudioRoute() {
         
         char cRoute[length+1];
         if (CFStringGetCString(route, cRoute, length+1, kCFStringEncodingASCII)) {
-            log(LOG_INFO, "Audio route: %s", cRoute);
+            log_message(LOG_INFO, "Audio route: %s", cRoute);
             if (strcmp(cRoute, "Headphone") == 0)
                 return kRAOPConnectionAudio_RouteHeadphones;
             else if (strcmp(cRoute, "AirTunes") == 0)
@@ -428,44 +428,50 @@ RAOPConnectionAudioRoute RAOPConnection::_getAudioRoute() {
     
 }
 
-void RAOPConnection::_processRequestCallback(WebConnection* connection, WebRequest* request) {
+void RAOPConnection::_processRequestCallback(web_connection_p connection, web_request_p request) {
     
     int cSeq = 0;    
     
-    const char* cmd = request->getCommand();
-    const char* path = request->getPath();
-    WebHeaders* headers = request->getHeaders();
-    WebResponse* response = request->getResponse();
-    WebHeaders* responseHeaders = response->getHeaders();
+    const char* cmd = web_request_get_command(request);
+    const char* path = web_request_get_path(request);
+    web_response_p response = web_request_get_response(request);
+    web_headers_p requestHeaders = web_request_get_headers(request);
+    web_headers_p responseHeaders = web_response_get_headers(response);
     
-    response->setStatus(200, "OK");
-    response->setKeepAlive(true);
+    web_response_set_status(response, 200, "OK");
+    web_response_set_keep_alive(response, true);
     
     if (cmd != NULL && path != NULL) {
     
-        log(LOG_INFO, "CMD: %s / PATH: %s", cmd, path);
+        log_message(LOG_INFO, "CMD: %s / PATH: %s", cmd, path);
         
         RAOPParameters* parameters = NULL;
         
-        if (headers->valueForName("CSeq") != NULL)
-            cSeq = atoi(headers->valueForName("CSeq"));
+        const char* cSeqValue = web_headers_value(requestHeaders, "CSeq");
+        if (cSeqValue != NULL)
+            cSeq = atoi(cSeqValue);
         
-        if (request->getContentLength() > 0) {
-            if (strcmp(headers->valueForName("Content-Type"), "application/sdp") == 0 || strcmp(headers->valueForName("Content-Type"), "text/parameters") == 0) {
+        uint32_t contentLength;
+        if ((contentLength = web_request_get_content(request, NULL, 0)) > 0) {
+            const char* contentType = web_headers_value(requestHeaders, "Content-Type");
+            if (strcmp(contentType, "application/sdp") == 0 || strcmp(contentType, "text/parameters") == 0) {
                 
-                const unsigned char* content = (unsigned char*) request->getContent();
-                uint32_t contentLength = request->getContentLength();
+                char* content[contentLength];
+                web_request_get_content(request, content, contentLength);
                 
-                int cl = _convertNewLines((unsigned char*)content, contentLength);
-                if (strcmp(headers->valueForName("Content-Type"), "application/sdp") == 0)
+                int cl = web_tools_convert_new_lines((unsigned char*)content, contentLength);
+                if (strcmp(contentType, "application/sdp") == 0)
                     parameters = new RAOPParameters((char*)content, cl, ParameterTypeSDP);
-                else if (strcmp(headers->valueForName("Content-Type"), "text/parameters") == 0)
+                else if (strcmp(contentType, "text/parameters") == 0)
                     parameters = new RAOPParameters((char*)content, cl, ParameterTypeTextParameters);
+                
+                log_data(LOG_INFO, (char*)content, contentLength);
+                
             }
         }
         
         const char* dacpId;
-        if (_dacpId[0] == '\0' && (dacpId = headers->valueForName("DACP-ID")) != NULL) {
+        if (_dacpId[0] == '\0' && (dacpId = web_headers_value(requestHeaders, "DACP-ID")) != NULL) {
             memset(_dacpId, '0', 16);
             int32_t start = 16 - strlen(dacpId);
             if (start >= 0 && start < DACPID_MAXLENGTH)
@@ -473,24 +479,24 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
         }
         
         const char* activeRemote;
-        if (_activeRemote[0] == '\0' && (activeRemote = headers->valueForName("Active-Remote")) != NULL)
+        if (_activeRemote[0] == '\0' && (activeRemote = web_headers_value(requestHeaders, "Active-Remote")) != NULL)
             strncpy(_activeRemote, activeRemote, ACTIVEREMOTE_MAXLENGTH);
         
         const char *sessionId;
-        if (_sessionId[0] == '\0' && (sessionId = headers->valueForName("Session")) != NULL)
+        if (_sessionId[0] == '\0' && (sessionId = web_headers_value(requestHeaders, "Session")) != NULL)
             strncpy(_sessionId, sessionId, SESSION_MAXLENGTH);
         
         const char *userAgent;
-        if (_userAgent[0] == '\0' && (userAgent = headers->valueForName("User-Agent")) != NULL)
+        if (_userAgent[0] == '\0' && (userAgent = web_headers_value(requestHeaders, "User-Agent")) != NULL)
             strncpy(_userAgent, userAgent, USERAGENT_MAXLENGTH);
         
-        responseHeaders->addValue("Server", "AirTunes/105.1");
-        responseHeaders->addValue("CSeq", "%d", cSeq);
+        web_headers_set_value(responseHeaders, "Server", "AirTunes/105.1");
+        web_headers_set_value(responseHeaders, "CSeq", "%d", cSeq);
         
-        if (_checkAuthentication(cmd, path, headers->valueForName("Authorization"))) {
+        if (_checkAuthentication(cmd, path, web_headers_value(requestHeaders, "Authorization"))) {
             
             if (0 == strcmp(cmd, "OPTIONS"))
-                responseHeaders->addValue("Public", "ANNOUNCE, RECORD, PAUSE, FLUSH, TEARDOWN, OPTIONS, GET_PARAMETER, SET_PARAMETER, POST, GET");
+                web_headers_set_value(responseHeaders, "Public", "ANNOUNCE, RECORD, PAUSE, FLUSH, TEARDOWN, OPTIONS, GET_PARAMETER, SET_PARAMETER, POST, GET");
             else if (0 == strcmp(cmd, "ANNOUNCE")) {
                 
                 const char* codec = NULL;
@@ -546,7 +552,7 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
                             if (size >= 16)
                                 memcpy(aeskey, aesKey, 16);
                             
-                            log(LOG_INFO, "AES key length: %d bits", size * 8);
+                            log_message(LOG_INFO, "AES key length: %d bits", size * 8);
                             
                             const char* aesInitializerBase64Encoded = parameters->valueForParameter("a-aesiv");
                             char aesInitializerBase64EncodedPadded[strlen(aesInitializerBase64Encoded) + 5];
@@ -557,7 +563,7 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
                             if (size >= 16)
                                 memcpy(aesiv, aesInitializer, 16);
                             
-                            log(LOG_INFO, "AES initialization vector length: %d bits", size * 8);
+                            log_message(LOG_INFO, "AES initialization vector length: %d bits", size * 8);
                             
                             _rtp = new RTPReceiver(aeskey, aesiv, this, fmtps, fmtpSize);
                             
@@ -565,21 +571,21 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
                             _rtp = new RTPReceiver(this, fmtps, fmtpSize);
                         
                     } else
-                        response->setStatus(400, "Bad Request");
+                        web_response_set_status(response, 400, "Bad Request");
                     
-                } else                        
-                    response->setStatus(400, "Bad Request");
+                } else
+                    web_response_set_status(response, 400, "Bad Request");
                 
             } else if (0 == strcmp(cmd, "SETUP")) {
                 
                 if (RTPReceiver::isAvailable() && _getAudioRoute() != kRAOPConnectionAudio_RouteAirPlay) {
                     
                     const char* transport;
-                    if (_rtp != NULL && (transport = headers->valueForName("Transport"))) {
+                    if (_rtp != NULL && (transport = web_headers_value(requestHeaders, "Transport"))) {
                         
                         char session[10];
                         _rtp->getSession(session);
-                        responseHeaders->addValue("Session", "%02X%02X%02X%02X", session[0], session[1], session[2], session[3]);
+                        web_headers_set_value(responseHeaders, "Session", "%02X%02X%02X%02X", session[0], session[1], session[2], session[3]);
                         
                         RAOPParameters* transportParams = new RAOPParameters(transport, strlen(transport), ParameterTypeSDP, ';');
                         
@@ -618,35 +624,35 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
                             
                             transportReply = addToBuffer(transportReply, "server_port=%d", port);
                             
-                            responseHeaders->addValue("Transport", transportReply);
+                            web_headers_set_value(responseHeaders, "Transport", transportReply);
                             
                             free(transportReply);
                             
-                            log(LOG_INFO, "RTP receiver set up at port %d", port);
+                            log_message(LOG_INFO, "RTP receiver set up at port %d", port);
                             
-                            NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientConnectedNotificationName, this, NULL);
+                            notification_center_post_notification(RAOPConnection::clientConnectedNotificationName, this, NULL);
                             
                         } else
-                            log(LOG_ERROR, "RTP Receiver didn't start");
+                            log_message(LOG_ERROR, "RTP Receiver didn't start");
                         
                     } else                            
-                        response->setStatus(400, "Bad Request");
+                        web_response_set_status(response, 400, "Bad Request");
                     
-                } else 
-                    response->setStatus(453, "Not Enough Bandwidth");
+                } else
+                    web_response_set_status(response, 453, "Not Enough Bandwidth");
                 
             } else if (0 == strcmp(cmd, "RECORD")) {
                 
                 char session[10];
                 _rtp->getSession(session);
-                responseHeaders->addValue("Session", "%02X%02X%02X%02X", session[0], session[1], session[2], session[3]);
+                web_headers_set_value(responseHeaders, "Session", "%02X%02X%02X%02X", session[0], session[1], session[2], session[3]);
                 
                 const char* rtpinfo;
-                if ((rtpinfo = headers->valueForName("RTP-Info"))) {
+                if ((rtpinfo = web_headers_value(requestHeaders, "RTP-Info"))) {
                     
                     RAOPParameters* rtpParams = new RAOPParameters(rtpinfo, strlen(rtpinfo), ParameterTypeSDP, ';');
                     if (!_rtp->start(atoi(rtpParams->valueForParameter("seq"))))
-                        response->setStatus(400, "Bad Request");
+                        web_response_set_status(response, 400, "Bad Request");
                     
                     delete rtpParams;
                     
@@ -654,10 +660,10 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
                     _rtp->start();
                 }
                 
-                NotificationCenter::defaultCenter()->postNotification(RAOPConnection::recordingStartedNotificationName, this, NULL);
+                notification_center_post_notification(RAOPConnection::recordingStartedNotificationName, this, NULL);
                 
-                responseHeaders->addValue("Audio-Latency", "11025");
-                                
+                web_headers_set_value(responseHeaders, "Audio-Latency", "11025");
+                
             } else if (0 == strcmp(cmd, "SET_PARAMETER")) {
                 
                 if (parameters != NULL) {
@@ -667,7 +673,7 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
                     if ((volume = parameters->valueForParameter("volume"))) {
                         float fVolume;
                         sscanf(volume, "%f", &fVolume);
-                        log(LOG_INFO, "Client set volume: %f", (30.0 + fVolume) / 30.0);
+                        log_message(LOG_INFO, "Client set volume: %f", (30.0 + fVolume) / 30.0);
                         
                         fVolume = (fVolume == -144 ? 0.0 : (30.0 + fVolume) / 30.0);
                         _rtp->getAudioPlayer()->setVolume(fVolume * fVolume * fVolume);
@@ -688,44 +694,51 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
                         info.position = (atoi(parts[1]) - start) / _rtp->getAudioPlayer()->getSampleRate();
                         info.total = (atoi(parts[2]) - start) / _rtp->getAudioPlayer()->getSampleRate();
                         
-                        NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientUpdatedProgressNotificationName, this, &info);
+                        notification_center_post_notification(RAOPConnection::clientUpdatedProgressNotificationName, this, &info);
                         
                     }
                     
                 } else {
                     
-                    const char* contentType = headers->valueForName("Content-Type");
+                    const char* contentType = web_headers_value(requestHeaders, "Content-Type");
+                    
+                    uint32_t contentLength = web_request_get_content(request, NULL, 0);
+                    char* content = (char*)malloc(contentLength);
+                    web_request_get_content(request, content, contentLength);
                     
                     if (0 == strcmp(contentType, "application/x-dmap-tagged")) {
-                                                
-                        DMAP* tags = new DMAP(request->getContent(), request->getContentLength());
+                        
+                        dmap_p tags = dmap_create();
+                        dmap_parse(tags, content, contentLength);
                         
                         uint32_t containerTag;
-                        if (tags->getCount() > 0 && DMAP::typeForTag((containerTag = tags->getTagAtIndex(0))) == kDMAPTypeContainer) {
+                        if (dmap_get_count(tags) > 0 && dmap_type_for_tag((containerTag = dmap_get_tag_at_index(tags, 0))) == dmap_type_container) {
                             
-                            DMAP* trackTags = tags->containerForAtom(containerTag);
-                            NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientUpdatedTrackInfoNofificationName, this, trackTags);
+                            dmap_p trackTags = dmap_container_for_atom_tag(tags, containerTag);
+                            notification_center_post_notification(RAOPConnection::clientUpdatedTrackInfoNofificationName, this, trackTags);
                             
-                            const char* title = trackTags->stringForAtom("dmap.itemname");
-                            const char* artist = trackTags->stringForAtom("daap.songartist");
+                            const char* title = dmap_string_for_atom_identifer(trackTags, "dmap.itemname");
+                            const char* artist = dmap_string_for_atom_identifer(trackTags, "dmap.songartist");
                             if (title != NULL && artist != NULL)
-                                log(LOG_INFO, "Now playing: \"%s\" by %s", title, artist);
+                                log_message(LOG_INFO, "Now playing: \"%s\" by %s", title, artist);
                             
                         }
                         
-                        delete tags;
+                        dmap_destroy(tags);
                         
                     } else {
                     
-                        log(LOG_INFO, "Track info received (Content-Type: %s)", headers->valueForName("Content-Type"));
+                        log_message(LOG_INFO, "Track info received (Content-Type: %s)", contentType);
                         RAOPConnectionClientUpdatedMetadataNotificationInfo info;
-                        info.content = request->getContent();
-                        info.contentLength = request->getContentLength();
-                        info.contentType = headers->valueForName("Content-Type");
+                        info.content = content;
+                        info.contentLength = contentLength;
+                        info.contentType = contentType;
                         
-                        NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientUpdatedMetadataNotificationName, this, &info);
+                        notification_center_post_notification(RAOPConnection::clientUpdatedMetadataNotificationName, this, &info);
 
                     }
+                    
+                    free(content);
                     
                 }
                 
@@ -733,7 +746,7 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
                 
                 int32_t lastSeq = -1;
                 const char* rtpInfo;
-                if ((rtpInfo = headers->valueForName("RTP-Info")) != NULL) {
+                if ((rtpInfo = web_headers_value(requestHeaders, "RTP-Info")) != NULL) {
                     
                     RAOPParameters* rtpParams = new RAOPParameters(rtpInfo, strlen(rtpInfo), ParameterTypeSDP, ';');
                     
@@ -746,13 +759,13 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
                 
             } else if (0 == strcmp(cmd, "TEARDOWN")) {
                 
-                responseHeaders->addValue("Connection", "Close");
-                response->setKeepAlive(false);
+                web_headers_set_value(responseHeaders, "Connection", "Close");
+                web_response_set_keep_alive(response, false);
                 
-                NotificationCenter::defaultCenter()->postNotification(RAOPConnection::clientDisconnectedNotificationName, this, NULL);
+                notification_center_post_notification(RAOPConnection::clientDisconnectedNotificationName, this, NULL);
                 
             } else
-                response->setStatus(400, "Bad Request");
+                web_response_set_status(response, 400, "Bad Request");
             
         } else {
             
@@ -763,14 +776,14 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
             
             md5ToString(nonce, _digestNonce);
             
-            responseHeaders->addValue("WWW-Authenticate", "Digest realm=\"raop\", nonce=\"%s\"", _digestNonce);
+            web_headers_set_value(responseHeaders, "WWW-Authenticate", "Digest realm=\"raop\", nonce=\"%s\"", _digestNonce);
             
-            response->setStatus(401, "Unauthorized");
+            web_response_set_status(response, 401, "Unauthorized");
             
         }
         
         const char* challenge;
-        if ((challenge = headers->valueForName("Apple-Challenge"))) {
+        if ((challenge = web_headers_value(requestHeaders, "Apple-Challenge"))) {
             
             char ares[1000];
             long resLength = 100;
@@ -781,34 +794,34 @@ void RAOPConnection::_processRequestCallback(WebConnection* connection, WebReque
             
             if (resLength > 0) {
                 ares[resLength] = '\0';
-                responseHeaders->addValue("Apple-Response", "%s", ares);
+                web_headers_set_value(responseHeaders, "Apple-Response", "%s", ares);
             }
             
         }
         
-        responseHeaders->addValue("Audio-Jack-Status", "connected; type=digital");
+        web_headers_set_value(responseHeaders, "Audio-Jack-Status", "connected; type=digital");
                     
         if (parameters != NULL)
             delete parameters;
         
     } else
-        response->setStatus(400, "Bad Request");
+        web_response_set_status(response, 400, "Bad Request");
     
 }
 
-void RAOPConnection::_processRequestCallbackHelper(WebConnection* connection, WebRequest* request, void* ctx) {
+void RAOPConnection::_processRequestCallbackHelper(web_connection_p connection, web_request_p request, void* ctx) {
     
     ((RAOPConnection*)ctx)->_processRequestCallback(connection, request);
     
 }
 
-void RAOPConnection::_connectionClosedCallback(WebConnection* connection) {
+void RAOPConnection::_connectionClosedCallback(web_connection_p connection) {
     
     delete this;
 
 }
 
-void RAOPConnection::_connectionClosedCallbackHelper(WebConnection* connection, void* ctx) {
+void RAOPConnection::_connectionClosedCallbackHelper(web_connection_p connection, void* ctx) {
     
     ((RAOPConnection*)ctx)->_connectionClosedCallback(connection);
     
@@ -840,13 +853,13 @@ const char* RAOPConnection::getUserAgent() {
 
 bool RAOPConnection::isConnected() {
     
-    return _connection->isConnected();
+    return web_connection_is_connected(_connection);
     
 }
 
 void RAOPConnection::closeConnection() {
     
     if (_connection != NULL)
-        _connection->closeConnection();
+        web_connection_close(_connection);
     
 }

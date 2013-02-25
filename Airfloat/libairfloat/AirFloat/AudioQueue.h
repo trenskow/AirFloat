@@ -11,9 +11,12 @@
 
 #include <stdint.h>
 
-#include "Mutex.h"
-#include "Condition.h"
 #include "AudioPacket.h"
+
+extern "C" {
+#include "mutex.h"
+#include "condition.h"
+}
 
 class AudioPlayer;
 
@@ -71,8 +74,8 @@ private:
     double _lastKnowSampleTime;
     double _lastKnowSampleTimesTime;
     
-    Mutex _mutex;
-    Condition _condition;
+    mutex_p _mutex;
+    condition_p _condition;
     
     bool _disposed;
     

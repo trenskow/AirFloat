@@ -10,7 +10,11 @@
 #define __RAOPSERVER_H
 
 #include <pthread.h>
-#include "WebServer.h"
+
+extern "C" {
+#include "sockaddr.h"
+#include "webserver.h"
+}
 
 class WebConnection;
 
@@ -26,18 +30,18 @@ public:
     
     bool isRunning();
     
-    SocketEndPoint* getLocalEndPoint();
+    struct sockaddr* getLocalEndPoint();
     uint32_t getConnectionCount();
     
     static const char* localhostConnectedErrorNotificationName;
     
 private:
     
-    static bool _acceptConnectionCallback(WebServer* server, WebConnection* newConnection, void* ctx);
+    static bool _acceptConnectionCallback(web_server_p server, web_connection_p newConnection, void* ctx);
     
     uint16_t _port;
     
-    WebServer* _server;
+    web_server_p _server;
     
 };
 

@@ -9,8 +9,11 @@
 #ifndef AirFloat_AudioConverter_h
 #define AirFloat_AudioConverter_h
 
-#include "Mutex.h"
 #include <AudioToolbox/AudioToolbox.h>
+
+extern "C" {
+#include "mutex.h"
+}
 
 class AudioConverter {
     
@@ -34,7 +37,7 @@ protected:
     void* _currentBuffer;
     int _currentBufferSize;
     
-    Mutex _decoderMutex;
+    mutex_p _decoderMutex;
     
 private:
     

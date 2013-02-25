@@ -6,7 +6,9 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#include "Log.h"
+extern "C" {
+#include "log.h"
+}
 
 #include "AppleLosslessSoftwareAudioConverter.h"
 
@@ -42,9 +44,9 @@ AppleLosslessSoftwareAudioConverter::~AppleLosslessSoftwareAudioConverter() {
 
 void AppleLosslessSoftwareAudioConverter::convert(void* srcBuffer, uint32_t srcSize, void* destBuffer, uint32_t* destSize) {
     
-    _decoderMutex.lock();
+    mutex_lock(_decoderMutex);
     decode_frame(_decoderInfo, (unsigned char*)srcBuffer, (unsigned char*)destBuffer, (int*)destSize);
-    _decoderMutex.unlock();
+    mutex_unlock(_decoderMutex);
     
 }
 
@@ -65,7 +67,7 @@ AudioStreamBasicDescription AppleLosslessSoftwareAudioConverter::getDestDescript
     UInt32 size = sizeof(outDesc);
     OSStatus err = AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, &outDesc);
     if (err != noErr)
-        log(LOG_ERROR, "Error");
+        log_message(LOG_ERROR, "Error");
     
     return outDesc;
     
