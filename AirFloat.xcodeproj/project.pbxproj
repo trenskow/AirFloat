@@ -22,6 +22,7 @@
 		4898FA9513CF17BC006EC97E /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898FA9413CF17BC006EC97E /* QuartzCore.framework */; };
 		4898FA9713CF2D6C006EC97E /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898FA9613CF2D6C006EC97E /* AudioToolbox.framework */; };
 		48B49EDA13D216EC00AB67D1 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 48B49ED913D216EC00AB67D1 /* Settings.bundle */; };
+		81A95D7516E070B200F0A2BE /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 81A95D5516E0572800F0A2BE /* libcrypto.a */; };
 		A10392D314E9B58400DB356F /* BarButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A10392CF14E9B58400DB356F /* BarButton.png */; };
 		A10392D414E9B58400DB356F /* BarButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A10392D014E9B58400DB356F /* BarButton@2x.png */; };
 		A10392D514E9B58400DB356F /* BarButtonHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = A10392D114E9B58400DB356F /* BarButtonHighlighted.png */; };
@@ -141,7 +142,6 @@
 		A19E4B5816CA977E00E5D60F /* NSString+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B5716CA977E00E5D60F /* NSString+AirFloatAdditions.m */; };
 		A19E4B5E16CA97A800E5D60F /* NSNull+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B5D16CA97A800E5D60F /* NSNull+AirFloatAdditions.m */; };
 		A19E4B6116CA97BF00E5D60F /* UIApplication+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B6016CA97BF00E5D60F /* UIApplication+AirFloatAdditions.m */; };
-		A19E4B8716CAA81700E5D60F /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A19E4B8416CAA80C00E5D60F /* libcrypto.a */; };
 		A1A8078C14EF1C0B005FFDA5 /* NSDictionary+AirFloatAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = A1A8078B14EF1C0B005FFDA5 /* NSDictionary+AirFloatAdditions.mm */; };
 		A1C20920150F4C820097EB4E /* AirFloatMissingWifiViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A1C2091E150F4C820097EB4E /* AirFloatMissingWifiViewController.m */; };
 		A1C20921150F4C820097EB4E /* AirFloatMissingWifiViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A1C2091F150F4C820097EB4E /* AirFloatMissingWifiViewController.xib */; };
@@ -168,18 +168,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		A19E4B8316CAA80C00E5D60F /* PBXContainerItemProxy */ = {
+		81A95D5416E0572800F0A2BE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A19E4B7F16CAA80C00E5D60F /* openssl.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 9069D28C0FCE659A0042E34C;
-			remoteInfo = crypto;
-		};
-		A19E4B8516CAA81400E5D60F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A19E4B7F16CAA80C00E5D60F /* openssl.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 9069D28B0FCE659A0042E34C;
 			remoteInfo = crypto;
 		};
 /* End PBXContainerItemProxy section */
@@ -403,7 +396,7 @@
 		A19E4B5D16CA97A800E5D60F /* NSNull+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "NSNull+AirFloatAdditions.m"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A19E4B5F16CA97BF00E5D60F /* UIApplication+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplication+AirFloatAdditions.h"; sourceTree = "<group>"; };
 		A19E4B6016CA97BF00E5D60F /* UIApplication+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIApplication+AirFloatAdditions.m"; sourceTree = "<group>"; };
-		A19E4B7F16CAA80C00E5D60F /* openssl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openssl.xcodeproj; path = "OpenSSL-Xcode/openssl.xcodeproj"; sourceTree = "<group>"; };
+		A19E4B7F16CAA80C00E5D60F /* openssl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openssl.xcodeproj; path = "../../../../../../../../AirFloat/AirFloat/OpenSSL-Xcode/openssl.xcodeproj"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1A8078A14EF1C0B005FFDA5 /* NSDictionary+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+AirFloatAdditions.h"; sourceTree = "<group>"; };
 		A1A8078B14EF1C0B005FFDA5 /* NSDictionary+AirFloatAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSDictionary+AirFloatAdditions.mm"; sourceTree = "<group>"; };
 		A1A8079714F10FE9005FFDA5 /* AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AirFloatAdditions.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -446,8 +439,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81A95D7516E070B200F0A2BE /* libcrypto.a in Frameworks */,
 				A194311F14D46878009FC07B /* CoreAudio.framework in Frameworks */,
-				A19E4B8716CAA81700E5D60F /* libcrypto.a in Frameworks */,
 				A1389E1F14E43684004FE040 /* SystemConfiguration.framework in Frameworks */,
 				A1DE598714CF163500A6767D /* MediaPlayer.framework in Frameworks */,
 				A1DF3AF514C4623700252C95 /* AVFoundation.framework in Frameworks */,
@@ -513,6 +506,14 @@
 				A188ECF2150BD6EA00CC089E /* Other */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		81A95D5116E0572800F0A2BE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				81A95D5516E0572800F0A2BE /* libcrypto.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		A10EB41114E81D0200615CDB /* DAAP */ = {
@@ -1039,14 +1040,6 @@
 			name = "Quartz Core";
 			sourceTree = "<group>";
 		};
-		A19E4B8016CAA80C00E5D60F /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				A19E4B8416CAA80C00E5D60F /* libcrypto.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		A1A8079214F10E92005FFDA5 /* Foundation */ = {
 			isa = PBXGroup;
 			children = (
@@ -1154,7 +1147,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				A19E4B8616CAA81400E5D60F /* PBXTargetDependency */,
 			);
 			name = AirFloat;
 			productName = AirFloat;
@@ -1181,7 +1173,7 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = A19E4B8016CAA80C00E5D60F /* Products */;
+					ProductGroup = 81A95D5116E0572800F0A2BE /* Products */;
 					ProjectRef = A19E4B7F16CAA80C00E5D60F /* openssl.xcodeproj */;
 				},
 			);
@@ -1193,11 +1185,11 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		A19E4B8416CAA80C00E5D60F /* libcrypto.a */ = {
+		81A95D5516E0572800F0A2BE /* libcrypto.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libcrypto.a;
-			remoteRef = A19E4B8316CAA80C00E5D60F /* PBXContainerItemProxy */;
+			remoteRef = 81A95D5416E0572800F0A2BE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -1386,14 +1378,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		A19E4B8616CAA81400E5D60F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = crypto;
-			targetProxy = A19E4B8516CAA81400E5D60F /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin PBXVariantGroup section */
 		4898FA0413CDAAD1006EC97E /* MainWindow.xib */ = {
 			isa = PBXVariantGroup;
@@ -1417,7 +1401,10 @@
 		4898FA0D13CDAAD1006EC97E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv6;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1439,7 +1426,10 @@
 		4898FA0E13CDAAD1006EC97E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv6;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_THUMB_SUPPORT = NO;
@@ -1458,7 +1448,10 @@
 		4898FA1013CDAAD1006EC97E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv6;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1482,7 +1475,10 @@
 		4898FA1113CDAAD1006EC97E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv6;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
@@ -1504,7 +1500,10 @@
 		A149209414E7323900849DC3 /* Debug (Server Logs) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv6;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1526,7 +1525,10 @@
 		A149209514E7323900849DC3 /* Debug (Server Logs) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv6;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1550,7 +1552,10 @@
 		A1A76011151B56B800728C9C /* App Store Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv6;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_THUMB_SUPPORT = NO;
@@ -1569,7 +1574,10 @@
 		A1A76012151B56B800728C9C /* App Store Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv6;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
@@ -1591,7 +1599,10 @@
 		A1C7F7AA1501048400D7DE52 /* Ad Hoc Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv6;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
@@ -1614,7 +1625,10 @@
 		A1C7F7AB1501048400D7DE52 /* Ad Hoc Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv6;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;

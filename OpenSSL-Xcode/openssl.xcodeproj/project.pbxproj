@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXFileReference section */
@@ -33,7 +33,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9069D2980FCE65C10042E34C /* Build configuration list for PBXNativeTarget "crypto" */;
 			buildPhases = (
-				27558DB412CE64BC00692BA9 /* ShellScript */,
+				27558DB412CE64BC00692BA9 /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -49,8 +49,11 @@
 /* Begin PBXProject section */
 		9069D12F0FCE340B0042E34C /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0440;
+			};
 			buildConfigurationList = 9069D1320FCE340B0042E34C /* Build configuration list for PBXProject "openssl" */;
-			compatibilityVersion = "Xcode 2.4";
+			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -69,18 +72,19 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		27558DB412CE64BC00692BA9 /* ShellScript */ = {
+		27558DB412CE64BC00692BA9 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ -f \"$CONFIGURATION_BUILD_DIR/libcrypto.a\" ]; then\n\texit 0;\nfi\n\nOPENSSL_SRCROOT=\"$SRCROOT/openssl\"\nif [ ! -d \"$OPENSSL_SRCROOT\" ]; then\n    OPENSSL_SRCROOT=\"$SRCROOT\"\nfi;\n\nif [ ! -f \"$SRCROOT/openssl-1.0.1e.tar.gz\" ]; then\n    cd $SRCROOT\n    curl -O http://www.openssl.org/source/openssl-1.0.1e.tar.gz;\nfi\n\nSRC_ARCHIVE=`ls openssl*tar.gz 2>/dev/null`\nif [ -f \"$SRC_ARCHIVE\" ]; then\n\tOPENSSL_SRCROOT=\"$PROJECT_TEMP_DIR/openssl\"\n\tif [ ! -d \"$OPENSSL_SRCROOT\" ]; then\n\t\techo \"Extracting $SRC_ARCHIVE...\"\n\t\tmkdir \"$OPENSSL_SRCROOT\"\n\t\ttar -C \"$OPENSSL_SRCROOT\" --strip-components=1 -zxf \"$SRC_ARCHIVE\" || exit 1\n\t\tcp -RL \"$OPENSSL_SRCROOT/include\" \"$CONFIGURATION_BUILD_DIR\"\n\tfi\nfi\n\nif [ \"$SDKROOT\" != \"\" ]; then\n\tISYSROOT=\"-isysroot $SDKROOT\"\nfi\n\nOPENSSL_OPTIONS=\"no-krb5 no-gost\"\n\ncd \"$OPENSSL_SRCROOT\"\n\n## this is a universal build\nif [ \"$ARCHS_STANDARD_32_BIT\" = \"i386 ppc\" ]; then\n\n\tBUILDARCH=\"ppc\"\n\techo \"***** BUILDING UNIVERSAL ARCH $BUILDARCH ******\"\n\tmake clean\n\t./config no-asm $OPENSSL_OPTIONS -openssldir=\"$BUILD_DIR\"\n\tASM_DEF=\"-UOPENSSL_BN_ASM_PART_WORDS\"\n\tmake CC=$PLATFORM_DEVELOPER_BIN_DIR/gcc CFLAG=\"-D_DARWIN_C_SOURCE $ASM_DEF -arch $BUILDARCH $ISYSROOT\" SHARED_LDFLAGS=\"-arch $BUILDARCH -dynamiclib\"\n\tcp libcrypto.a \"$CONFIGURATION_TEMP_DIR\"/$BUILDARCH-libcrypto.a\n\tcp libssl.a \"$CONFIGURATION_TEMP_DIR\"/$BUILDARCH-libssl.a\n\t\n\tBUILDARCH=\"i386\"\n\techo \"***** BUILDING UNIVERSAL ARCH $BUILDARCH ******\"\n\tmake clean\n\t./config $OPENSSL_OPTIONS -openssldir=\"$BUILD_DIR\"\n\tASM_DEF=\"-DOPENSSL_BN_ASM_PART_WORDS\"\n\tmake CC=$PLATFORM_DEVELOPER_BIN_DIR/gcc CFLAG=\"-D_DARWIN_C_SOURCE $ASM_DEF -arch $BUILDARCH $ISYSROOT\" SHARED_LDFLAGS=\"-arch $BUILDARCH -dynamiclib\"\n\tcp libcrypto.a \"$CONFIGURATION_TEMP_DIR\"/$BUILDARCH-libcrypto.a\n\tcp libssl.a \"$CONFIGURATION_TEMP_DIR\"/$BUILDARCH-libssl.a\n\tmkdir -p \"$CONFIGURATION_BUILD_DIR\"\n\tlipo -create \"$CONFIGURATION_TEMP_DIR/*-libcrypto.a\" -output \"$CONFIGURATION_BUILD_DIR/libcrypto.a\"\n   \tlipo -create \"$CONFIGURATION_TEMP_DIR/*-libssl.a\" -output \"$CONFIGURATION_BUILD_DIR/libssl.a\"\nelse\n\tBUILDARCH=$ARCHS\n\techo \"***** BUILDING ARCH $BUILDARCH ******\"\n\tmake clean\n\n\tif [ \"$BUILDARCH\" = \"i386\" ]; then\n\t\t./config $OPENSSL_OPTIONS -openssldir=\"$BUILD_DIR\"\n\t\tASM_DEF=\"-DOPENSSL_BN_ASM_PART_WORDS\"\n     else\n\t\t./config no-asm $OPENSSL_OPTIONS -openssldir=\"$BUILD_DIR\"\n\t\tASM_DEF=\"-UOPENSSL_BN_ASM_PART_WORDS\"\n     fi\n\tmake CC=$PLATFORM_DEVELOPER_BIN_DIR/gcc CFLAG=\"-D_DARWIN_C_SOURCE $ASM_DEF -arch $BUILDARCH $ISYSROOT\" SHARED_LDFLAGS=\"-arch $BUILDARCH -dynamiclib\"\n\tmkdir -p \"$CONFIGURATION_BUILD_DIR\"\n    cp \"$OPENSSL_SRCROOT/libcrypto.a\" \"$CONFIGURATION_BUILD_DIR\"\n    cp \"$OPENSSL_SRCROOT/libssl.a\" \"$CONFIGURATION_BUILD_DIR\"\nfi\n\nranlib \"$CONFIGURATION_BUILD_DIR/libcrypto.a\"\nranlib \"$CONFIGURATION_BUILD_DIR/libssl.a\"";
+			shellScript = "if [ -f \"$CONFIGURATION_BUILD_DIR/libcrypto.a\" ]; then\n\texit 0;\nfi\n\nOPENSSL_SRCROOT=\"$SRCROOT/openssl\"\nif [ ! -d \"$OPENSSL_SRCROOT\" ]; then\n    OPENSSL_SRCROOT=\"$SRCROOT\"\nfi;\n\nif [ ! -f \"$SRCROOT/openssl-1.0.1e.tar.gz\" ]; then\n    cd $SRCROOT\n    curl -O http://www.openssl.org/source/openssl-1.0.1e.tar.gz;\nfi\n\nSRC_ARCHIVE=`ls openssl*tar.gz 2>/dev/null`\nif [ -f \"$SRC_ARCHIVE\" ]; then\n\tOPENSSL_SRCROOT=\"$PROJECT_TEMP_DIR/openssl\"\n\tif [ ! -d \"$OPENSSL_SRCROOT\" ]; then\n\t\techo \"Extracting $SRC_ARCHIVE...\"\n\t\tmkdir \"$OPENSSL_SRCROOT\"\n\t\ttar -C \"$OPENSSL_SRCROOT\" --strip-components=1 -zxf \"$SRC_ARCHIVE\" || exit 1\n\t\tcp -RL \"$OPENSSL_SRCROOT/include\" \"$CONFIGURATION_BUILD_DIR\"\n\tfi\nfi\n\nif [ \"$SDKROOT\" != \"\" ]; then\n\tISYSROOT=\"-isysroot $SDKROOT\"\nfi\n\nOPENSSL_OPTIONS=\"no-krb5 no-gost\"\n\ncd \"$OPENSSL_SRCROOT\"\n\n## this is a universal build\nif [ $(echo \"$ARCHS\" | wc -w) > 1 ]; then\n    for BUILDARCH in $ARCHS; do\n        #BUILDARCH=\"ppc\"\n        echo \"***** BUILDING UNIVERSAL ARCH $BUILDARCH ******\"\n        make clean\n        ./config no-asm $OPENSSL_OPTIONS -openssldir=\"$BUILD_DIR\"\n        \n        if [ \"$BUILDARCH\" = \"i386\" ]; then\n            ./config $OPENSSL_OPTIONS -openssldir=\"$BUILD_DIR\"\n            ASM_DEF=\"-DOPENSSL_BN_ASM_PART_WORDS\"\n        else\n            ./config no-asm $OPENSSL_OPTIONS -openssldir=\"$BUILD_DIR\"\n            ASM_DEF=\"-UOPENSSL_BN_ASM_PART_WORDS\"\n        fi\n\n        make CC=$PLATFORM_DEVELOPER_BIN_DIR/gcc CFLAG=\"-D_DARWIN_C_SOURCE $ASM_DEF -arch $BUILDARCH $ISYSROOT\" SHARED_LDFLAGS=\"-arch $BUILDARCH -dynamiclib\"\n        cp libcrypto.a \"$CONFIGURATION_TEMP_DIR\"/$BUILDARCH-libcrypto.a\n        cp libssl.a \"$CONFIGURATION_TEMP_DIR\"/$BUILDARCH-libssl.a\n    done\n\n\tmkdir -p \"$CONFIGURATION_BUILD_DIR\"\n\n    for BUILDARCH in $ARCHS; do\n        _CRYPTO_ARCH_LIBS+=\" $CONFIGURATION_TEMP_DIR/$BUILDARCH-libcrypto.a \"\n        _SSL_ARCH_LIBS+=\" $CONFIGURATION_TEMP_DIR/$BUILDARCH-libssl.a \"\n    done\n\tlipo -create $_CRYPTO_ARCH_LIBS -output \"$CONFIGURATION_BUILD_DIR/libcrypto.a\"\n   \tlipo -create $_SSL_ARCH_LIBS -output \"$CONFIGURATION_BUILD_DIR/libssl.a\"\n\nelse\n    BUILDARCH=$ARCHS\n    echo \"***** BUILDING ARCH $BUILDARCH ******\"\n\tmake clean\n    if [ \"$BUILDARCH\" = \"i386\" ]; then\n        ./config $OPENSSL_OPTIONS -openssldir=\"$BUILD_DIR\"\n        ASM_DEF=\"-DOPENSSL_BN_ASM_PART_WORDS\"\n    else\n        ./config no-asm $OPENSSL_OPTIONS -openssldir=\"$BUILD_DIR\"\n        ASM_DEF=\"-UOPENSSL_BN_ASM_PART_WORDS\"\n    fi\n\n    make CC=$PLATFORM_DEVELOPER_BIN_DIR/gcc CFLAG=\"-D_DARWIN_C_SOURCE $ASM_DEF $ARCH_TARGETS $ISYSROOT\" SHARED_LDFLAGS=\"-arch $BUILDARCH -dynamiclib\"\n\tmkdir -p \"$CONFIGURATION_BUILD_DIR\"\n    cp \"$OPENSSL_SRCROOT/libcrypto.a\" \"$CONFIGURATION_BUILD_DIR\"\n    cp \"$OPENSSL_SRCROOT/libssl.a\" \"$CONFIGURATION_BUILD_DIR\"\nfi\n\nranlib \"$CONFIGURATION_BUILD_DIR/libcrypto.a\"\nranlib \"$CONFIGURATION_BUILD_DIR/libssl.a\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -88,8 +92,14 @@
 		9069D1300FCE340B0042E34C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv6;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
 				COPY_PHASE_STRIP = NO;
+				GCC_THUMB_SUPPORT = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				MACH_O_TYPE = staticlib;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 			};
@@ -98,8 +108,14 @@
 		9069D1310FCE340B0042E34C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv6;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
 				COPY_PHASE_STRIP = YES;
+				GCC_THUMB_SUPPORT = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				MACH_O_TYPE = staticlib;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 			};
@@ -108,15 +124,17 @@
 		9069D28D0FCE659B0042E34C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = armv6;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				PREBINDING = NO;
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = "";
 				PRODUCT_NAME = crypto;
 			};
 			name = Debug;
@@ -124,14 +142,16 @@
 		9069D28E0FCE659B0042E34C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = armv6;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				PREBINDING = NO;
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = "";
 				PRODUCT_NAME = crypto;
 				ZERO_LINK = NO;
 			};
