@@ -40,7 +40,7 @@ static void connectionClosedCallbackHelper(web_connection_p connection, void* ct
         
         _connection = connection;
         web_connection_set_request_callback(self._connection, processRequestCallbackHelper, self);
-        web_connection_set_close_callback(self._connection, connectionClosedCallbackHelper, self);
+        web_connection_set_closed_callback(self._connection, connectionClosedCallbackHelper, self);
                 
     }
     

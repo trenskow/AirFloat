@@ -15,15 +15,15 @@
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
+web_headers_p web_headers_create();
+void web_headers_destroy(web_headers_p wh);
+
 struct web_response_t {
     uint16_t status_code;
     char* status_message;
-    
     web_headers_p headers;
-    
     void* content;
-    uint32_t content_length;
-    
+    size_t content_length;
     bool keep_alive;
 };
 
@@ -88,7 +88,7 @@ const char* web_response_get_status_message(struct web_response_t* wr) {
     
 }
 
-void web_response_set_content(struct web_response_t* wr, void* content, uint32_t size) {
+void web_response_set_content(struct web_response_t* wr, void* content, size_t size) {
     
     if (wr->content != NULL) {
         free(wr->content);
@@ -113,7 +113,7 @@ void web_response_set_content(struct web_response_t* wr, void* content, uint32_t
     
 }
 
-uint32_t web_response_get_content(struct web_response_t* wr, void* content, uint32_t size) {
+size_t web_response_get_content(struct web_response_t* wr, void* content, size_t size) {
     
     if (content)
         memcpy(content, wr->content, MIN(size, wr->content_length));

@@ -9,7 +9,10 @@
 #ifndef __BASE64_H
 #define __BASE64_H
 
-int base64_encode(const void *data, int size, char **str);
-int base64_decode(const char *str, void *data);
+#include <stdint.h>
+
+size_t base64_encode(const void *data, size_t size, char **str);
+size_t base64_decode(const char *str, void *data);
+size_t base64_pad(const char* base64, size_t base64_size, char* out, size_t out_size);
 
 #endif

@@ -20,6 +20,7 @@ struct web_header_t {
     char* name;
     char* value;
 };
+
 struct web_headers_t {
     struct web_header_t* headers;
     uint32_t count;
@@ -80,15 +81,15 @@ uint32_t web_headers_count(struct web_headers_t* wh) {
     
 }
 
-uint32_t web_headers_get_content(struct web_headers_t* wh, void* buffer, uint32_t size) {
+size_t web_headers_get_content(struct web_headers_t* wh, void* buffer, size_t size) {
     
-    uint32_t writePos = 0;
+    size_t writePos = 0;
     char* writeBuf = (char*)buffer;
     
     for (uint32_t i = 0 ; i < wh->count ; i++) {
         
-        uint32_t nameLen = strlen(wh->headers[i].name);
-        uint32_t valueLen = strlen(wh->headers[i].value);
+        size_t nameLen = strlen(wh->headers[i].name);
+        size_t valueLen = strlen(wh->headers[i].value);
         
         if (writeBuf != NULL) {
             
@@ -118,7 +119,7 @@ uint32_t web_headers_get_content(struct web_headers_t* wh, void* buffer, uint32_
     
 }
 
-uint32_t web_headers_parse(struct web_headers_t* wh, void* buffer, uint32_t size) {
+size_t web_headers_parse(struct web_headers_t* wh, void* buffer, size_t size) {
     
     assert(buffer != NULL && size > 0);
     
@@ -129,7 +130,7 @@ uint32_t web_headers_parse(struct web_headers_t* wh, void* buffer, uint32_t size
     for (i = 0 ; i < size ; i++)
         if (readBuffer[i] == '\n') {
             
-            uint32_t lineLength = &readBuffer[i] - lineStart + 1;
+            size_t lineLength = &readBuffer[i] - lineStart + 1;
             wh->headers = (struct web_header_t *)realloc(wh->headers, sizeof(struct web_header_t) * (wh->count + 1));
             char* name = wh->headers[wh->count].name = (char*)malloc(lineLength);
             memcpy(name, lineStart, lineLength);

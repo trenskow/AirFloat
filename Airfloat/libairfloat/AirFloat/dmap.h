@@ -39,7 +39,7 @@ typedef struct dmap_t *dmap_p;
 
 dmap_p dmap_create();
 void dmap_destroy(dmap_p d);
-void dmap_parse(dmap_p d, const void* buffer, uint32_t size);
+void dmap_parse(dmap_p d, const void* buffer, size_t size);
 dmap_p dmap_copy(dmap_p d);
 
 dmap_type dmap_type_for_tag(uint32_t tag);
@@ -50,12 +50,12 @@ uint32_t dmap_get_count(dmap_p d);
 uint32_t dmap_get_tag_at_index(dmap_p d, uint32_t index);
 uint32_t dmap_get_index_of_tag(dmap_p d, uint32_t tag);
 
-uint32_t dmap_get_length(dmap_p d);
-uint32_t dmap_get_content(dmap_p d, void* content, uint32_t size);
+size_t dmap_get_length(dmap_p d);
+size_t dmap_get_content(dmap_p d, void* content, size_t size);
 
-uint32_t dmap_get_size_of_atom_at_index(dmap_p d, uint32_t index);
-uint32_t dmap_get_size_of_atom_tag(dmap_p d, uint32_t tag);
-uint32_t dmap_get_size_of_atom_identifer(dmap_p d, const char* identifier);
+size_t dmap_get_size_of_atom_at_index(dmap_p d, uint32_t index);
+size_t dmap_get_size_of_atom_tag(dmap_p d, uint32_t tag);
+size_t dmap_get_size_of_atom_identifer(dmap_p d, const char* identifier);
 
 char dmap_char_at_index(dmap_p d, uint32_t index);
 char dmap_char_for_atom_tag(dmap_p d, uint32_t tag);
@@ -93,6 +93,6 @@ void dmap_add_string(dmap_p d, const char* string, uint32_t tag);
 void dmap_add_date(dmap_p d, uint32_t date, uint32_t tag);
 void dmap_add_version(dmap_p d, dmap_version version, uint32_t tag);
 void dmap_add_container(dmap_p d, dmap_p container, uint32_t tag);
-void dmap_add_bytes(dmap_p d, const void* data, uint32_t size, uint32_t tag);
+void dmap_add_bytes(dmap_p d, const void* data, size_t size, uint32_t tag);
 
 #endif

@@ -8,6 +8,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "base64.h"
 
@@ -21,7 +22,7 @@ static int pos(char c) {
     return -1;
 }
 
-int base64_encode(const void *data, int size, char **str) {
+size_t base64_encode(const void *data, size_t size, char **str) {
     char *s, *p;
     int i;
     int c;
@@ -79,7 +80,7 @@ static unsigned int token_decode(const char *token) {
     return (marker << 24) | val;
 }
 
-int base64_decode(const char *str, void *data) {
+size_t base64_decode(const char *str, void *data) {
     const char *p;
     unsigned char *q;
     
@@ -98,3 +99,15 @@ int base64_decode(const char *str, void *data) {
     return (int)(q - (unsigned char *) data);
 }
 
+size_t base64_pad(const char* base64, size_t base64_size, char* out, size_t out_size) {
+    
+    assert(out_size >= base64_size + 3);
+    
+    memcpy(out, base64, base64_size);
+    for (size_t i = 0 ; i < (base64_size % 4) ; i++)
+        out[base64_size + i] = '=';
+    out[base64_size + (base64_size % 4)] = '\0';
+    
+    return base64_size + (base64_size % 4);
+    
+}

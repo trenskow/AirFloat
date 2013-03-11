@@ -28,11 +28,10 @@ typedef struct web_connection_t *web_connection_p;
 typedef void(*web_connection_request_callback)(web_connection_p connection, web_request_p request, void* ctx);
 typedef void(*web_connection_closed_callback)(web_connection_p connection, void* ctx);
 
-web_connection_p web_connection_create(socket_p socket, web_server_p server);
-void web_connection_destroy(web_connection_p connection);
 void web_connection_set_request_callback(web_connection_p wc, web_connection_request_callback request_callback, void* ctx);
-void web_connection_set_close_callback(web_connection_p wc, web_connection_closed_callback closed_callback, void* ctx);
+void web_connection_set_closed_callback(web_connection_p wc, web_connection_closed_callback closed_callback, void* ctx);
 bool web_connection_is_connected(web_connection_p wc);
+void web_connection_take_off(struct web_connection_t* wc);
 void web_connection_close(web_connection_p wc);
 void web_connection_wait_close(web_connection_p wc);
 struct sockaddr* web_connection_get_local_end_point(web_connection_p wc);

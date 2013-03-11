@@ -16,14 +16,18 @@
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
+web_headers_p web_headers_create();
+void web_headers_destroy(web_headers_p wh);
+
+web_response_p web_response_create();
+void web_response_destroy(web_response_p wr);
+
 struct web_request_t {
     char* command;
     char* path;
     char* protocol;
-    
     void* content;
-    uint32_t content_length;
-    
+    size_t content_length;
     web_headers_p headers;
     web_response_p response;
 };
@@ -83,13 +87,13 @@ const char* web_request_get_protocol(struct web_request_t* wr) {
     
 }
 
-uint32_t web_request_get_content(struct web_request_t* wr, void* buffer, uint32_t size) {
+size_t web_request_get_content(struct web_request_t* wr, void* buffer, size_t size) {
     
     if (buffer == NULL)
         return wr->content_length;
     else if (wr->content != NULL) {
         
-        uint32_t ret = MIN(wr->content_length, size);
+        size_t ret = MIN(wr->content_length, size);
         memcpy(buffer, wr->content, ret);
         return ret;
         
@@ -99,7 +103,7 @@ uint32_t web_request_get_content(struct web_request_t* wr, void* buffer, uint32_
     
 }
 
-void web_request_set_content(web_request_p wr, const void* buffer, uint32_t size) {
+void web_request_set_content(web_request_p wr, const void* buffer, size_t size) {
     
     if (wr->content != NULL) {
         free(wr->content);

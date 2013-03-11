@@ -16,16 +16,9 @@ extern "C" {
 #include "mutex.h"
 #include "condition.h"
 #include "notificationcenter.h"
-}
-
-#include "AudioConverter.h"
-#include "AppleLosslessAudioConverter.h"
-#include "AppleLosslessSoftwareAudioConverter.h"
-#include "AudioPlayer.h"
-#include "AudioPacket.h"
-#include "AudioQueue.h"
-
-extern "C" {
+#include "decoder.h"
+#include "audiooutput.h"
+#include "audioqueue.h"
 #include "base64.h"
 #include "socket.h"
 #include "sockaddr.h"
@@ -34,11 +27,10 @@ extern "C" {
 #include "webrequest.h"
 #include "webconnection.h"
 #include "webserver.h"
+#include "parameters.h"
+#include "rtprecorder.h"
+#include "raopsession.h"
+#include "raopserver.h"
 }
-
-#include "RTPReceiver.h"
-#include "RAOPParameters.h"
-#include "RAOPConnection.h"
-#include "RAOPServer.h"
 
 #endif

@@ -6,16 +6,19 @@
 //  Copyright (c) 2012 The Famous Software Company. All rights reserved.
 //
 
-#include <pthread.h>
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 
 #include "log.h"
+#include "mutex.h"
 #include "sockaddr.h"
 #include "socket.h"
 #include "webconnection.h"
 #include "webserver.h"
+
+web_connection_p web_connection_create(socket_p socket, web_server_p server);
+void web_connection_destroy(web_connection_p connection);
 
 struct web_server_t {
     socket_p socket_ipv4;
@@ -27,11 +30,9 @@ struct web_server_t {
     web_server_accept_callback accept_callback;
     void* accept_callback_ctx;
     web_connection_p* connections;
-    uint32_t connectionCount;
-    pthread_mutex_t mutex;
+    uint32_t connection_count;
+    mutex_p mutex;
 };
-
-void web_connection_take_off(web_connection_p wc);
 
 struct web_server_thread_data_t {
     struct web_server_t* ws;
@@ -44,7 +45,7 @@ struct web_server_t* web_server_create(sockaddr_type socket_types) {
     bzero(ws, sizeof(struct web_server_t));
     
     ws->socket_types = socket_types;
-    pthread_mutex_init(&ws->mutex, NULL);
+    ws->mutex = mutex_create();
     
     return ws;
     
@@ -54,7 +55,7 @@ void web_server_destroy(struct web_server_t* ws) {
     
     web_server_stop(ws);
     
-    pthread_mutex_destroy(&ws->mutex);
+    mutex_destroy(ws->mutex);
     
     free(ws);
     
@@ -88,7 +89,7 @@ socket_p _web_server_bind(struct web_server_t* ws, uint16_t port, sockaddr_type 
 
 void _web_server_accept_loop(void* ctx) {
     
-    pthread_setname_np("Server Socket");
+    thread_set_name("Server socket");
     
     struct web_server_thread_data_t* thread_data = (struct web_server_thread_data_t*)ctx;
     
@@ -104,7 +105,7 @@ void _web_server_accept_loop(void* ctx) {
         if (new_socket == NULL)
             break;
         
-        pthread_mutex_lock(&ws->mutex);
+        mutex_lock(ws->mutex);
         
         web_connection_p new_connection = web_connection_create(new_socket, ws);
         
@@ -114,19 +115,17 @@ void _web_server_accept_loop(void* ctx) {
             web_connection_destroy(new_connection);
         else {
             
-            ws->connections = (web_connection_p*)realloc(ws->connections, sizeof(web_connection_p) * (ws->connectionCount + 1));
-            ws->connections[ws->connectionCount] = new_connection;
-            ws->connectionCount++;
+            ws->connections = (web_connection_p*)realloc(ws->connections, sizeof(web_connection_p) * (ws->connection_count + 1));
+            ws->connections[ws->connection_count] = new_connection;
+            ws->connection_count++;
             
             web_connection_take_off(new_connection);
             
         }
         
-        pthread_mutex_unlock(&ws->mutex);
+        mutex_unlock(ws->mutex);
         
     }
-    
-    pthread_exit(0);
     
 }
 
@@ -141,22 +140,16 @@ void _web_server_accept_loop_start(struct web_server_t* ws, thread_p* thread, so
     
 }
 
-bool web_server_start(struct web_server_t* ws, uint16_t port, uint16_t port_range) {
+bool web_server_start(struct web_server_t* ws, uint16_t port) {
     
-    pthread_mutex_lock(&ws->mutex);
+    mutex_lock(ws->mutex);
     
-    if (ws->is_running) {
-        log_message(LOG_ERROR, "Server already running");
-        pthread_mutex_unlock(&ws->mutex);
-        return false;
-    }
-    
-    for (uint16_t p = port ; p < (port ?: 80) + (port_range ?: 1) ; p++) {
+    if (!ws->is_running) {
         
-        log_message(LOG_INFO, "Trying port %d", p);
+        log_message(LOG_INFO, "Trying port %d", port);
         
-        ws->socket_ipv4 = _web_server_bind(ws, p, sockaddr_type_inet_4);
-        ws->socket_ipv6 = _web_server_bind(ws, p, sockaddr_type_inet_6);
+        ws->socket_ipv4 = _web_server_bind(ws, port, sockaddr_type_inet_4);
+        ws->socket_ipv6 = _web_server_bind(ws, port, sockaddr_type_inet_6);
         
         if (((ws->socket_types & sockaddr_type_inet_4) == 0 || ws->socket_ipv4 != NULL) && ((ws->socket_types & sockaddr_type_inet_6) == 0 || ws->socket_ipv6 != NULL)) {
             
@@ -167,7 +160,7 @@ bool web_server_start(struct web_server_t* ws, uint16_t port, uint16_t port_rang
             
             ws->is_running = true;
             
-            pthread_mutex_unlock(&ws->mutex);
+            mutex_unlock(ws->mutex);
             
             return true;
             
@@ -178,69 +171,72 @@ bool web_server_start(struct web_server_t* ws, uint16_t port, uint16_t port_rang
         if (ws->socket_ipv6 != NULL)
             socket_destroy(ws->socket_ipv6);
         
-    }
+        log_message(LOG_INFO, "Server started.");
+        
+    } else
+        log_message(LOG_ERROR, "Cannot start: Server is already running");
     
-    pthread_mutex_unlock(&ws->mutex);
+    mutex_unlock(ws->mutex);
     
     return false;
     
 }
 
-void web_server_stop(struct web_server_t* ws) {
-    
-    pthread_mutex_lock(&ws->mutex);
-    
-    if (ws->socket_ipv4 != NULL)
-        socket_close(ws->socket_ipv4);
-    if (ws->socket_ipv6 != NULL)
-        socket_close(ws->socket_ipv6);
-    
-    web_server_wait_stop(ws);
-    
-    if (ws->socket_ipv4 != NULL) {
-        socket_destroy(ws->socket_ipv4);
-        ws->socket_ipv4 = NULL;
-    }
-    if (ws->socket_ipv6 != NULL) {
-        socket_destroy(ws->socket_ipv6);
-        ws->socket_ipv6 = NULL;
-    }
-    
-    ws->is_running = false;
-    
-    while (ws->connectionCount > 0)
-        web_connection_destroy(ws->connections[0]);
-    
-    pthread_mutex_unlock(&ws->mutex);
-    
-    log_message(LOG_INFO, "Server stopped");
-    
-}
-
-void web_server_wait_stop(struct web_server_t* ws) {
-    
-    if ((ws->socket_types & sockaddr_type_inet_4) != 0)
-        thread_join(ws->accept_loop_ipv4);
-    if ((ws->socket_types & sockaddr_type_inet_6) != 0)
-        thread_join(ws->accept_loop_ipv6);
-    
-}
-
 bool web_server_is_running(struct web_server_t* ws) {
     
-    pthread_mutex_lock(&ws->mutex);
+    mutex_lock(ws->mutex);
     bool ret = ws->is_running;
-    pthread_mutex_unlock(&ws->mutex);
+    mutex_unlock(ws->mutex);
     
     return ret;
     
 }
 
+void web_server_stop(struct web_server_t* ws) {
+    
+    mutex_lock(ws->mutex);
+    
+    if (ws->is_running) {
+        
+        if (ws->socket_ipv4 != NULL)
+            socket_close(ws->socket_ipv4);
+        if (ws->socket_ipv6 != NULL)
+            socket_close(ws->socket_ipv6);
+        
+        // Await accept threads exit
+        if ((ws->socket_types & sockaddr_type_inet_4) != 0)
+            thread_join(ws->accept_loop_ipv4);
+        if ((ws->socket_types & sockaddr_type_inet_6) != 0)
+            thread_join(ws->accept_loop_ipv6);
+        
+        if (ws->socket_ipv4 != NULL) {
+            socket_destroy(ws->socket_ipv4);
+            ws->socket_ipv4 = NULL;
+        }
+        if (ws->socket_ipv6 != NULL) {
+            socket_destroy(ws->socket_ipv6);
+            ws->socket_ipv6 = NULL;
+        }
+        
+        ws->is_running = false;
+        
+        while (ws->connection_count > 0)
+            web_connection_destroy(ws->connections[0]);
+        
+        log_message(LOG_INFO, "Server stopped");
+        
+    } else
+        log_message(LOG_ERROR, "Cannot stop: Server is not running");
+    
+    mutex_unlock(ws->mutex);
+    
+}
+
 uint32_t web_server_get_connection_count(struct web_server_t* ws) {
     
-    pthread_mutex_lock(&ws->mutex);
-    uint32_t ret = ws->connectionCount;
-    pthread_mutex_unlock(&ws->mutex);
+    mutex_lock(ws->mutex);
+    uint32_t ret = ws->connection_count;
+    mutex_unlock(ws->mutex);
     
     return ret;
     
@@ -256,29 +252,31 @@ struct sockaddr* web_server_get_local_end_point(struct web_server_t* ws, sockadd
 
 void web_server_set_accept_callback(struct web_server_t* ws, web_server_accept_callback accept_callback, void* ctx) {
     
-    pthread_mutex_lock(&ws->mutex);
+    mutex_lock(ws->mutex);
     ws->accept_callback = accept_callback;
     ws->accept_callback_ctx = ctx;
-    pthread_mutex_unlock(&ws->mutex);
+    mutex_unlock(ws->mutex);
     
 }
 
 void web_server_connection_closed(web_server_p ws, web_connection_p wc) {
     
-    pthread_mutex_lock(&ws->mutex);
+    mutex_lock(ws->mutex);
     
-    for (uint32_t i = 0 ; i < ws->connectionCount ; i++)
+    uint32_t previous_connection_count = ws->connection_count;
+    
+    for (uint32_t i = 0 ; i < ws->connection_count ; i++)
         if (ws->connections[i] == wc) {
             web_connection_destroy(wc);
-            for (uint32_t x = i ; x < ws->connectionCount - 1 ; x++)
+            for (uint32_t x = i ; x < ws->connection_count - 1 ; x++)
                 ws->connections[x] = ws->connections[x + 1];
-            ws->connectionCount--;
-            pthread_mutex_unlock(&ws->mutex);
-            return;
+            ws->connection_count--;
+            break;
         }
     
-    log_message(LOG_ERROR, "Server knows nothing about connection %p", wc);
+    if (previous_connection_count == ws->connection_count)
+        log_message(LOG_ERROR, "Server knows nothing about connection %p", wc);
     
-    pthread_mutex_unlock(&ws->mutex);
+    mutex_unlock(ws->mutex);
     
 }

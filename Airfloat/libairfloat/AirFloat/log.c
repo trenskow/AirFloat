@@ -31,14 +31,14 @@ void log_message(int level, const char* message, ...) {
     
 }
 
-void log_data(int level, const char* data, uint32_t size) {
+void log_data(int level, const void* data, size_t data_size) {
     
 #if defined (LOG_SERVER) && defined(DEBUG)
-    assert((level == LOG_INFO || level == LOG_ERROR) && data != NULL && size > 0);
+    assert((level == LOG_INFO || level == LOG_ERROR) && data != NULL && data_size > 0);
     
-    char msgnl[size + 3];
-    memcpy(msgnl, data, size);
-    memcpy(&msgnl[size], "\n", 2);
+    char msgnl[data_size + 3];
+    memcpy(msgnl, data, data_size);
+    memcpy(&msgnl[data_size], "\n", 2);
     
     printf("%s", msgnl);
 #endif

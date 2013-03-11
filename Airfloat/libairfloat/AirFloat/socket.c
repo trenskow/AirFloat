@@ -115,7 +115,7 @@ socket_p socket_accept(socket_p s) {
     
 }
 
-int64_t socket_receive(socket_p s, void* buffer, uint32_t size) {
+int64_t socket_receive(socket_p s, void* buffer, size_t size) {
 
     assert(buffer != NULL && size > 0);
     
@@ -123,7 +123,7 @@ int64_t socket_receive(socket_p s, void* buffer, uint32_t size) {
         
         struct sockaddr_storage remote_addr;
         socklen_t remote_addr_len = sizeof(struct sockaddr_storage);
-        int ret = recvfrom(s->socket, buffer, size, 0, (struct sockaddr*) &remote_addr, &remote_addr_len);
+        ssize_t ret = recvfrom(s->socket, buffer, size, 0, (struct sockaddr*) &remote_addr, &remote_addr_len);
         
         if (s->is_udp) {
             if (s->remote_end_point != NULL) {
@@ -141,13 +141,13 @@ int64_t socket_receive(socket_p s, void* buffer, uint32_t size) {
     
 }
 
-int64_t socket_send(socket_p s, const void* buffer, uint32_t size) {
+int64_t socket_send(socket_p s, const void* buffer, size_t size) {
     
     return send(s->socket, buffer, size, 0);
     
 }
 
-int64_t socket_send_to(socket_p s, struct sockaddr* end_point, const void* buffer, uint32_t size) {
+int64_t socket_send_to(socket_p s, struct sockaddr* end_point, const void* buffer, size_t size) {
     
     assert(end_point != NULL && buffer != NULL && size > 0);
     

@@ -11,6 +11,7 @@
 
 #include <stdbool.h>
 
+const char* settings_get_name();
 const char* settings_get_password();
 
 #endif

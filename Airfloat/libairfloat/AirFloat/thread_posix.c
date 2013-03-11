@@ -13,6 +13,7 @@
 #include <pthread.h>
 
 #include "log.h"
+#include "condition.h"
 #include "thread.h"
 
 struct thread_t {
@@ -27,10 +28,7 @@ void* thread_pthread_head(void* ctx) {
     struct thread_t* t = (struct thread_t*)ctx;
     
     t->fnc(t->ctx);
-    
-    free(t->thread);
-    t->thread = NULL;
-    
+        
     pthread_exit(0);
     
 }
@@ -49,10 +47,12 @@ struct thread_t* thread_create(thread_start_fnc start_fnc, void* ctx) {
     
 }
 
-void thread_destroy(thread_p t) {
+void thread_destroy(struct thread_t* t) {
     
-    if (t->thread != NULL)
-        log_message(LOG_ERROR, "Thread %p was destroyed while thread was running.");
+    if (t->thread != NULL) {
+        pthread_join(*t->thread, NULL);
+        free(t->thread);
+    }
     
     free(t);
     
