@@ -9,13 +9,12 @@
 #ifndef _log_h
 #define _log_h
 
-#include <pthread.h>
 #include <stdint.h>
 
 #define LOG_INFO  0
 #define LOG_ERROR 1
 
 void log_message(int level, const char* message, ...);
-void log_data(int level, const char* data, uint32_t size);
+void log_data(int level, const void* data, size_t data_size);
 
 #endif

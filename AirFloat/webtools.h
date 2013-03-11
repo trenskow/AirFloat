@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 
-uint32_t web_tools_convert_new_lines(unsigned char* buffer, uint32_t length);
-unsigned char* web_tools_get_content_start(unsigned char *buffer, uint32_t length);
+size_t web_tools_convert_new_lines(void* buffer, size_t buffer_size);
+const char* web_tools_get_content_start(void* buffer, size_t length);
 
 #endif

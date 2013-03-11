@@ -17,23 +17,23 @@ static struct AirFloatNotificationBridge {
 } _airFloatNotificationBridge[5] = {
     
     {
-        [[NSString alloc] initWithCString:RAOPConnection::clientConnectedNotificationName encoding:NSASCIIStringEncoding],
+        [[NSString alloc] initWithCString:raop_session_client_setup_recorder_notification encoding:NSASCIIStringEncoding],
         AirFloatClientConnectedNotification
     },
     {
-        [[NSString alloc] initWithCString:RAOPConnection::clientDisconnectedNotificationName encoding:NSASCIIStringEncoding],
+        [[NSString alloc] initWithCString:raop_session_client_torned_down_recorder_notification encoding:NSASCIIStringEncoding],
         AirFloatClientDisconnectedNotification
     },
     {
-        [[NSString alloc] initWithCString:AudioQueue::flushNotificationName encoding:NSASCIIStringEncoding],
+        [[NSString alloc] initWithCString:audio_queue_flush_notification encoding:NSASCIIStringEncoding],
         AirFloatRecordingEndedNotification
     },
     {
-        [[NSString alloc] initWithCString:AudioQueue::syncNotificationName encoding:NSASCIIStringEncoding],
+        [[NSString alloc] initWithCString:audio_queue_synchronization_notification encoding:NSASCIIStringEncoding],
         AirFloatRecordingStartedNotification
     },
     {
-        [[NSString alloc] initWithCString:RAOPServer::localhostConnectedErrorNotificationName encoding:NSASCIIStringEncoding],
+        [[NSString alloc] initWithCString:raop_server_localhost_refused_notification encoding:NSASCIIStringEncoding],
         AirFloatLocalhostConnectedErrorNotification
     }
     
@@ -54,10 +54,7 @@ static void notificationCallback(notification_p notification, void* ctx) {
                                              notificationInfo:notification_get_info(notification)];
     };
     
-    if (notification_get_info(notification) == NULL)
-        dispatch_async(dispatch_get_main_queue(), routeBlock);
-    else
-        dispatch_sync(dispatch_get_main_queue(), routeBlock);
+    dispatch_sync(dispatch_get_main_queue(), routeBlock);
     
 }
 
@@ -92,7 +89,7 @@ static void notificationCallback(notification_p notification, void* ctx) {
             return;
         }
     
-    if ([name isEqualToString:[NSString stringWithCString:RAOPConnection::clientUpdatedTrackInfoNofificationName encoding:NSASCIIStringEncoding]]) {
+    if ([name isEqualToString:[NSString stringWithCString:raop_session_client_updated_track_notification encoding:NSASCIIStringEncoding]]) {
 
         dmap_p tags = (dmap_p)notificationInfo;
         
@@ -105,12 +102,12 @@ static void notificationCallback(notification_p notification, void* ctx) {
 
         return;
         
-    } else if ([name isEqualToString:[NSString stringWithCString:RAOPConnection::clientUpdatedMetadataNotificationName encoding:NSASCIIStringEncoding]]) {
+    } else if ([name isEqualToString:[NSString stringWithCString:raop_session_client_updated_artwork_notification encoding:NSASCIIStringEncoding]]) {
         
-        RAOPConnectionClientUpdatedMetadataNotificationInfo* info = (RAOPConnectionClientUpdatedMetadataNotificationInfo*)notificationInfo;
+        raop_session_client_updated_artwork_info* info = (raop_session_client_updated_artwork_info*)notificationInfo;
         
-        NSData* data = [NSData dataWithBytes:info->content length:info->contentLength];
-        NSString* contentType = [NSString stringWithCString:info->contentType encoding:NSUTF8StringEncoding];
+        NSData* data = [NSData dataWithBytes:info->data length:info->data_size];
+        NSString* contentType = [NSString stringWithCString:info->mime_type encoding:NSUTF8StringEncoding];
         
         [infoDictionary addEntriesFromDictionary:[NSDictionary dictionaryWithObjectsAndKeys:data, kAirFloatMetadataDataKey, contentType, kAirFloatMetadataContentType, nil]];
         

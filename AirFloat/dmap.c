@@ -16,21 +16,17 @@
 #include "DMAP.h"
 
 struct dmap_atom_type {
-    
     const uint32_t tag;
     const char* const identifier;
     const dmap_type type;
-    
 };
 
 struct dmap_atom {
-    
     uint32_t tag;
     uint32_t type;
     void* buffer;
-    uint32_t size;
+    size_t size;
     dmap_p container;
-    
 };
 
 struct dmap_t {
@@ -231,10 +227,10 @@ void dmap_destroy(struct dmap_t* d) {
     
 }
 
-void dmap_parse(struct dmap_t* d, const void* buffer, uint32_t size) {
+void dmap_parse(struct dmap_t* d, const void* buffer, size_t size) {
     
     char* mBuffer = (char*)buffer;
-    uint32_t length = size;
+    size_t length = size;
     
     while (length > 0) {
         
@@ -366,9 +362,9 @@ uint32_t dmap_get_index_of_tag(dmap_p d, uint32_t tag) {
     
 }
 
-uint32_t dmap_get_length(dmap_p d) {
+size_t dmap_get_length(dmap_p d) {
     
-    uint32_t ret = 0;
+    size_t ret = 0;
     
     for (uint32_t i = 0 ; i < d->count ; i++) {
         if (d->atoms[i].type == dmap_type_container)
@@ -381,17 +377,17 @@ uint32_t dmap_get_length(dmap_p d) {
     
 }
 
-uint32_t dmap_get_content(dmap_p d, void* content, uint32_t size) {
+size_t dmap_get_content(dmap_p d, void* content, size_t size) {
     
-    uint32_t writePos = 0;
+    size_t writePos = 0;
     
     for (uint32_t i = 0 ; i < d->count ; i++) {
         
-        uint32_t atomSize = (d->atoms[i].type == dmap_type_container ? dmap_get_length(d->atoms[i].container) : d->atoms[i].size);
+        size_t atomSize = (d->atoms[i].type == dmap_type_container ? dmap_get_length(d->atoms[i].container) : d->atoms[i].size);
         if (size - writePos >= atomSize + 8) {
             
             uint32_t tag = mtbl(d->atoms[i].tag);
-            uint32_t aSize = mtbl(atomSize);
+            size_t aSize = mtbl(atomSize);
             memcpy(&((char*)content)[writePos], &tag, 4);
             memcpy(&((char*)content)[writePos + 4], &aSize, 4);
             
@@ -416,7 +412,7 @@ uint32_t dmap_get_content(dmap_p d, void* content, uint32_t size) {
     
 }
 
-uint32_t dmap_get_size_of_atom_at_index(dmap_p d, uint32_t index) {
+size_t dmap_get_size_of_atom_at_index(dmap_p d, uint32_t index) {
     
     assert(index < d->count);
     
@@ -424,7 +420,7 @@ uint32_t dmap_get_size_of_atom_at_index(dmap_p d, uint32_t index) {
     
 }
 
-uint32_t dmap_get_size_of_atom_tag(dmap_p d, uint32_t tag) {
+size_t dmap_get_size_of_atom_tag(dmap_p d, uint32_t tag) {
     
     uint32_t index = dmap_get_index_of_tag(d, tag);
     if (index != DMAP_INDEX_NOT_FOUND)
@@ -434,7 +430,7 @@ uint32_t dmap_get_size_of_atom_tag(dmap_p d, uint32_t tag) {
     
 }
 
-uint32_t dmap_get_size_of_atom_identifer(dmap_p d, const char* identifier) {
+size_t dmap_get_size_of_atom_identifer(dmap_p d, const char* identifier) {
     
     return dmap_get_size_of_atom_tag(d, dmap_tag_for_identifier(identifier));
     
@@ -667,7 +663,7 @@ struct dmap_atom* _add_atom(dmap_p d, uint32_t tag, uint32_t type) {
     
 }
 
-void _set_atom_buffer(struct dmap_atom* atom, const void* buffer, uint32_t size) {
+void _set_atom_buffer(struct dmap_atom* atom, const void* buffer, size_t size) {
     
     if (atom->buffer != NULL)
         free(atom->buffer);
@@ -742,7 +738,7 @@ void dmap_add_container(dmap_p d, dmap_p container, uint32_t tag) {
     
 }
 
-void dmap_add_bytes(dmap_p d, const void* data, uint32_t size, uint32_t tag) {
+void dmap_add_bytes(dmap_p d, const void* data, size_t size, uint32_t tag) {
     
     struct dmap_atom* new_atom = _add_atom(d, tag, dmap_type_unknown);
     _set_atom_buffer(new_atom, data, size);

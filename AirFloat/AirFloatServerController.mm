@@ -13,9 +13,9 @@
 #import "AirFloatDAAPPairer.h"
 #import "AirFloatServerController.h"
 
-@interface  AirFloatServerController (Private)
+@interface AirFloatServerController (Private)
 
-@property (nonatomic,readonly) RAOPServer* _server;
+@property (nonatomic,readonly) raop_server_p _server;
 
 - (void)_didPairDaap:(NSNotification*)notification;
 - (void)_daapAuthenticationFailed:(NSNotification*)notification;
@@ -79,12 +79,18 @@
         return;
     }
     
-    _server = new RAOPServer(5000);
+    _server = raop_server_create();
     
-    if (self._server->startServer()) {
+    uint16_t port = 5000;
+    
+    while (port < 5010 && !raop_server_start(self._server, port++));
+    
+    if (port < 5010) {
         
+        /*
         [_bonjour release];
-        _bonjour = [[AirFloatBonjourController alloc] initWithMacAddress:[[AirFloatInterfaces wifiInterface] objectForKey:@"mac"] andPort:sockaddr_get_port(self._server->getLocalEndPoint())];
+        _bonjour = [[AirFloatBonjourController alloc] initWithMacAddress:[[AirFloatInterfaces wifiInterface] objectForKey:@"mac"] andPort:port - 1];
+        */
         
         [NSDefaultNotificationCenter addObserver:self selector:@selector(_clientConnected) name:AirFloatClientConnectedNotification object:nil];
         [NSDefaultNotificationCenter addObserver:self selector:@selector(_clientDisconnected) name:AirFloatClientDisconnectedNotification object:nil];
@@ -100,7 +106,7 @@
         
     }
     
-    delete (RAOPServer*)self._server;
+    raop_server_destroy(self._server);
     _server = NULL;
     
     [self _updateServerStatus];
@@ -109,21 +115,7 @@
 
 - (void)stop {
     
-    if (_server && RTPReceiver::isAvailable()) {
-        
-        self._server->stopServer();
-        self._server->waitServer();
-        delete (RAOPServer*)self._server;
-        _server = NULL;
-        
-        [_bonjour release];
-        _bonjour = nil;
-        
-        [NSDefaultNotificationCenter removeObserver:self];
-        
-        [self _updateServerStatus];
-                
-    }
+    raop_server_stop(self._server);
     
 }
 
@@ -134,9 +126,9 @@
 
 - (AirFloatServerControllerStatus)status {
     
-    if (_server != NULL && RTPReceiver::getStreamingReceiver() != NULL && RTPReceiver::getStreamingReceiver()->getConnection()->isConnected())
+    if (_server != NULL && raop_server_is_recording(self._server))
         return kAirFloatServerControllerStatusReceiving;
-    else if (_server != NULL && self._server->isRunning())
+    else if (_server != NULL && raop_server_is_running(self._server))
         return kAirFloatServerControllerStatusReady;
     else if (!_wifiReachability.isAvailable)
         return kAirFloatServerControllerStatusNeedsWifi;
@@ -145,6 +137,7 @@
     
 }
 
+/*
 - (NSString*)connectedHost {
     
     if (self.status == kAirFloatServerControllerStatusReceiving) {
@@ -166,19 +159,22 @@
     return nil;
     
 }
+ */
 
 #pragma mark - Audio Session Delegate Methods
 
 - (void)beginInterruption {
     
+    /*
     RTPReceiver* receiver;
     if ((receiver = RTPReceiver::getStreamingReceiver()) != NULL && receiver->getConnection()->isConnected())
         receiver->getConnection()->closeConnection();
-    
+    */
 }
 
 #pragma mark - Bonjour Browser Delegate Methods
 
+/*
 - (bool)bonjourBrowser:(AirFloatBonjourBrowser *)browser didFindAddresses:(NSArray *)addresses forService:(NSNetService*)service {
     
     NSDLog(@"Found service of type %@", [service type]);
@@ -230,6 +226,8 @@
         [NSDefaultNotificationCenter postNotificationName:AirFloatServerControllerFailedFindingDAAPNoification object:self];
     
 }
+
+ */
 
 #pragma mark - Reachability Delegate Methods
 
@@ -302,6 +300,7 @@
 
 - (void)_recordingStarted {
     
+    /*
     if (!_daapClient && AirFloatiOSSharedAppDelegate.serverController.status == kAirFloatServerControllerStatusReceiving) {
         
         RAOPConnection* connection = RTPReceiver::getStreamingReceiver()->getConnection();
@@ -315,6 +314,7 @@
     }
     
     [self _updateServerStatus];
+     */
     
 }
 
@@ -329,9 +329,9 @@
 
 #pragma mark - Private Properties
 
-- (RAOPServer*)_server {
+- (raop_server_p)_server {
     
-    return (RAOPServer*)_server;
+    return (raop_server_p)_server;
     
 }
 

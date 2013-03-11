@@ -55,7 +55,7 @@ static bool acceptConnectionCallback(web_server_p server, web_connection_p conne
 
 - (BOOL)startServerOnPort:(NSUInteger)port tryPorts:(NSUInteger)portRange {
     
-    return web_server_start(self._server, port, portRange);
+    return web_server_start(self._server, port);
     
 }
 
@@ -68,7 +68,6 @@ static bool acceptConnectionCallback(web_server_p server, web_connection_p conne
 - (void)stopServer {
     
     web_server_stop(self._server);
-    web_server_wait_stop(self._server);
     
 }
 

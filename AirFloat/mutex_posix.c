@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 
+#include "mutex.h"
+
 #define MAX_NAME_LENGTH 250
 
 struct mutex_t {
@@ -32,6 +34,12 @@ void mutex_destroy(struct mutex_t* m) {
     
     pthread_mutex_destroy(&m->mutex);
     free(m);
+    
+}
+
+bool mutex_trylock(struct mutex_t* m) {
+    
+    return (pthread_mutex_trylock(&m->mutex) == 0);
     
 }
 
