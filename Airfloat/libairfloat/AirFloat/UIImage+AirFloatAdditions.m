@@ -1,380 +1,91 @@
 //
 //  UIImage+AirFloatAdditions.m
-//  
+//  AirFloat
 //
-//  Created by Kristian Trenskow on 3/11/12.
-//  Copyright (c) 2012 The Famous Software Company. All rights reserved.
+//  Created by Kristian Trenskow on 3/20/13.
 //
+//
+
+#import <AVFoundation/AVFoundation.h>
 
 #import "UIImage+AirFloatAdditions.h"
 
 @implementation UIImage (AirFloatAdditions)
 
-#pragma mark - Public Class Methods
-
-+ (UIImage*)imageWithSolidColor:(UIColor*)color withSize:(CGSize)size andScale:(CGFloat)scale {
+- (UIImage *)imageAspectedFilledWithSize:(CGSize)size {
     
-    UIGraphicsBeginImageContextWithOptions(size, NO, scale);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    UIGraphicsPushContext(context);
+    CGSize aspect = CGSizeMake(size.width / self.size.width,
+                               size.height / self.size.height);
     
-    CGContextSetFillColorWithColor(context, color.CGColor);
-    CGContextFillRect(context, CGRectMake(0, 0, size.width, size.height));
+    CGSize newSize = CGSizeMake(self.size.width * MAX(aspect.width, aspect.height),
+                                self.size.height * MAX(aspect.width, aspect.height));
     
-    UIGraphicsPopContext();
-    UIImage* ret = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    return ret;
-    
-}
-
-+ (UIImage*)imageWithSolidColor:(UIColor*)color withSize:(CGSize)size {
-    
-    return [self imageWithSolidColor:color withSize:size andScale:0.0];
-    
-}
-
-#pragma mark - Public Methods
-
-- (UIImage*)stackBlur:(NSUInteger)inradius {
-    
-	int radius=inradius; // Transform unsigned into signed for further operations
-    
-	//	return [other applyBlendFilter:filterOverlay  other:self context:nil];
-	// First get the image into your data buffer
-    
-	CGImageRef inImage = self.CGImage;
-	CFDataRef m_DataRef = CGDataProviderCopyData(CGImageGetDataProvider(inImage));  
-	UInt8 * m_PixelBuf = (UInt8 *) CFDataGetBytePtr(m_DataRef);  	
-    
-    
-	CGContextRef ctx = CGBitmapContextCreate(m_PixelBuf,  
-											 CGImageGetWidth(inImage),  
-											 CGImageGetHeight(inImage),  
-											 CGImageGetBitsPerComponent(inImage),
-											 CGImageGetBytesPerRow(inImage),  
-											 CGImageGetColorSpace(inImage),  
-											 CGImageGetBitmapInfo(inImage) 
-											 ); 
-    
-	if (radius<1){
-		return self;
-	}
-	int w=CGImageGetWidth(inImage);
-	int h=CGImageGetHeight(inImage);
-	int wm=w-1;
-	int hm=h-1;
-	int wh=w*h;
-	int div=radius+radius+1;
-    
-	int *r=malloc(wh*sizeof(int));
-	int *g=malloc(wh*sizeof(int));
-	int *b=malloc(wh*sizeof(int));
-	memset(r,0,wh*sizeof(int));
-	memset(g,0,wh*sizeof(int));
-	memset(b,0,wh*sizeof(int));
-	int rsum,gsum,bsum,x,y,i,p,yp,yi,yw;
-	int *vmin = malloc(sizeof(int)*MAX(w,h));
-	memset(vmin,0,sizeof(int)*MAX(w,h));
-	int divsum=(div+1)>>1;
-	divsum*=divsum;
-	int *dv=malloc(sizeof(int)*(256*divsum));
-	for (i=0;i<256*divsum;i++){
-		dv[i]=(i/divsum);
-	}
-    
-	yw=yi=0;
-    
-	int *stack=malloc(sizeof(int)*(div*3));
-	int stackpointer;
-	int stackstart;
-	int *sir;
-	int rbs;
-	int r1=radius+1;
-	int routsum,goutsum,boutsum;
-	int rinsum,ginsum,binsum;
-	memset(stack,0,sizeof(int)*div*3);
-    
-	for (y=0;y<h;y++){
-		rinsum=ginsum=binsum=routsum=goutsum=boutsum=rsum=gsum=bsum=0;
+    if (newSize.width != self.size.width || newSize.height != self.size.height) {
         
-		for(int i=-radius;i<=radius;i++){
-			sir=&stack[(i+radius)*3];
-			/*			p=m_PixelBuf[yi+MIN(wm,MAX(i,0))];
-			 sir[0]=(p & 0xff0000)>>16;
-			 sir[1]=(p & 0x00ff00)>>8;
-			 sir[2]=(p & 0x0000ff);
-			 */
-			int offset=(yi+MIN(wm,MAX(i,0)))*4;
-			sir[0]=m_PixelBuf[offset];
-			sir[1]=m_PixelBuf[offset+1];
-			sir[2]=m_PixelBuf[offset+2];
-            
-			rbs=r1-abs(i);
-			rsum+=sir[0]*rbs;
-			gsum+=sir[1]*rbs;
-			bsum+=sir[2]*rbs;
-			if (i>0){
-				rinsum+=sir[0];
-				ginsum+=sir[1];
-				binsum+=sir[2];
-			} else {
-				routsum+=sir[0];
-				goutsum+=sir[1];
-				boutsum+=sir[2];
-			}
-		}
-		stackpointer=radius;
+        UIGraphicsBeginImageContextWithOptions(size, YES, self.scale);
         
+        CGContextRef context = UIGraphicsGetCurrentContext();
         
-		for (x=0;x<w;x++){
-			r[yi]=dv[rsum];
-			g[yi]=dv[gsum];
-			b[yi]=dv[bsum];
-            
-			rsum-=routsum;
-			gsum-=goutsum;
-			bsum-=boutsum;
-            
-			stackstart=stackpointer-radius+div;
-			sir=&stack[(stackstart%div)*3];
-            
-			routsum-=sir[0];
-			goutsum-=sir[1];
-			boutsum-=sir[2];
-            
-			if(y==0){
-				vmin[x]=MIN(x+radius+1,wm);
-			}
-            
-			/*			p=m_PixelBuf[yw+vmin[x]];
-			 
-			 sir[0]=(p & 0xff0000)>>16;
-			 sir[1]=(p & 0x00ff00)>>8;
-			 sir[2]=(p & 0x0000ff);
-			 */
-			int offset=(yw+vmin[x])*4;
-			sir[0]=m_PixelBuf[offset];
-			sir[1]=m_PixelBuf[offset+1];
-			sir[2]=m_PixelBuf[offset+2];
-			rinsum+=sir[0];
-			ginsum+=sir[1];
-			binsum+=sir[2];
-            
-			rsum+=rinsum;
-			gsum+=ginsum;
-			bsum+=binsum;
-            
-			stackpointer=(stackpointer+1)%div;
-			sir=&stack[((stackpointer)%div)*3];
-            
-			routsum+=sir[0];
-			goutsum+=sir[1];
-			boutsum+=sir[2];
-            
-			rinsum-=sir[0];
-			ginsum-=sir[1];
-			binsum-=sir[2];
-            
-			yi++;
-		}
-		yw+=w;
-	}
-	for (x=0;x<w;x++){
-		rinsum=ginsum=binsum=routsum=goutsum=boutsum=rsum=gsum=bsum=0;
-		yp=-radius*w;
-		for(i=-radius;i<=radius;i++){
-			yi=MAX(0,yp)+x;
-            
-			sir=&stack[(i+radius)*3];
-            
-			sir[0]=r[yi];
-			sir[1]=g[yi];
-			sir[2]=b[yi];
-            
-			rbs=r1-abs(i);
-            
-			rsum+=r[yi]*rbs;
-			gsum+=g[yi]*rbs;
-			bsum+=b[yi]*rbs;
-            
-			if (i>0){
-				rinsum+=sir[0];
-				ginsum+=sir[1];
-				binsum+=sir[2];
-			} else {
-				routsum+=sir[0];
-				goutsum+=sir[1];
-				boutsum+=sir[2];
-			}
-            
-			if(i<hm){
-				yp+=w;
-			}
-		}
-		yi=x;
-		stackpointer=radius;
-		for (y=0;y<h;y++){
-			//			m_PixelBuf[yi]=0xff000000 | (dv[rsum]<<16) | (dv[gsum]<<8) | dv[bsum];
-			int offset=yi*4;
-			m_PixelBuf[offset]=dv[rsum];
-			m_PixelBuf[offset+1]=dv[gsum];
-			m_PixelBuf[offset+2]=dv[bsum];
-			rsum-=routsum;
-			gsum-=goutsum;
-			bsum-=boutsum;
-            
-			stackstart=stackpointer-radius+div;
-			sir=&stack[(stackstart%div)*3];
-            
-			routsum-=sir[0];
-			goutsum-=sir[1];
-			boutsum-=sir[2];
-            
-			if(x==0){
-				vmin[y]=MIN(y+r1,hm)*w;
-			}
-			p=x+vmin[y];
-            
-			sir[0]=r[p];
-			sir[1]=g[p];
-			sir[2]=b[p];
-            
-			rinsum+=sir[0];
-			ginsum+=sir[1];
-			binsum+=sir[2];
-            
-			rsum+=rinsum;
-			gsum+=ginsum;
-			bsum+=binsum;
-            
-			stackpointer=(stackpointer+1)%div;
-			sir=&stack[(stackpointer)*3];
-            
-			routsum+=sir[0];
-			goutsum+=sir[1];
-			boutsum+=sir[2];
-            
-			rinsum-=sir[0];
-			ginsum-=sir[1];
-			binsum-=sir[2];
-            
-			yi+=w;
-		}
-	}
-	free(r);
-	free(g);
-	free(b);
-	free(vmin);
-	free(dv);
-	free(stack);
-	CGImageRef imageRef = CGBitmapContextCreateImage(ctx);  
-	CGContextRelease(ctx);	
+        CGContextTranslateCTM(context, 0.0, size.height);
+        CGContextScaleCTM(context, 1.0, -1.0);
+        
+        CGContextDrawImage(context, CGRectMake((size.width - newSize.width) / 2, (size.height - newSize.height) / 2, newSize.width, newSize.height), self.CGImage);
+        
+        UIImage* ret = UIGraphicsGetImageFromCurrentImageContext();
+        
+        UIGraphicsEndImageContext();
+        
+        return ret;
+        
+    }
     
-	//	CFRelease(m_DataRef);
-	UIImage *finalImage = [UIImage imageWithCGImage:imageRef scale:self.scale orientation:UIImageOrientationUp];
-	CGImageRelease(imageRef);	
-	CFRelease(m_DataRef);
-	return finalImage;
-}
-
-- (UIImage*)verticallyFlippedImage {
-    
-    UIGraphicsBeginImageContextWithOptions(self.size, YES, self.scale);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    UIGraphicsPushContext(context);
-    
-    CGContextTranslateCTM(context, 0.0, self.size.height);
-    CGContextScaleCTM(context, 1.0, -1.0);
-    
-    [self drawInRect:CGRectMake(0, 0, self.size.width, self.size.height)];
-    
-    UIGraphicsPopContext();
-    
-    UIImage* ret = UIGraphicsGetImageFromCurrentImageContext();
-    
-    UIGraphicsEndImageContext();
-    
-    return ret;
+    return self;
     
 }
 
-- (UIImage*)imageByApplyingMask:(UIImage*)mask {
+- (UIImage *)imageGaussianBlurredWithRadius:(CGFloat)radius {
     
-    CGContextRef context;
+    if ([[UIDevice currentDevice].systemVersion floatValue] >= 6 && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+        
+        @try {
+            
+            EAGLContext* glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+            CIContext* ciContext = [CIContext contextWithEAGLContext:glContext];
+            [glContext release];
+            
+            CGAffineTransform transform = CGAffineTransformIdentity;
+            
+            CIImage *inputImage = [CIImage imageWithCGImage:self.CGImage];
+            
+            CIFilter* clampFilter = [CIFilter filterWithName:@"CIAffineClamp"];
+            [clampFilter setDefaults];
+            [clampFilter setValue:[NSValue valueWithBytes:&transform objCType:@encode(CGAffineTransform)]
+                           forKey:@"inputTransform"];
+            [clampFilter setValue:inputImage
+                           forKey:kCIInputImageKey];
+            
+            CIImage* clampedImage = [clampFilter outputImage];
+            
+            CIFilter *filter = [CIFilter filterWithName:@"CIGaussianBlur"
+                                          keysAndValues:kCIInputImageKey, clampedImage,
+                                @"inputRadius", [NSNumber numberWithDouble:radius],
+                                nil];
+            
+            CIImage *outputImage = [filter outputImage];
+            
+            CGImageRef outImage = [ciContext createCGImage:outputImage
+                                                  fromRect:[inputImage extent]];
+            
+            return [UIImage imageWithCGImage:outImage];
+            
+        }
+        @catch (NSException *exception) {
+            return nil;
+        }
+        
+    }
     
-    UIGraphicsBeginImageContextWithOptions(self.size, NO, self.scale);
-    context = UIGraphicsGetCurrentContext();
-    UIGraphicsPushContext(context);
-    
-    CGRect fullRect = CGRectMake(0, 0, self.size.width, self.size.height);
-    
-    CGContextClipToMask(context, fullRect, mask.CGImage);
-    [self drawInRect:fullRect];
-    
-    UIGraphicsPopContext();
-    
-    UIImage* ret = UIGraphicsGetImageFromCurrentImageContext();
-    
-    UIGraphicsEndImageContext();
-    
-    return ret;
-    
-}
-
-- (UIImage*)imageWithScale:(CGFloat)scale {
-    
-    return [UIImage imageWithCGImage:self.CGImage scale:scale orientation:UIImageOrientationUp];
-    
-}
-
-- (UIImage*)imageResizedToSize:(CGSize)size {
-    
-    CGSize realSize = size;
-    
-    if (self.size.height * (realSize.width / self.size.width) <= size.height)
-        realSize.height = self.size.height * (realSize.width / self.size.width);
-    else
-        realSize.width = self.size.width * (realSize.height / self.size.height);
-    
-    UIGraphicsBeginImageContextWithOptions(size, NO, self.scale);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    UIGraphicsPushContext(context);
-    
-    CGContextSetFillColorWithColor(context, [UIColor blackColor].CGColor);
-    CGContextFillRect(context, CGRectMake(0, 0, size.width, size.height));
-    
-    [self drawInRect:CGRectMake((size.width - realSize.width) / 2, 
-                                (size.height - realSize.height) / 2, 
-                                realSize.width, 
-                                realSize.height)];
-    
-    UIGraphicsPopContext();
-    
-    UIImage* ret = UIGraphicsGetImageFromCurrentImageContext();
-    
-    UIGraphicsEndImageContext();
-    
-    return ret;
-    
-}
-
-- (UIImage*)imageScaledToSize:(CGSize)size {
-    
-    UIGraphicsBeginImageContextWithOptions(size, NO, self.scale);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    UIGraphicsPushContext(context);
-    
-    [self drawInRect:CGRectMake(0, 0, size.width, size.height)];
-    
-    UIGraphicsPopContext();
-    
-    UIImage* ret = UIGraphicsGetImageFromCurrentImageContext();
-    
-    UIGraphicsEndImageContext();
-    
-    return ret;
+    return nil;
     
 }
 

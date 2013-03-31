@@ -20,13 +20,14 @@
 #include "base64.h"
 #include "settings.h"
 #include "hardware.h"
-#include "notificationcenter.h"
+
+#include "settings.h"
 
 #include "parameters.h"
 #include "dmap.h"
 
 #include "webtools.h"
-#include "webconnection.h"
+#include "webserverconnection.h"
 
 #include "dacpclient.h"
 
@@ -42,12 +43,7 @@
 
 #define MAX(x,y) (x > y ? x : y)
 
-const char* raop_session_client_setup_recorder_notification = "raop_session_client_setup_recorder_notification";
-const char* raop_session_client_recording_started_notification = "raop_session_client_recording_started_notification";
-const char* raop_session_client_updated_progress_notification = "raop_session_client_updated_progress_notification";
-const char* raop_session_client_updated_track_notification = "raop_session_client_updated_track_notification";
-const char* raop_session_client_updated_artwork_notification = "raop_session_client_updated_artwork_notification";
-const char* raop_session_client_torned_down_recorder_notification = "raop_session_client_torned_down_recorder_notification";
+void raop_server_session_ended(raop_server_p rs, struct raop_session_t* session);
 
 struct raop_rtp_session_t {
     audio_queue_p queue;
@@ -57,31 +53,46 @@ struct raop_rtp_session_t {
 
 struct raop_session_t {
     mutex_p mutex;
-    bool started;
-    bool stopped;
+    bool is_running;
+    bool is_stopping;
+    bool is_destroyed;
     raop_server_p server;
-    web_connection_p raop_connection;
+    char* password;
+    web_server_connection_p raop_connection;
     char authentication_digest_nonce[33];
     dacp_client_p dacp_client;
     char* user_agent;
     crypt_aes_p crypt_aes;
     decoder_p decoder;
-    struct raop_rtp_session_t* rtp_sessions;
-    uint32_t rtp_sessions_count;
+    struct raop_rtp_session_t* rtp_session;
     uint32_t rtp_last_session_id;
-    raop_session_ended_callback ended_callback;
-    void* ended_callback_ctx;
+    struct {
+        raop_session_client_initiated_callback initiated;
+        raop_session_client_started_recording_callback started_recording;
+        raop_session_client_updated_track_info_callback updated_track_info;
+        raop_session_client_updated_track_position_callback updated_track_position;
+        raop_session_client_updated_artwork_callback updated_artwork;
+        raop_session_client_ended_recording_callback ended_recording;
+        raop_session_ended_callback ended;
+        struct {
+            void* initiated;
+            void* started_recording;
+            void* updated_track_info;
+            void* updated_track_position;
+            void* updated_artwork;
+            void* ended_recording;
+            void* ended;
+        } ctx;
+    } callbacks;
 };
 
 bool _raop_session_check_authentication(struct raop_session_t* rs, const char* method, const char* uri, const char* authentication_parameter) {
     
     assert(method != NULL && uri != NULL);
     
-    bool ret = true;
+    bool ret = (rs->password == NULL);
     
-    const char* password = settings_get_password();
-    
-    if (password != NULL) {
+    if (ret == false) {
         
         if (authentication_parameter != NULL) {
             
@@ -101,10 +112,10 @@ bool _raop_session_check_authentication(struct raop_session_t* rs, const char* m
                     
                     const char* username = parameters_value_for_key(parameters, "username");
                     const char* realm =  parameters_value_for_key(parameters, "realm");
-                    size_t pw_len = strlen(password);
+                    size_t pw_len = strlen(rs->password);
                     
                     char a1pre[strlen(username) + strlen(realm) + pw_len + 3];
-                    sprintf(a1pre, "%s:%s:%s", username, realm, password);
+                    sprintf(a1pre, "%s:%s:%s", username, realm, rs->password);
                     
                     char a2pre[strlen(method) + strlen(uri) + 2];
                     sprintf(a2pre, "%s:%s", method, uri);
@@ -126,17 +137,17 @@ bool _raop_session_check_authentication(struct raop_session_t* rs, const char* m
                     
                     char hfinal[33];
                     hfinal[32] = '\0';
-                    crypt_hex_encode(final, 32, hfinal, 32);
+                    crypt_hex_encode(final, 16, hfinal, 32);
                     
                     for (int i = 0 ; i < 32 ; i++) {
                         hfinal[i] = tolower(hfinal[i]);
                         w_response[i] = tolower(w_response[i]);
                     }
                     
-                    if (strcmp(hfinal, w_response) != 0) {
+                    if (strcmp(hfinal, w_response) == 0)
+                        ret = true;
+                    else
                         log_message(LOG_INFO, "Authentication failure");
-                        ret = false;
-                    }
                     
                 }
                 
@@ -161,7 +172,7 @@ void _raop_session_get_apple_response(struct raop_session_t* rs, const char* cha
     if (actual_length != 16)
         log_message(LOG_ERROR, "Apple-Challenge: Expected 16 bytes - got %d", actual_length);
     
-    struct sockaddr* local_end_point = web_connection_get_local_end_point(rs->raop_connection);
+    struct sockaddr* local_end_point = web_server_connection_get_local_end_point(rs->raop_connection);
     uint64_t hw_identifier = hardware_identifier();
     
     size_t response_size = 32;
@@ -215,24 +226,31 @@ void _raop_session_get_apple_response(struct raop_session_t* rs, const char* cha
     
 }
 
-void _raop_session_raop_connection_request_callback(web_connection_p connection, web_request_p request, void* ctx) {
+void _raop_session_audio_queue_received_audio_callback(audio_queue_p aq, void* ctx) {
     
     struct raop_session_t* rs = (struct raop_session_t*)ctx;
     
-    mutex_lock(rs->mutex);
+    if (rs->dacp_client != NULL)
+        dacp_client_update_playback_state(rs->dacp_client);
+    
+}
+
+void _raop_session_raop_connection_request_callback(web_server_connection_p connection, web_request_p request, void* ctx) {
+    
+    struct raop_session_t* rs = (struct raop_session_t*)ctx;
     
     int c_seq = 0;
     
+    bool keep_alive = true;
+    
     const char* cmd = web_request_get_command(request);
     const char* path = web_request_get_path(request);
-    web_response_p response = web_request_get_response(request);
     web_headers_p request_headers = web_request_get_headers(request);
+    
+    web_response_p response = web_response_create();
     web_headers_p response_headers = web_response_get_headers(response);
     
     web_response_set_status(response, 200, "OK");
-    web_response_set_keep_alive(response, true);
-    
-    struct raop_rtp_session_t* rtp_session = NULL;
     
     if (cmd != NULL && path != NULL) {
         
@@ -240,43 +258,41 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
         
         size_t content_length;
         if ((content_length = web_request_get_content(request, NULL, 0)) > 0) {
-            const char* contentType = web_headers_value(request_headers, "Content-Type");
-            if (strcmp(contentType, "application/sdp") == 0 || strcmp(contentType, "text/parameters") == 0) {
+            
+            const char* content_type = web_headers_value(request_headers, "Content-Type");
+            
+            if (strcmp(content_type, "application/sdp") == 0 || strcmp(content_type, "text/parameters") == 0) {
                 
                 char* content[content_length];
+                
                 web_request_get_content(request, content, content_length);
                 
-                size_t cl = web_tools_convert_new_lines(content, content_length);
-                if (strcmp(contentType, "application/sdp") == 0)
-                    parameters = parameters_create(content, cl, parameters_type_sdp);
-                else if (strcmp(contentType, "text/parameters") == 0)
-                    parameters = parameters_create(content, cl, parameters_type_text);
+                content_length = web_tools_convert_new_lines(content, content_length);
                 
-                log_data(LOG_INFO, (char*)content, content_length);
+                if (strcmp(content_type, "application/sdp") == 0)
+                    parameters = parameters_create(content, content_length, parameters_type_sdp);
+                else if (strcmp(content_type, "text/parameters") == 0)
+                    parameters = parameters_create(content, content_length, parameters_type_text);
                 
             }
+            
         }
         
+        mutex_lock(rs->mutex);
+        
         const char *user_agent;
+        
         if (rs->user_agent == NULL && (user_agent = web_headers_value(request_headers, "User-Agent")) != NULL) {
             rs->user_agent = (char*)malloc(strlen(user_agent) + 1);
             strcpy(rs->user_agent, user_agent);
         }
         
+        struct raop_rtp_session_t* rtp_session = rs->rtp_session;
+        
+        mutex_unlock(rs->mutex);
+        
         web_headers_set_value(response_headers, "Server", "AirTunes/105.1");
         web_headers_set_value(response_headers, "CSeq", "%d", c_seq);
-        
-        const char *session_id;
-        if ((session_id = web_headers_value(request_headers, "Session")) != NULL) {
-            uint32_t session = atoi(session_id);
-            for (uint32_t i = 0 ; i < rs->rtp_sessions_count ; i++)
-                if (rs->rtp_sessions[i].session_id == session) {
-                    rtp_session = &rs->rtp_sessions[i];
-                    web_headers_set_value(response_headers, "Session", "%d", rtp_session->session_id);
-                    break;
-                }
-            
-        }
         
         if (_raop_session_check_authentication(rs, cmd, path, web_headers_value(request_headers, "Authorization"))) {
             
@@ -284,14 +300,16 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
                 web_headers_set_value(response_headers, "Public", "ANNOUNCE, RECORD, PAUSE, FLUSH, TEARDOWN, OPTIONS, GET_PARAMETER, SET_PARAMETER, POST, GET");
             else if (0 == strcmp(cmd, "ANNOUNCE")) {
                 
+                mutex_lock(rs->mutex);
                 if (rs->dacp_client == NULL) {
                     
                     const char* dacp_id;
                     const char* active_remote;
                     if ((dacp_id = web_headers_value(request_headers, "DACP-ID")) != NULL && (active_remote = web_headers_value(request_headers, "Active-Remote")) != NULL)
-                        rs->dacp_client = dacp_client_create(dacp_id, active_remote);
+                        rs->dacp_client = dacp_client_create(web_server_connection_get_remote_end_point(rs->raop_connection), dacp_id, active_remote);
                     
                 }
+                mutex_unlock(rs->mutex);
                 
                 const char* codec = NULL;
                 uint32_t codec_identifier;
@@ -314,7 +332,9 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
                             rtp_fmtp++;
                         rtp_fmtp++;
                         
+                        mutex_lock(rs->mutex);
                         rs->decoder = decoder_create(codec, rtp_fmtp);
+                        mutex_unlock(rs->mutex);
                         
                         const char* aes_key_base64_encrypted;
                         if ((aes_key_base64_encrypted = parameters_value_for_key(parameters, "a-rsaaeskey")) != NULL) {
@@ -337,7 +357,9 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
                             char aes_initializer[size];
                             size = base64_decode(aes_initializer_base64_encoded_padded, aes_initializer);
                             
+                            mutex_lock(rs->mutex);
                             rs->crypt_aes = crypt_aes_create(aes_key, aes_initializer, size);
+                            mutex_unlock(rs->mutex);
                             
                         }
                         
@@ -349,11 +371,9 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
                 
             } else if (0 == strcmp(cmd, "SETUP")) {
                 
-                mutex_unlock(rs->mutex);
-                bool is_recorder = raop_server_is_recording(rs->server);
-                mutex_lock(rs->mutex);
+                bool is_recording = raop_server_is_recording(rs->server);
                 
-                if (!is_recorder) {
+                if (!is_recording) {
                     
                     const char* transport;
                     if ((transport = web_headers_value(request_headers, "Transport"))) {
@@ -369,24 +389,27 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
                         if ((s_timing_port = parameters_value_for_key(transport_params, "timing_port")) != NULL)
                             timing_port = atoi(s_timing_port);
                         
+                        mutex_lock(rs->mutex);
+                        
                         audio_queue_p audio_queue = audio_queue_create(rs->decoder);
                         
-                        struct sockaddr* local_end_point = web_connection_get_local_end_point(rs->raop_connection);
-                        struct sockaddr* remote_end_point = web_connection_get_remote_end_point(rs->raop_connection);
+                        audio_queue_set_received_audio_callback(audio_queue, _raop_session_audio_queue_received_audio_callback, rs);
+                        
+                        struct sockaddr* local_end_point = web_server_connection_get_local_end_point(rs->raop_connection);
+                        struct sockaddr* remote_end_point = web_server_connection_get_remote_end_point(rs->raop_connection);
                         rtp_recorder_p new_recorder = rtp_recorder_create(rs->crypt_aes, audio_queue, local_end_point, remote_end_point, control_port, timing_port);
                         
                         uint32_t session_id = ++rs->rtp_last_session_id;
-                        
-                        rs->rtp_sessions = (struct raop_rtp_session_t*)realloc(rs->rtp_sessions, sizeof(struct raop_rtp_session_t) + (rs->rtp_sessions_count + 1));
-                        rs->rtp_sessions[rs->rtp_sessions_count] = (struct raop_rtp_session_t){ audio_queue, new_recorder, session_id };
-                        rtp_session = &rs->rtp_sessions[rs->rtp_sessions_count];
-                        rs->rtp_sessions_count++;
+                        rs->rtp_session = (struct raop_rtp_session_t*)malloc(sizeof(struct raop_rtp_session_t));
+                        rs->rtp_session->queue = audio_queue;
+                        rs->rtp_session->recorder = new_recorder;
+                        rs->rtp_session->session_id = session_id;
                         
                         web_headers_set_value(response_headers, "Session", "%d", session_id);
                         
-                        parameters_set_value(transport_params, "timing_port", "%d", rtp_recorder_get_timing_port(rtp_session->recorder));
-                        parameters_set_value(transport_params, "control_port", "%d", rtp_recorder_get_control_port(rtp_session->recorder));
-                        parameters_set_value(transport_params, "server_port", "%d", rtp_recorder_get_streaming_port(rtp_session->recorder));
+                        parameters_set_value(transport_params, "timing_port", "%d", rtp_recorder_get_timing_port(rs->rtp_session->recorder));
+                        parameters_set_value(transport_params, "control_port", "%d", rtp_recorder_get_control_port(rs->rtp_session->recorder));
+                        parameters_set_value(transport_params, "server_port", "%d", rtp_recorder_get_streaming_port(rs->rtp_session->recorder));
                         
                         size_t transport_reply_len = parameters_write(transport_params, NULL, 0, parameters_type_http_header);
                         char transport_reply[transport_reply_len];
@@ -394,12 +417,15 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
                         
                         web_headers_set_value(response_headers, "Transport", transport_reply);
                         
-                        mutex_unlock(rs->mutex);
-                        notification_center_post_notification(raop_session_client_setup_recorder_notification, rs, NULL);
-                        mutex_lock(rs->mutex);
-                        
                         if (parameters != NULL)
                             parameters_destroy(parameters);
+                        
+                        parameters_destroy(transport_params);
+                        
+                        mutex_unlock(rs->mutex);
+                        
+                        if (rs->callbacks.initiated != NULL)
+                            rs->callbacks.initiated(rs, rs->callbacks.ctx.initiated);
                         
                     } else
                         web_response_set_status(response, 400, "Bad Request");
@@ -413,11 +439,10 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
                     
                     audio_queue_start(rtp_session->queue);
                     
-                    mutex_unlock(rs->mutex);
-                    notification_center_post_notification(raop_session_client_recording_started_notification, rs, NULL);
-                    mutex_lock(rs->mutex);
-                    
                     web_headers_set_value(response_headers, "Audio-Latency", "11025");
+                    
+                    if (rs->callbacks.started_recording != NULL)
+                        rs->callbacks.started_recording(rs, rs->callbacks.ctx.started_recording);
                     
                 } else
                     web_response_set_status(response, 400, "Bad Request");
@@ -435,7 +460,7 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
                         
                         audio_output_set_volume(audio_queue_get_output(rtp_session->queue), MAX(pow(10.0, 0.05 * f_volume), 0.0));
                         
-                    } else if ((progress = parameters_value_for_key(parameters, "progress"))) {
+                    } else if (rs->callbacks.updated_track_position != NULL && (progress = parameters_value_for_key(parameters, "progress"))) {
                         
                         const char* parts[3] = { NULL, NULL, NULL };
                         uint32_t c_art = 1;
@@ -449,14 +474,7 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
                         
                         struct decoder_output_format_t output_format = decoder_get_output_format(rs->decoder);
                         
-                        struct raop_session_client_updated_progress_info info;
-                        
-                        info.position = (atoi(parts[1]) - start) / (double)output_format.sample_rate;
-                        info.total = (atoi(parts[2]) - start) / (double)output_format.sample_rate;
-                        
-                        mutex_unlock(rs->mutex);
-                        notification_center_post_notification(raop_session_client_updated_progress_notification, rs, &info);
-                        mutex_lock(rs->mutex);
+                        rs->callbacks.updated_track_position(rs, (atoi(parts[1]) - start) / (double)output_format.sample_rate, (atoi(parts[2]) - start) / (double)output_format.sample_rate, rs->callbacks.ctx.updated_track_position);
                         
                     }
                     
@@ -468,7 +486,7 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
                     char* data = (char*)malloc(data_size);
                     web_request_get_content(request, data, data_size);
                     
-                    if (0 == strcmp(mime_type, "application/x-dmap-tagged")) {
+                    if (rs->callbacks.updated_track_info != NULL && 0 == strcmp(mime_type, "application/x-dmap-tagged")) {
                         
                         dmap_p tags = dmap_create();
                         dmap_parse(tags, data, data_size);
@@ -477,34 +495,19 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
                         if (dmap_get_count(tags) > 0 && dmap_type_for_tag((container_tag = dmap_get_tag_at_index(tags, 0))) == dmap_type_container) {
                             
                             dmap_p track_tags = dmap_container_for_atom_tag(tags, container_tag);
-                            mutex_unlock(rs->mutex);
-                            notification_center_post_notification(raop_session_client_updated_track_notification, rs, track_tags);
-                            mutex_lock(rs->mutex);
                             
                             const char* title = dmap_string_for_atom_identifer(track_tags, "dmap.itemname");
-                            const char* artist = dmap_string_for_atom_identifer(track_tags, "dmap.songartist");
-                            if (title != NULL && artist != NULL)
-                                log_message(LOG_INFO, "Now playing: \"%s\" by %s", title, artist);
+                            const char* artist = dmap_string_for_atom_identifer(track_tags, "daap.songartist");
+                            const char* album = dmap_string_for_atom_identifer(track_tags, "daap.songalbum");
+                            
+                            rs->callbacks.updated_track_info(rs, title, artist, album, rs->callbacks.ctx.updated_track_info);
                             
                         }
                         
                         dmap_destroy(tags);
                         
-                    } else {
-                        
-                        log_message(LOG_INFO, "Track info received (Content-Type: %s)", mime_type);
-                        
-                        struct raop_session_client_updated_artwork_info info;
-                        
-                        info.data = data;
-                        info.data_size = data_size;
-                        info.mime_type = mime_type;
-                        
-                        mutex_unlock(rs->mutex);
-                        notification_center_post_notification(raop_session_client_updated_artwork_notification, rs, &info);
-                        mutex_lock(rs->mutex);
-                        
-                    }
+                    } else if (rs->callbacks.updated_artwork != NULL)
+                        rs->callbacks.updated_artwork(rs, data, data_size, mime_type, rs->callbacks.ctx.updated_artwork);
                     
                     free(data);
                     
@@ -526,30 +529,24 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
                     
                 }
                 
-                mutex_unlock(rs->mutex);
+                if (rs->dacp_client != NULL)
+                    dacp_client_update_playback_state(rs->dacp_client);
+                
                 audio_queue_flush(rtp_session->queue, last_seq);
-                mutex_lock(rs->mutex);
                 
             } else if (0 == strcmp(cmd, "TEARDOWN") && rtp_session != NULL) {
                 
-                audio_queue_destroy(rtp_session->queue);
-                rtp_recorder_destroy(rtp_session->recorder);
+                keep_alive = false;
                 
-                for (uint32_t i = 0 ; i < rs->rtp_sessions_count ; i++)
-                    if (rs->rtp_sessions[i].session_id == rtp_session->session_id) {
-                        for (uint32_t a = i + 1 ; a < rs->rtp_sessions_count ; a++)
-                            rs->rtp_sessions[i - 1] = rs->rtp_sessions[i];
-                        break;
-                    }
-                
-                mutex_unlock(rs->mutex);
-                notification_center_post_notification(raop_session_client_torned_down_recorder_notification, rs, NULL);
-                mutex_lock(rs->mutex);
+                if (rs->callbacks.ended_recording != NULL)
+                    rs->callbacks.ended_recording(rs, rs->callbacks.ctx.ended_recording);
                 
             } else
                 web_response_set_status(response, 400, "Bad Request");
             
         } else {
+            
+            mutex_lock(rs->mutex);
             
             char nonce[16];
             
@@ -560,6 +557,8 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
             rs->authentication_digest_nonce[32] = '\0';
             
             web_headers_set_value(response_headers, "WWW-Authenticate", "Digest realm=\"raop\", nonce=\"%s\"", rs->authentication_digest_nonce);
+            
+            mutex_unlock(rs->mutex);
             
             web_response_set_status(response, 401, "Unauthorized");
             
@@ -591,11 +590,13 @@ void _raop_session_raop_connection_request_callback(web_connection_p connection,
     } else
         web_response_set_status(response, 400, "Bad Request");
     
-    mutex_unlock(rs->mutex);
+    web_server_connection_send_response(rs->raop_connection, response, "RTSP/1.0", !keep_alive);
+    
+    web_response_destroy(response);
     
 }
 
-void _raop_session_raop_closed_callback(web_connection_p connection, void* ctx) {
+void _raop_session_raop_closed_callback(web_server_connection_p connection, void* ctx) {
     
     struct raop_session_t* rs = (struct raop_session_t*)ctx;
     
@@ -603,7 +604,7 @@ void _raop_session_raop_closed_callback(web_connection_p connection, void* ctx) 
     
 }
 
-struct raop_session_t* raop_session_create(raop_server_p server, web_connection_p connection) {
+struct raop_session_t* raop_session_create(raop_server_p server, web_server_connection_p connection, settings_p settings) {
     
     struct raop_session_t* rs = (struct raop_session_t*)malloc(sizeof(struct raop_session_t));
     bzero(rs, sizeof(struct raop_session_t));
@@ -611,8 +612,14 @@ struct raop_session_t* raop_session_create(raop_server_p server, web_connection_
     rs->server = server;
     rs->raop_connection = connection;
     
-    web_connection_set_request_callback(rs->raop_connection, _raop_session_raop_connection_request_callback, rs);
-    web_connection_set_closed_callback(rs->raop_connection, _raop_session_raop_closed_callback, rs);
+    const char* password = settings_get_password(settings);
+    if (password != NULL && strlen(password) > 0) {
+        rs->password = (char*)malloc(strlen(password) + 1);
+        strcpy(rs->password, password);
+    }
+    
+    web_server_connection_set_request_callback(rs->raop_connection, _raop_session_raop_connection_request_callback, rs);
+    web_server_connection_set_closed_callback(rs->raop_connection, _raop_session_raop_closed_callback, rs);
     
     rs->mutex = mutex_create();
     
@@ -620,10 +627,88 @@ struct raop_session_t* raop_session_create(raop_server_p server, web_connection_
     
 }
 
-void _raop_session_reset(struct raop_session_t* rs) {
+void raop_session_destroy(struct raop_session_t* rs) {
     
-    if (rs->started && !rs->stopped)
-        web_connection_close(rs->raop_connection);
+    mutex_lock(rs->mutex);
+    
+    if (rs->is_stopping == false) {
+        
+        if (rs->is_running) {
+            mutex_unlock(rs->mutex);
+            raop_session_stop(rs);
+            mutex_lock(rs->mutex);
+        }
+        
+        if (rs->password != NULL) {
+            free(rs->password);
+            rs->password = NULL;
+        }
+        
+        mutex_unlock(rs->mutex);
+        
+        mutex_destroy(rs->mutex);
+        rs->mutex = NULL;
+        
+        free(rs);
+        
+        return;
+        
+    } else
+        rs->is_destroyed = true;
+    
+    mutex_unlock(rs->mutex);
+    
+}
+
+void raop_session_start(struct raop_session_t* rs) {
+    
+    mutex_lock(rs->mutex);
+    
+    if (!rs->is_running)
+        rs->is_running = true;
+    
+    mutex_unlock(rs->mutex);
+    
+}
+
+void raop_session_stop(struct raop_session_t* rs) {
+    
+    bool stopped = false;
+    
+    mutex_lock(rs->mutex);
+    
+    rs->is_stopping = true;
+    
+    if (rs->is_running) {
+        
+        web_server_connection_close(rs->raop_connection);
+        rs->is_running = false;
+        stopped = true;
+        
+        if (rs->callbacks.ended != NULL) {
+            mutex_unlock(rs->mutex);
+            rs->callbacks.ended(rs, rs->callbacks.ctx.ended);
+            mutex_lock(rs->mutex);
+        }
+        
+    }
+    
+    if (rs->rtp_session != NULL){
+        rtp_recorder_destroy(rs->rtp_session->recorder);
+        audio_queue_destroy(rs->rtp_session->queue);
+        free(rs->rtp_session);
+        rs->rtp_session = NULL;
+    }
+    
+    if (rs->decoder != NULL) {
+        decoder_destroy(rs->decoder);
+        rs->decoder = NULL;
+    }
+    
+    if (rs->crypt_aes != NULL) {
+        crypt_aes_destroy(rs->crypt_aes);
+        rs->crypt_aes = NULL;
+    }
     
     if (rs->dacp_client != NULL) {
         dacp_client_destroy(rs->dacp_client);
@@ -634,69 +719,80 @@ void _raop_session_reset(struct raop_session_t* rs) {
         free(rs->user_agent);
         rs->user_agent = NULL;
     }
-
-}
-
-void raop_session_destroy(struct raop_session_t* rs) {
     
-    mutex_lock(rs->mutex);
-    
-    _raop_session_reset(rs);
+    rs->is_stopping = false;
     
     mutex_unlock(rs->mutex);
     
-    mutex_destroy(rs->mutex);
+    if (stopped)
+        raop_server_session_ended(rs->server, rs);
     
-    free(rs);
-    
-}
-
-void raop_session_start(struct raop_session_t* rs) {
-    
-    mutex_lock(rs->mutex);
-    
-    if (!rs->started)
-        rs->started = true;
-    
-    mutex_unlock(rs->mutex);
+    if (rs->is_destroyed)
+        raop_session_destroy(rs);
     
 }
 
-void raop_session_stop(struct raop_session_t* rs) {
+void raop_session_set_client_initiated_callback(struct raop_session_t* rs, raop_session_client_initiated_callback callback, void* ctx) {
     
-    mutex_lock(rs->mutex);
+    rs->callbacks.initiated = callback;
+    rs->callbacks.ctx.initiated = ctx;
     
-    bool closed = false;
+}
+
+void raop_session_set_client_started_recording_callback(struct raop_session_t* rs, raop_session_client_started_recording_callback callback, void* ctx) {
     
-    if (rs->started && !rs->stopped) {
-        
-        _raop_session_reset(rs);
-        
-        closed = rs->stopped = true;
-        closed = true;
-        
-    }
+    rs->callbacks.started_recording = callback;
+    rs->callbacks.ctx.started_recording = ctx;
     
-    mutex_unlock(rs->mutex);
+}
+
+void raop_session_set_client_updated_track_info_callback(struct raop_session_t* rs, raop_session_client_updated_track_info_callback callback, void* ctx) {
     
-    if (closed && rs->ended_callback != NULL)
-        rs->ended_callback(rs, rs->ended_callback_ctx);
+    rs->callbacks.updated_track_info = callback;
+    rs->callbacks.ctx.updated_track_info = ctx;
+    
+}
+
+void raop_session_set_client_updated_track_position_callback(struct raop_session_t* rs, raop_session_client_updated_track_position_callback callback, void* ctx) {
+    
+    rs->callbacks.updated_track_position = callback;
+    rs->callbacks.ctx.updated_track_position = ctx;
+    
+}
+
+void raop_session_set_client_updated_artwork_callback(struct raop_session_t* rs, raop_session_client_updated_artwork_callback callback, void* ctx) {
+    
+    rs->callbacks.updated_artwork = callback;
+    rs->callbacks.ctx.updated_artwork = ctx;
+    
+}
+
+void raop_session_set_client_ended_recording_callback(struct raop_session_t* rs, raop_session_client_ended_recording_callback callback, void* ctx) {
+    
+    rs->callbacks.ended_recording = callback;
+    rs->callbacks.ctx.ended_recording = ctx;
     
 }
 
 void raop_session_set_ended_callback(struct raop_session_t* rs, raop_session_ended_callback callback, void* ctx) {
     
-    rs->ended_callback = callback;
-    rs->ended_callback_ctx = ctx;
+    rs->callbacks.ended = callback;
+    rs->callbacks.ctx.ended = ctx;
     
 }
 
 bool raop_session_is_recording(struct raop_session_t* rs) {
     
     mutex_lock(rs->mutex);
-    bool ret = (rs->rtp_sessions_count > 0);
+    bool ret = (rs->rtp_session != NULL);
     mutex_unlock(rs->mutex);
     
     return ret;
+    
+}
+
+dacp_client_p raop_session_get_dacp_client(struct raop_session_t* rs) {
+    
+    return rs->dacp_client;
     
 }

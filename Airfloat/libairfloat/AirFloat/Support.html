@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Support</title>
+        <style type="text/css">
+            
+            * {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none; /* Disable selection/Copy of UIWebView */
+            }
+            
+            body {
+                font-family: Helvetica;
+                font-weight: bold;
+                color: white;
+                margin: 20px;
+                background-color: transparent;
+            }
+			
+			a, a:visited, a:active {
+				color: rgba(255,255,255,.8);
+				text-decoration: underline;
+			}
+            
+            p {
+                font-size: 12px;
+                text-align: center;
+                line-height: 1.3em;
+            }
+            
+            #header {
+                width: 195px;
+                height: 64px;
+                margin-left: 50px;
+                margin-bottom: 30px;
+            }
+            
+            #logo {
+                width: 64px;
+                height: 64px;
+                margin: 0px auto;
+                display: block;
+            }
+            
+            h1 {
+                padding-top: 31px;
+				text-align: center;
+                margin: 15px 0px;
+                padding: 0em;
+            }
+                        
+            #donate {
+                margin-top: 30px;
+				margin-bottom: 30px;
+            }
+            
+            #donate img {
+                width: 92px;
+                height: 47px;
+            }
+            
+			#source {
+				color: rgba(255,255,255,.8);
+			}
+            
+        </style>
+        <script type="text/javascript">
+            
+            window.onload = function() {
+                
+                var imgs = document.getElementsByTagName('img');
+                for (var i = 0 ; i < imgs.length ; i++) {
+                    if (imgs[i].getAttribute('data-retina') == 'true') {
+						imgs[i].src = imgs[i].src.substr(0, imgs[i].src.length - 4) + '@2x.png';
+					}
+                }
+                
+            }
+            
+        </script>
+	</head>
+	<body>
+		<img id="logo" data-retina="true" src="AirFloatLogo-Support.png" />
+		<h1>Support</h1>
+		<p>AirFloat is the result of countless hours of work. It is a complete reimplementation of the AirPlay audio protocol. And as such it has been almost four months in the works as a full time project.</p>
+		<p>AirFloat is made freely available to the jailbreak community as an homage to all the great work being done in the pursuit of making iOS an even greater platform.</p>
+		<p>If you like AirFloat and like using it, please consider supporting me in the continuous development and maintenance of the app.</p>
+		<p>Thanks!</p>
+		<p id="donate"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=R59FM5PEGHT6E"><img src="PayPalDonate.png" data-retina="true" alt="Donate" /></a></p>
+		<p id="source">Source codes are available through <a href="https://www.github.com/trenskow/AirFloat">GitHub</a>.</p>
+	</body>
+</html>

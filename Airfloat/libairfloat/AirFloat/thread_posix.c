@@ -49,10 +49,7 @@ struct thread_t* thread_create(thread_start_fnc start_fnc, void* ctx) {
 
 void thread_destroy(struct thread_t* t) {
     
-    if (t->thread != NULL) {
-        pthread_join(*t->thread, NULL);
-        free(t->thread);
-    }
+    thread_join(t);
     
     free(t);
     
@@ -66,8 +63,11 @@ void thread_set_name(const char* name) {
 
 void thread_join(struct thread_t* t) {
     
-    if (t->thread != NULL)
+    if (t->thread != NULL) {
         pthread_join(*t->thread, NULL);
+        free(t->thread);
+        t->thread = NULL;
+    }
     
 }
 

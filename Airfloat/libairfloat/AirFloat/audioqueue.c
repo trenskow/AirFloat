@@ -15,7 +15,6 @@
 #include "log.h"
 #include "mutex.h"
 #include "condition.h"
-#include "notificationcenter.h"
 #include "decoder.h"
 #include "hardware.h"
 #include "audiooutput.h"
@@ -49,7 +48,7 @@ enum audio_packet_state {
 };
 
 struct audio_packet_t {
-    uint32_t seq_no;
+    uint16_t seq_no;
     uint32_t sample_time;
     double time;
     enum audio_packet_state state;
@@ -144,6 +143,8 @@ struct audio_queue_t {
 #if DEBUG
     uint32_t non_garbage;
 #endif
+    audio_queue_received_audio_callback audio_received_callback;
+    void* audio_received_callback_ctx;
     audio_output_p output;
     struct audio_packet_t* queue_head;
     struct audio_packet_t* queue_tail;
@@ -152,11 +153,9 @@ struct audio_queue_t {
     bool output_is_homed;
     double output_homed_at_host_time;
     bool synchronization_enabled;
-    bool synchronization_notification_sent;
     double client_server_difference;
     double client_server_difference_history[10];
     int client_server_difference_history_count;
-    uint32_t fold_count;
     uint32_t queue_count;
     uint32_t missing_count;
     uint32_t frame_count;
@@ -169,10 +168,6 @@ struct audio_queue_t {
     bool destroyed;
 };
 
-const char* audio_queue_synchronization_notification = "audio_queue_synchronization_notification";
-const char* audio_queue_flush_notification = "audio_queue_flush_notification";
-
-uint32_t _audio_queue_handle_sequence_overflow(struct audio_queue_t* aq, uint32_t seq_no);
 void _audio_queue_add_packet_to_tail(struct audio_queue_t* aq, struct audio_packet_t* packet);
 struct audio_packet_t* _audio_queue_add_empty_packet(struct audio_queue_t* aq);
 struct audio_packet_t* _audio_queue_pop_packet_from_head(struct audio_queue_t* aq, bool keep_queue_filled);
@@ -191,10 +186,10 @@ void _audio_queue_debug_check_queue_consistancy(struct audio_queue_t* aq) {
     
     if (aq->queue_head != NULL) {
         
-        uint32_t c_seq_no = aq->queue_head->seq_no + 1;
+        uint16_t c_seq_no = aq->queue_head->seq_no + 1;
         size_t c_sample_time = aq->queue_head->sample_time + (aq->queue_head->buffer_size / aq->output_format.frame_size);
         
-        frame_count = aq->queue_tail->sample_time - aq->queue_head->sample_time + aq->output_format.frames_per_packet;
+        frame_count = ((uint32_t)aq->queue_head->buffer_size / aq->output_format.frame_size);
         
         queue_count++;
         if (aq->queue_head->state != audio_packet_state_complete)
@@ -212,7 +207,7 @@ void _audio_queue_debug_check_queue_consistancy(struct audio_queue_t* aq) {
             
             c_seq_no++;
             c_sample_time += (current_packet->buffer_size / aq->output_format.frame_size);
-            
+            frame_count += (current_packet->buffer_size / aq->output_format.frame_size);
             
         }
         
@@ -223,21 +218,6 @@ void _audio_queue_debug_check_queue_consistancy(struct audio_queue_t* aq) {
     assert(frame_count == aq->frame_count /* Queue number of audio frames */);
     
 #endif
-    
-}
-
-uint32_t _audio_queue_handle_sequence_overflow(struct audio_queue_t* aq, uint32_t seq_no) {
-    
-    uint32_t ret = (seq_no & 0xFFFF) + (aq->fold_count << 16);
-    
-    if ((seq_no & 0xFFFF) == 0xFFFF)
-        aq->fold_count++;
-    
-    // If package is a resend from before we folded.
-    if (aq->queue_tail != NULL && IS_UPPER(seq_no) && IS_LOWER(aq->queue_tail->seq_no))
-        ret = seq_no + ((aq->fold_count - 1) << 16);
-    
-    return ret;
     
 }
 
@@ -262,6 +242,11 @@ void _audio_queue_add_packet_to_tail(struct audio_queue_t* aq, struct audio_pack
     
     aq->queue_tail = packet;
     
+    _audio_queue_debug_check_queue_consistancy(aq);
+    
+    if ((packet->seq_no & 0xFF) == 0xFF)
+        log_message(LOG_INFO, "Added package %d to queue", packet->seq_no);
+    
     while (aq->queue_count > MAX_QUEUE_COUNT)
         audio_packet_destroy(_audio_queue_pop_packet_from_head(aq, false));
     
@@ -272,7 +257,7 @@ struct audio_packet_t* _audio_queue_add_empty_packet(struct audio_queue_t* aq) {
     struct audio_packet_t* new_packet = audio_packet_create(audio_packet_state_missing);
     
     if (aq->queue_tail != NULL)
-        new_packet->seq_no = _audio_queue_handle_sequence_overflow(aq, aq->queue_tail->seq_no + 1);
+        new_packet->seq_no = aq->queue_tail->seq_no + 1;
     
     size_t size = aq->output_format.frame_size * aq->output_format.frames_per_packet;
     char* emptyBuffer[size];
@@ -291,7 +276,8 @@ struct audio_packet_t* _audio_queue_pop_packet_from_head(struct audio_queue_t* a
     
     struct audio_packet_t* head_packet = aq->queue_head;
     
-    if (aq->queue_head != NULL) {
+    if (head_packet != NULL) {
+        
         aq->queue_head = head_packet->next;
         if (aq->queue_head != NULL)
             aq->queue_head->previous = NULL;
@@ -313,11 +299,11 @@ struct audio_packet_t* _audio_queue_pop_packet_from_head(struct audio_queue_t* a
         
         condition_signal(aq->condition);
         
-        return head_packet;
-        
     }
     
-    return NULL;
+    _audio_queue_debug_check_queue_consistancy(aq);
+    
+    return head_packet;
     
 }
 
@@ -330,15 +316,7 @@ bool _audio_queue_has_available_packet(struct audio_queue_t* aq) {
     else {
         
         ret = ret && (aq->frame_count >= aq->output_format.sample_rate * 2);
-        
-        if (ret && !aq->synchronization_notification_sent) {
-            
-            aq->synchronization_notification_sent = true;
-            
-            log_message(LOG_INFO, "Queue was synced");
-            notification_center_post_notification(audio_queue_synchronization_notification, aq, NULL);
-            
-        }
+        log_message(LOG_INFO, "Queue was synced");
         
     }
     
@@ -363,9 +341,15 @@ void _audio_queue_get_audio_buffer(struct audio_queue_t* aq, void* buffer, size_
         
         while (buf_write_size > 0) {
             
-            if (aq->queue_head) {
+            if (aq->queue_head != NULL) {
                 
                 struct audio_packet_t* audio_packet = aq->queue_head;
+                
+                if (audio_packet->state == audio_packet_state_missing) {
+                    log_message(LOG_INFO, "Missing package %d made it to playhead", audio_packet->seq_no);
+                    audio_output_set_muted(aq->output, true);
+                    aq->output_homed_at_host_time = hardware_get_time() + 1.0;
+                }
                 
                 size_t written = audio_packet_get_buffer(audio_packet, buf_write_head, buf_write_size);
                 
@@ -477,7 +461,7 @@ void _audio_queue_output_render(audio_output_p ao, void* buffer, size_t size, do
                 }
                 
                 if (aq->queue_head && aq->queue_head->seq_no % 100 == 0)
-                    log_message(LOG_INFO, "%d packages in queue (%d missing / seq %d / delay %1.3f / playback rate %1.3f)", aq->queue_count, aq->missing_count, aq->queue_head->seq_no & 0xFFFF, delay, audio_output_get_playback_rate(aq->output));
+                    log_message(LOG_INFO, "%d packages in queue (%d missing / seq %d / delay %1.3f / playback rate %1.3f)", aq->queue_count, aq->missing_count, aq->queue_head->seq_no, delay, audio_output_get_playback_rate(aq->output));
                 
             }
             
@@ -487,8 +471,6 @@ void _audio_queue_output_render(audio_output_p ao, void* buffer, size_t size, do
         aq->output_is_homed = false;
         log_message(LOG_INFO, "Output lost synchronization");
     }
-    
-    _audio_queue_debug_check_queue_consistancy(aq);
     
     mutex_unlock(aq->mutex);
     
@@ -506,7 +488,7 @@ struct audio_queue_t* audio_queue_create(decoder_p decoder) {
     
     aq->flush_last_seq_no = true;
     aq->synchronization_enabled = true;
-    
+  
     aq->output = audio_output_create(aq->output_format);
     audio_output_set_callback(aq->output, _audio_queue_output_render, aq);
     
@@ -524,6 +506,8 @@ void audio_queue_destroy(struct audio_queue_t* aq) {
         audio_packet_destroy(packet);
     }
     
+    aq->queue_count = aq->missing_count = aq->frame_count = 0;
+    
     aq->destroyed = true;
     
     condition_broadcast(aq->condition);
@@ -539,14 +523,23 @@ void audio_queue_destroy(struct audio_queue_t* aq) {
     
 }
 
-void audio_queue_disable_synchronization(audio_queue_p aq) {
+void audio_queue_set_received_audio_callback(struct audio_queue_t* aq, audio_queue_received_audio_callback callback, void* ctx) {
+    
+    mutex_lock(aq->mutex);
+    
+    aq->audio_received_callback = callback;
+    aq->audio_received_callback_ctx = ctx;
+    
+    mutex_unlock(aq->mutex);
+    
+}
+
+void audio_queue_disable_synchronization(struct audio_queue_t* aq) {
     
     mutex_lock(aq->mutex);
     
     log_message(LOG_INFO, "Synchronization is disabled");
-    aq->synchronization_notification_sent = true;
     aq->synchronization_enabled = false;
-    notification_center_post_notification(audio_queue_synchronization_notification, aq, NULL);
     
     mutex_unlock(aq->mutex);
     
@@ -565,9 +558,7 @@ void audio_queue_synchronize(struct audio_queue_t* aq, uint32_t current_sample_t
         
         audio_output_start(aq->output);
         
-        aq->synchronization_notification_sent = true;
         log_message(LOG_INFO, "Queue was synced");
-        notification_center_post_notification(audio_queue_synchronization_notification, aq, NULL);
         
     }
     
@@ -600,7 +591,7 @@ void audio_queue_set_remote_time(struct audio_queue_t* aq, double remote_time) {
 
 }
 
-uint32_t audio_queue_add_packet(struct audio_queue_t* aq, void* encoded_buffer, size_t encoded_buffer_size, int32_t seq_no, uint32_t sample_time) {
+uint32_t audio_queue_add_packet(struct audio_queue_t* aq, void* encoded_buffer, size_t encoded_buffer_size, uint16_t seq_no, uint32_t sample_time) {
     
     assert(encoded_buffer != NULL && encoded_buffer_size > 0);
     
@@ -611,6 +602,18 @@ uint32_t audio_queue_add_packet(struct audio_queue_t* aq, void* encoded_buffer, 
     if (aq->flushed && (seq_no >= aq->flush_last_seq_no || (IS_LOWER(seq_no) && IS_UPPER(aq->flush_last_seq_no)))) {
         aq->flushed = false;
         aq->flush_last_seq_no = 0;
+    }
+    
+    bool package_resend = false;
+    
+    // Determine if package is a resend package.
+    if (aq->queue_head != NULL) {
+        
+        if (aq->queue_tail->seq_no < aq->queue_head->seq_no)
+            package_resend = (seq_no <= aq->queue_tail->seq_no || seq_no >= aq->queue_head->seq_no);
+        else
+            package_resend = (seq_no >= aq->queue_head->seq_no && seq_no <= aq->queue_tail->seq_no);
+        
     }
     
     if (!aq->flushed) {
@@ -631,14 +634,28 @@ uint32_t audio_queue_add_packet(struct audio_queue_t* aq, void* encoded_buffer, 
             memcpy(decoded_buffer, encoded_buffer, encoded_buffer_size);
         }
         
-        seq_no = _audio_queue_handle_sequence_overflow(aq, seq_no);
-        
-        if (aq->queue_head == NULL || aq->queue_tail->seq_no < seq_no) {
+        if (aq->queue_head == NULL || !package_resend) {
             
-            // Add missing packets
-            ret += (aq->queue_head != NULL ? seq_no - (aq->queue_tail->seq_no + 1) : 0);
-            for (int i = 0 ; i < ret ; i++)
-                _audio_queue_add_empty_packet(aq);
+            if (aq->queue_head != NULL) {
+                                
+                // If sequence number has overflowed
+                if (seq_no < aq->queue_tail->seq_no)
+                    ret = ((uint32_t)seq_no | (1 << 16)) - aq->queue_tail->seq_no - 1;
+                else
+                    ret = seq_no - aq->queue_tail->seq_no - 1;
+                
+                // Late packages can make it here and pose as new packet in far future. Break out if so.
+                if (IS_UPPER(ret)) {
+                    free(decoded_buffer);
+                    mutex_unlock(aq->mutex);
+                    return 0;
+                }
+                
+                for (uint32_t i = 0 ; i < ret ; i++)
+                    _audio_queue_add_empty_packet(aq);
+                
+            } else if (!package_resend && aq->audio_received_callback != NULL)
+                aq->audio_received_callback(aq, aq->audio_received_callback_ctx);
             
             struct audio_packet_t* new_packet = audio_packet_create(audio_packet_state_complete);
             
@@ -676,8 +693,6 @@ uint32_t audio_queue_add_packet(struct audio_queue_t* aq, void* encoded_buffer, 
             
         }
         
-        _audio_queue_debug_check_queue_consistancy(aq);
-        
         free(decoded_buffer);
         
     }
@@ -692,8 +707,6 @@ struct audio_queue_missing_packet_window audio_queue_get_next_missing_window(str
     
     struct audio_queue_missing_packet_window ret;
     
-    bool found = false;
-    
     ret.seq_no = 0;
     ret.packet_count = 0;
     
@@ -701,28 +714,21 @@ struct audio_queue_missing_packet_window audio_queue_get_next_missing_window(str
     
     if (aq->missing_count < aq->queue_count >> 2) {
         
-        uint32_t queue_pos = 0;
+        uint32_t queue_pos = 0; // Stop when half of queue has been searched
         for (struct audio_packet_t* current_packet = aq->queue_head ; current_packet != NULL && queue_pos < aq->queue_count >> 1 ; current_packet = current_packet->next) {
             
             if (current_packet->state == audio_packet_state_missing) {
                 
-                ret.seq_no = current_packet->seq_no % 0xFFFF;
-                found = true;
+                ret.seq_no = current_packet->seq_no;
                 
-                LOOP_FROM(missing_packet, current_packet, next, NULL) {
-                    if (missing_packet->state == audio_packet_state_missing) {
-                        missing_packet->state = audio_packet_state_requested;
-                        ret.packet_count++;
-                        if (ret.packet_count > aq->queue_count >> 2)
-                            break;
-                    } else
-                        break;
+                for (struct audio_packet_t* missing_packet = current_packet ; missing_packet->state == audio_packet_state_missing ; missing_packet = missing_packet->next) {
+                    ret.packet_count++;
+                    missing_packet->state = audio_packet_state_requested;
                 }
                 
-            }
-            
-            if (found)
                 break;
+                
+            }
             
             queue_pos++;
             
@@ -755,11 +761,8 @@ void audio_queue_flush(struct audio_queue_t* aq, uint16_t last_seq_no) {
     while (aq->queue_head != NULL)
         audio_packet_destroy(_audio_queue_pop_packet_from_head(aq, false));
     
-    aq->queue_tail = NULL;
-    
     aq->flushed = true;
     aq->flush_last_seq_no = last_seq_no;
-    aq->fold_count = 0;
     aq->last_known_sample = aq->last_known_sample_time = 0;
     
     audio_output_flush(aq->output);
@@ -768,9 +771,7 @@ void audio_queue_flush(struct audio_queue_t* aq, uint16_t last_seq_no) {
     mutex_unlock(aq->mutex);
     
     log_message(LOG_INFO, "Queue flushed");
-    
-    notification_center_post_notification(audio_queue_flush_notification, aq, NULL);
-    
+        
 }
 
 bool audio_queue_wait_for_space(struct audio_queue_t* aq) {

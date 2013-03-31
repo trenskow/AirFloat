@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 #include <pthread.h>
+#include <string.h>
 
 #include "mutex.h"
 
@@ -17,12 +18,14 @@
 
 struct mutex_t {
     pthread_mutex_t mutex;
+    bool locked;
     char name[MAX_NAME_LENGTH];
 };
 
 struct mutex_t* mutex_create() {
     
     struct mutex_t* m = (struct mutex_t*)malloc(sizeof(struct mutex_t));
+    bzero(m, sizeof(struct mutex_t));
     
     pthread_mutex_init(&m->mutex, NULL);
     
@@ -45,19 +48,25 @@ bool mutex_trylock(struct mutex_t* m) {
 
 void mutex_lock(struct mutex_t* m) {
     
-    pthread_mutex_lock(&m->mutex);
+    if (m != NULL) {
+        pthread_mutex_lock(&m->mutex);
 #ifdef DEBUG
-    pthread_getname_np(pthread_self(), m->name, MAX_NAME_LENGTH);
+        pthread_getname_np(pthread_self(), m->name, MAX_NAME_LENGTH);
+        m->locked = true;
 #endif
+    }
     
 }
 
 void mutex_unlock(struct mutex_t* m) {
     
+    if (m != NULL) {
 #ifdef DEBUG
-    m->name[0] = '\0';
-    pthread_mutex_unlock(&m->mutex);
+        m->locked = false;
+        m->name[0] = '\0';
 #endif
+        pthread_mutex_unlock(&m->mutex);
+    }
     
 }
 

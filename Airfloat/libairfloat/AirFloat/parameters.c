@@ -27,98 +27,64 @@ struct parameters_t {
     uint32_t parameters_count;
 };
 
-void _parameters_parse_text(struct parameters_t* p, const void* buffer, size_t size) {
+void _parameters_parse(struct parameters_t* p, const void* data, size_t data_size, const char* delimiter, const char* key_value_seperator) {
     
-    const char* start = (char*)buffer;
-    const char* b = start;
+    size_t delimiter_length = strlen(delimiter);
+    size_t key_value_seperator_length = strlen(key_value_seperator);
     
-    for (size_t i = 0 ; i < size ; i++)
-        if (b[i] == '\n') {
-            
-            size_t length = &b[i] - start;
-            
-            p->parameters = (struct parameter_t*)realloc(p->parameters, sizeof(struct parameter_t) * (p->parameters_count + 1));
-            char* key = p->parameters[p->parameters_count].key = (char*)malloc(length + 1);
-            memcpy(key, start, length);
-            key[length] = '\0';
-            
-            for (size_t x = 0 ; x < strlen(key) - 1 ; x++)
-                if (memcmp(&key[x], ": ", 2) == 0) {
-                    
-                    key[x] = '\0';
-                    p->parameters[p->parameters_count].value = &key[x+2];
-                    
-                    break;
-                }
-            
-            p->parameters_count++;
-            start = &b[i+1];
-            
-            if (i < size && b[i+1] == '\n')
-                break;
-            
-        }
+    const char* buffer = (const char*)data;
+    const char* line_start = buffer;
     
-}
-
-void _parameters_parse_simple(struct parameters_t* p, const void* buffer, size_t size, unsigned char delimiter) {
-    
-    const char* line_start = (char*)buffer;
-    const char* b = line_start;
-    
-    for (size_t i = 0 ; i < size ; i++) {
+    for (size_t i = 0 ; i <= data_size ; i++) {
         
-        if (b[i] == delimiter || b[i] == '\0') {
+        size_t line_length = 0;
+        if ((i + delimiter_length <= data_size && memcmp(&buffer[i], delimiter, delimiter_length) == 0) || i == data_size) {
             
-            size_t line_length = &b[i] - line_start;
+            line_length = buffer - line_start + i;
             
-            if (line_length > 0 && line_start[0] == ' ')
-                line_start++;
-            
-            p->parameters = (struct parameter_t*)realloc(p->parameters, sizeof(struct parameter_t) * (p->parameters_count + 1));
-            char* key = p->parameters[p->parameters_count].value = p->parameters[p->parameters_count].key = (char*)malloc(line_length + 1);
-            memcpy(key, line_start, line_length);
-            key[line_length] = '\0';
-            
-            for (size_t a = 0 ; a < strlen(key) ; a++)
-                if (key[a] == '=') {
-                    bool blFound = false;
-                    for (long x = a ; x < strlen(key) ; x++)
-                        if (key[x] == ':') {
-                            blFound = true;
-                            p->parameters[p->parameters_count].value = &key[x+1];
-                            key[x] = '\0';
-                            break;
-                        } else if (key[x] == ' ')
-                            break;
-                    
-                    if (!blFound) {
-                        p->parameters[p->parameters_count].value = &key[a+1];
-                        key[a] = '\0';
-                    } else
-                        key[a] = '-';
-                    
-                    break;
+            if (line_length > 0) {
+                
+                struct parameter_t new_parameter = { NULL, NULL };
+                
+                new_parameter.key = (char*)malloc(line_length + 1);
+                memcpy(new_parameter.key, line_start, line_length);
+                new_parameter.key[line_length] = '\0';
+                new_parameter.value = strstr(new_parameter.key, key_value_seperator);
+                
+                if (new_parameter.value != NULL) {
+                    new_parameter.value[0] = '\0';
+                    new_parameter.value += key_value_seperator_length;
+                    if (new_parameter.value[0] == ' ')
+                        new_parameter.value++;
+                    if (new_parameter.value[0] == '\"') {
+                        new_parameter.value++;
+                        new_parameter.key[line_length - 1] = '\0';
+                    }
                 }
-            
-            p->parameters_count++;
-            line_start = &b[i+1];
-            
-            if (i < size && delimiter == '\n' && b[i+1] == '\n')
-                break;
+                
+                p->parameters = (struct parameter_t*)realloc(p->parameters, sizeof(struct parameter_t) * (p->parameters_count + 1));
+                p->parameters[p->parameters_count] = new_parameter;
+                p->parameters_count++;
+                
+                line_start += line_length + delimiter_length;
+                
+                if (line_start[0] == ' ')
+                    line_start++;
+                
+            }
             
         }
         
     }
-
+        
 }
 
 void _parameters_parse_http_authentication(struct parameters_t* p, const void* buffer, size_t size) {
     
-    _parameters_parse_simple(p, buffer, size, ',');
+    _parameters_parse(p, buffer, size, ",", "=");
     
     for (uint32_t i = 0 ; i < p->parameters_count ; i++) {
-        
+                
         if (p->parameters[i].value[0] == '"' || p->parameters[i].value[0] == '\'') {
             
             p->parameters[i].value++;
@@ -157,7 +123,7 @@ size_t _parameters_write_http_header(struct parameters_t* p, void* buffer, size_
     for (uint32_t i = 0 ; i < p->parameters_count ; i++) {
         struct parameter_t* c_param = &p->parameters[i];
         size_t key_len = strlen(c_param->key);
-        if (c_param->key != c_param->value) {
+        if (c_param->value != NULL) {
             size_t value_len = strlen(c_param->value);
             if (buffer != NULL && write_pos + key_len + value_len + 2 <= buffer_size)
                 sprintf(&c_buffer[write_pos], "%s=%s", c_param->key, c_param->value);
@@ -189,23 +155,32 @@ struct parameters_t* parameters_create(const void* buffer, size_t size, enum par
     
     switch (type) {
         case parameters_type_text:
-            _parameters_parse_text(p, buffer, size);
+            _parameters_parse(p, buffer, size, "\n", ":");
             break;
-        case parameters_type_sdp:
-            _parameters_parse_simple(p, buffer, size, '\n');
-            break;
+        case parameters_type_sdp: {
+            
+            _parameters_parse(p, buffer, size, "\n", "=");
+            
+            for (uint32_t i = 0 ; i < p->parameters_count ; i++) {
+                struct parameter_t* param = &p->parameters[i];
+                if (strcmp(param->key, "a") == 0) {
+                    char* colon = strchr(param->value, ':');
+                    if (colon != NULL) {
+                        param->key[1] = '-';
+                        colon[0] = '\0';
+                        param->value = colon + 1;
+                    }
+                }
+            }
+            
+        } break;
         case parameters_type_http_header:
-            _parameters_parse_simple(p, buffer, size, ';');
+            _parameters_parse(p, buffer, size, ";", "=");
             break;
         case parameters_type_http_authentication:
             _parameters_parse_http_authentication(p, buffer, size);
             break;
     }
-    
-    log_message(LOG_INFO, "----");
-    for (uint32_t i = 0; i < p->parameters_count; i++)
-        log_message(LOG_INFO, "%s => %s", p->parameters[i].key, p->parameters[i].value);
-    log_message(LOG_INFO, "----");
     
     return p;
     
@@ -217,6 +192,7 @@ void parameters_destroy(struct parameters_t* p) {
         free(p->parameters[i].key);
     
     free(p->parameters);
+    
     free(p);
     
 }

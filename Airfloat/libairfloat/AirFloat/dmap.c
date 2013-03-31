@@ -26,7 +26,7 @@ struct dmap_atom {
     uint32_t type;
     void* buffer;
     size_t size;
-    dmap_p container;
+    struct dmap_t* container;
 };
 
 struct dmap_t {
@@ -170,7 +170,7 @@ const struct dmap_atom_type _atom_types[] = {
     { 'aeGU',     "com.apple.itunes.gapless-dur",          dmap_type_longlong  },
     { 'aeGR',     "com.apple.itunes.gapless-resy",         dmap_type_longlong  },
     { 'aeGE',     "com.apple.itunes.gapless-enc-del",      dmap_type_long      },
-    { '????',     "com.apple.itunes.req-fplay",            dmap_type_char      },
+    { '\?\?\?\?', "com.apple.itunes.req-fplay",            dmap_type_char      },
     { 'aePS',     "com.apple.itunes.special-playlist",     dmap_type_char      },
     { 'aeCR',     "com.apple.itunes.content-rating",       dmap_type_string    },
     { 'aeSG',     "com.apple.itunes.saved-genius",         dmap_type_char      },
@@ -187,16 +187,10 @@ const struct dmap_atom_type _atom_types[] = {
     { 'aeAD',     "com.apple.itunes.adam-ids-array",       dmap_type_container },
     { 'aeSV',     "com.apple.itunes.music-sharing-version",dmap_type_long      },
     
-    // Custom
+    // AirPlay cust
     
-    { 'cmsr',     "com.AirFloat.RevisionNumber",           dmap_type_long      },
-    { 'cmst',     "com.AirFloat.NowPlayingContainer",      dmap_type_container },
-    { 'caps',     "com.AirFloat.NowPlayingStatus",         dmap_type_char      },
-    { 'canp',     "com.AirFloat.NowPlayingInfo",           dmap_type_unknown   },
-    { 'cmpa',     "com.AirFloat.PairingContainer",         dmap_type_container },
-    { 'cmnm',     "com.AirFloat.PairingDeviceName",        dmap_type_string    },
-    { 'cmty',     "com.AirFloat.PairingDeviceType",        dmap_type_string    },
-    { 'cmpg',     "com.AirFloat.PairingDeviceToken",       dmap_type_unknown   }
+    { 'cmst',     "com.airfloat.nowplayingcontainer",      dmap_type_container },
+    { 'caps',     "com.airfloat.nowplayingstatus",         dmap_type_char      },
     
 };
 
@@ -216,8 +210,10 @@ void dmap_destroy(struct dmap_t* d) {
     for (uint32_t i = 0 ; i < d->count ; i++) {
         if (d->atoms[i].type == dmap_type_container)
             dmap_destroy(d->atoms[i].container);
-        else
+        
+        if (d->atoms[i].buffer != NULL)
             free(d->atoms[i].buffer);
+        
     }
     
     if (d->count > 0)
@@ -227,45 +223,46 @@ void dmap_destroy(struct dmap_t* d) {
     
 }
 
-void dmap_parse(struct dmap_t* d, const void* buffer, size_t size) {
+void dmap_parse(struct dmap_t* d, const void* data, size_t data_size) {
     
-    char* mBuffer = (char*)buffer;
-    size_t length = size;
+    char* buffer = (char*)data;
+    size_t length = data_size;
     
     while (length > 0) {
         
-        uint32_t frameSize;
+        uint32_t frame_size;
         uint32_t tag;
         
-        memcpy(&frameSize, &mBuffer[4], sizeof(uint32_t));
-        memcpy(&tag, mBuffer, sizeof(uint32_t));
+        memcpy(&frame_size, &buffer[4], sizeof(uint32_t));
+        memcpy(&tag, buffer, sizeof(uint32_t));
         
-        frameSize = btml(frameSize);
+        frame_size = btml(frame_size);
         tag = btml(tag);
         
-        mBuffer += 8;
+        buffer += 8;
         length -= 8;
         
         d->atoms = (struct dmap_atom*)realloc(d->atoms, sizeof(struct dmap_atom) * (d->count + 1));
+        bzero(&d->atoms[d->count], sizeof(struct dmap_atom));
         
         d->atoms[d->count].tag = tag;
         d->atoms[d->count].type = dmap_type_for_tag(tag);
-        d->atoms[d->count].buffer = malloc(frameSize + 1);
-        ((char*)d->atoms[d->count].buffer)[frameSize] = '\0';
-        memcpy(d->atoms[d->count].buffer, mBuffer, frameSize);
-        d->atoms[d->count].size = frameSize;
+        d->atoms[d->count].buffer = malloc(frame_size + 1);
+        ((char*)d->atoms[d->count].buffer)[frame_size] = '\0';
+        memcpy(d->atoms[d->count].buffer, buffer, frame_size);
+        d->atoms[d->count].size = frame_size;
         
         d->atoms[d->count].container = NULL;
         if (d->atoms[d->count].type == dmap_type_container) {
             struct dmap_t* container = dmap_create();
-            dmap_parse(container, mBuffer, frameSize);
+            dmap_parse(container, buffer, frame_size);
             d->atoms[d->count].container = container;
         }
         
         d->count++;
         
-        mBuffer += frameSize;
-        length -= frameSize;
+        buffer += frame_size;
+        length -= frame_size;
         
     }
     
@@ -338,13 +335,13 @@ const char* dmap_identifier_for_tag(uint32_t tag) {
     
 }
 
-uint32_t dmap_get_count(dmap_p d) {
+uint32_t dmap_get_count(struct dmap_t* d) {
     
     return d->count;
     
 }
 
-uint32_t dmap_get_tag_at_index(dmap_p d, uint32_t index) {
+uint32_t dmap_get_tag_at_index(struct dmap_t* d, uint32_t index) {
     
     assert(index < d->count);
     
@@ -352,7 +349,7 @@ uint32_t dmap_get_tag_at_index(dmap_p d, uint32_t index) {
     
 }
 
-uint32_t dmap_get_index_of_tag(dmap_p d, uint32_t tag) {
+uint32_t dmap_get_index_of_tag(struct dmap_t* d, uint32_t tag) {
     
     for (uint32_t i = 0 ; i < d->count ; i++)
         if (d->atoms[i].tag == tag)
@@ -362,7 +359,7 @@ uint32_t dmap_get_index_of_tag(dmap_p d, uint32_t tag) {
     
 }
 
-size_t dmap_get_length(dmap_p d) {
+size_t dmap_get_length(struct dmap_t* d) {
     
     size_t ret = 0;
     
@@ -377,7 +374,7 @@ size_t dmap_get_length(dmap_p d) {
     
 }
 
-size_t dmap_get_content(dmap_p d, void* content, size_t size) {
+size_t dmap_get_content(struct dmap_t* d, void* content, size_t size) {
     
     size_t writePos = 0;
     
@@ -412,7 +409,7 @@ size_t dmap_get_content(dmap_p d, void* content, size_t size) {
     
 }
 
-size_t dmap_get_size_of_atom_at_index(dmap_p d, uint32_t index) {
+size_t dmap_get_size_of_atom_at_index(struct dmap_t* d, uint32_t index) {
     
     assert(index < d->count);
     
@@ -420,7 +417,7 @@ size_t dmap_get_size_of_atom_at_index(dmap_p d, uint32_t index) {
     
 }
 
-size_t dmap_get_size_of_atom_tag(dmap_p d, uint32_t tag) {
+size_t dmap_get_size_of_atom_tag(struct dmap_t* d, uint32_t tag) {
     
     uint32_t index = dmap_get_index_of_tag(d, tag);
     if (index != DMAP_INDEX_NOT_FOUND)
@@ -430,13 +427,13 @@ size_t dmap_get_size_of_atom_tag(dmap_p d, uint32_t tag) {
     
 }
 
-size_t dmap_get_size_of_atom_identifer(dmap_p d, const char* identifier) {
+size_t dmap_get_size_of_atom_identifer(struct dmap_t* d, const char* identifier) {
     
     return dmap_get_size_of_atom_tag(d, dmap_tag_for_identifier(identifier));
     
 }
 
-char dmap_char_at_index(dmap_p d, uint32_t index) {
+char dmap_char_at_index(struct dmap_t* d, uint32_t index) {
     
     assert(index < d->count && d->atoms[index].type == dmap_type_char);
     
@@ -444,7 +441,7 @@ char dmap_char_at_index(dmap_p d, uint32_t index) {
     
 }
 
-char dmap_char_for_atom_tag(dmap_p d, uint32_t tag) {
+char dmap_char_for_atom_tag(struct dmap_t* d, uint32_t tag) {
     
     uint32_t index = dmap_get_index_of_tag(d, tag);
     if (index != DMAP_INDEX_NOT_FOUND)
@@ -454,13 +451,13 @@ char dmap_char_for_atom_tag(dmap_p d, uint32_t tag) {
     
 }
 
-char dmap_char_for_atom_identifer(dmap_p d, const char* identifier) {
+char dmap_char_for_atom_identifer(struct dmap_t* d, const char* identifier) {
     
     return dmap_char_for_atom_tag(d, dmap_tag_for_identifier(identifier));
     
 }
 
-int16_t dmap_short_at_index(dmap_p d, uint32_t index) {
+int16_t dmap_short_at_index(struct dmap_t* d, uint32_t index) {
     
     assert(index < d->count && d->atoms[index].type == dmap_type_short);
     
@@ -468,7 +465,7 @@ int16_t dmap_short_at_index(dmap_p d, uint32_t index) {
     
 }
 
-int16_t dmap_short_for_atom_tag(dmap_p d, uint32_t tag) {
+int16_t dmap_short_for_atom_tag(struct dmap_t* d, uint32_t tag) {
     
     uint32_t index = dmap_get_index_of_tag(d, tag);
     if (index != DMAP_INDEX_NOT_FOUND)
@@ -478,13 +475,13 @@ int16_t dmap_short_for_atom_tag(dmap_p d, uint32_t tag) {
     
 }
 
-int16_t dmap_short_for_atom_identifer(dmap_p d, const char* identifier) {
+int16_t dmap_short_for_atom_identifer(struct dmap_t* d, const char* identifier) {
     
     return dmap_short_for_atom_tag(d, dmap_tag_for_identifier(identifier));
     
 }
 
-int32_t dmap_long_at_index(dmap_p d, uint32_t index) {
+int32_t dmap_long_at_index(struct dmap_t* d, uint32_t index) {
     
     assert(index < d->count && (d->atoms[index].type == dmap_type_long || d->atoms[index].type == dmap_type_date));
     
@@ -492,7 +489,7 @@ int32_t dmap_long_at_index(dmap_p d, uint32_t index) {
     
 }
 
-int32_t dmap_long_for_atom_tag(dmap_p d, uint32_t tag) {
+int32_t dmap_long_for_atom_tag(struct dmap_t* d, uint32_t tag) {
     
     uint32_t index = dmap_get_index_of_tag(d, tag);
     if (index != DMAP_INDEX_NOT_FOUND)
@@ -502,13 +499,13 @@ int32_t dmap_long_for_atom_tag(dmap_p d, uint32_t tag) {
     
 }
 
-int32_t dmap_long_for_atom_identifer(dmap_p d, const char* identifier) {
+int32_t dmap_long_for_atom_identifer(struct dmap_t* d, const char* identifier) {
     
     return dmap_long_for_atom_tag(d, dmap_tag_for_identifier(identifier));
     
 }
 
-int64_t dmap_longlong_at_index(dmap_p d, uint32_t index) {
+int64_t dmap_longlong_at_index(struct dmap_t* d, uint32_t index) {
     
     assert(index < d->count && d->atoms[index].type == dmap_type_longlong);
     
@@ -516,7 +513,7 @@ int64_t dmap_longlong_at_index(dmap_p d, uint32_t index) {
     
 }
 
-int64_t dmap_longlong_for_atom_tag(dmap_p d, uint32_t tag) {
+int64_t dmap_longlong_for_atom_tag(struct dmap_t* d, uint32_t tag) {
     
     uint32_t index = dmap_get_index_of_tag(d, tag);
     if (index != DMAP_INDEX_NOT_FOUND)
@@ -526,13 +523,13 @@ int64_t dmap_longlong_for_atom_tag(dmap_p d, uint32_t tag) {
     
 }
 
-int64_t dmap_longlong_for_atom_identifer(dmap_p d, const char* identifier) {
+int64_t dmap_longlong_for_atom_identifer(struct dmap_t* d, const char* identifier) {
     
     return dmap_longlong_for_atom_tag(d, dmap_tag_for_identifier(identifier));
     
 }
 
-const char* dmap_string_at_index(dmap_p d, uint32_t index) {
+const char* dmap_string_at_index(struct dmap_t* d, uint32_t index) {
     
     assert(index < d->count && d->atoms[index].type == dmap_type_string);
     
@@ -540,7 +537,7 @@ const char* dmap_string_at_index(dmap_p d, uint32_t index) {
     
 }
 
-const char* dmap_string_for_atom_tag(dmap_p d, uint32_t tag) {
+const char* dmap_string_for_atom_tag(struct dmap_t* d, uint32_t tag) {
     
     uint32_t index = dmap_get_index_of_tag(d, tag);
     if (index != DMAP_INDEX_NOT_FOUND)
@@ -550,31 +547,31 @@ const char* dmap_string_for_atom_tag(dmap_p d, uint32_t tag) {
     
 }
 
-const char* dmap_string_for_atom_identifer(dmap_p d, const char* identifier) {
+const char* dmap_string_for_atom_identifer(struct dmap_t* d, const char* identifier) {
     
     return dmap_string_for_atom_tag(d, dmap_tag_for_identifier(identifier));
     
 }
 
-uint32_t dmap_date_at_index(dmap_p d, uint32_t index) {
+uint32_t dmap_date_at_index(struct dmap_t* d, uint32_t index) {
     
     return dmap_long_at_index(d, index);
     
 }
 
-uint32_t dmap_date_for_atom_tag(dmap_p d, uint32_t tag) {
+uint32_t dmap_date_for_atom_tag(struct dmap_t* d, uint32_t tag) {
     
     return dmap_long_for_atom_tag(d, tag);
     
 }
 
-uint32_t dmap_date_for_atom_identifer(dmap_p d, const char* identifier) {
+uint32_t dmap_date_for_atom_identifer(struct dmap_t* d, const char* identifier) {
     
     return dmap_long_for_atom_identifer(d, identifier);
     
 }
 
-dmap_version dmap_version_at_index(dmap_p d, uint32_t index) {
+dmap_version dmap_version_at_index(struct dmap_t* d, uint32_t index) {
     
     assert(index < d->count && d->atoms[index].type == dmap_type_version);
     
@@ -586,7 +583,7 @@ dmap_version dmap_version_at_index(dmap_p d, uint32_t index) {
     
 }
 
-dmap_version dmap_version_for_atom_tag(dmap_p d, uint32_t tag) {
+dmap_version dmap_version_for_atom_tag(struct dmap_t* d, uint32_t tag) {
     
     uint32_t index = dmap_get_index_of_tag(d, tag);
     if (index != DMAP_INDEX_NOT_FOUND)
@@ -596,13 +593,13 @@ dmap_version dmap_version_for_atom_tag(dmap_p d, uint32_t tag) {
     
 }
 
-dmap_version dmap_version_for_atom_identifer(dmap_p d, const char* identifier) {
+dmap_version dmap_version_for_atom_identifer(struct dmap_t* d, const char* identifier) {
     
     return dmap_version_for_atom_tag(d, dmap_tag_for_identifier(identifier));
     
 }
 
-dmap_p dmap_container_at_index(dmap_p d, uint32_t index) {
+struct dmap_t* dmap_container_at_index(struct dmap_t* d, uint32_t index) {
     
     assert(index < d->count && d->atoms[index].type == dmap_type_container);
     
@@ -610,7 +607,7 @@ dmap_p dmap_container_at_index(dmap_p d, uint32_t index) {
     
 }
 
-dmap_p dmap_container_for_atom_tag(dmap_p d, uint32_t tag) {
+struct dmap_t* dmap_container_for_atom_tag(struct dmap_t* d, uint32_t tag) {
     
     uint32_t index = dmap_get_index_of_tag(d, tag);
     if (index != DMAP_INDEX_NOT_FOUND)
@@ -620,13 +617,13 @@ dmap_p dmap_container_for_atom_tag(dmap_p d, uint32_t tag) {
     
 }
 
-dmap_p dmap_container_for_atom_identifer(dmap_p d, const char* identifier) {
+struct dmap_t* dmap_container_for_atom_identifer(struct dmap_t* d, const char* identifier) {
     
     return dmap_container_for_atom_tag(d, dmap_tag_for_identifier(identifier));
     
 }
 
-const void* dmap_bytes_at_index(dmap_p d, uint32_t index) {
+const void* dmap_bytes_at_index(struct dmap_t* d, uint32_t index) {
     
     assert(index < d->count);
     
@@ -634,7 +631,7 @@ const void* dmap_bytes_at_index(dmap_p d, uint32_t index) {
     
 }
 
-const void* dmap_bytes_for_atom_tag(dmap_p d, uint32_t tag) {
+const void* dmap_bytes_for_atom_tag(struct dmap_t* d, uint32_t tag) {
     
     uint32_t index = dmap_get_index_of_tag(d, tag);
     if (index != DMAP_INDEX_NOT_FOUND)
@@ -644,13 +641,13 @@ const void* dmap_bytes_for_atom_tag(dmap_p d, uint32_t tag) {
     
 }
 
-const void* dmap_bytes_for_atom_identifer(dmap_p d, const char* identifier) {
+const void* dmap_bytes_for_atom_identifer(struct dmap_t* d, const char* identifier) {
     
     return dmap_bytes_for_atom_tag(d, dmap_tag_for_identifier(identifier));
     
 }
 
-struct dmap_atom* _add_atom(dmap_p d, uint32_t tag, uint32_t type) {
+struct dmap_atom* _add_atom(struct dmap_t* d, uint32_t tag, uint32_t type) {
     
     d->atoms = (struct dmap_atom*)realloc(d->atoms, sizeof(struct dmap_atom) * (d->count + 1));
     struct dmap_atom* ret = &d->atoms[d->count];
@@ -674,14 +671,14 @@ void _set_atom_buffer(struct dmap_atom* atom, const void* buffer, size_t size) {
     memcpy(atom->buffer, buffer, size);
     
 }
-void dmap_add_char(dmap_p d, int8_t chr, uint32_t tag) {
+void dmap_add_char(struct dmap_t* d, int8_t chr, uint32_t tag) {
     
     struct dmap_atom* new_atom = _add_atom(d, tag, dmap_type_char);
     _set_atom_buffer(new_atom, &chr, sizeof(int8_t));
     
 }
 
-void dmap_add_short(dmap_p d, int16_t shrt, uint32_t tag) {
+void dmap_add_short(struct dmap_t* d, int16_t shrt, uint32_t tag) {
     
     struct dmap_atom* new_atom = _add_atom(d, tag, dmap_type_short);
     int16_t val = mtbs(shrt);
@@ -689,7 +686,7 @@ void dmap_add_short(dmap_p d, int16_t shrt, uint32_t tag) {
     
 }
 
-void dmap_add_long(dmap_p d, int32_t lng, uint32_t tag) {
+void dmap_add_long(struct dmap_t* d, int32_t lng, uint32_t tag) {
     
     struct dmap_atom* new_atom = _add_atom(d, tag, dmap_type_long);
     int32_t val = mtbl(lng);
@@ -697,7 +694,7 @@ void dmap_add_long(dmap_p d, int32_t lng, uint32_t tag) {
     
 }
 
-void dmap_add_longlong(dmap_p d, int64_t lnglng, uint32_t tag) {
+void dmap_add_longlong(struct dmap_t* d, int64_t lnglng, uint32_t tag) {
     
     struct dmap_atom* new_atom = _add_atom(d, tag, dmap_type_longlong);
     int64_t val = mtbll(lnglng);
@@ -705,14 +702,14 @@ void dmap_add_longlong(dmap_p d, int64_t lnglng, uint32_t tag) {
     
 }
 
-void dmap_add_string(dmap_p d, const char* string, uint32_t tag) {
+void dmap_add_string(struct dmap_t* d, const char* string, uint32_t tag) {
     
     struct dmap_atom* new_atom = _add_atom(d, tag, dmap_type_string);
     _set_atom_buffer(new_atom, string, strlen(string));
     
 }
 
-void dmap_add_date(dmap_p d, uint32_t date, uint32_t tag) {
+void dmap_add_date(struct dmap_t* d, uint32_t date, uint32_t tag) {
     
     struct dmap_atom* new_atom = _add_atom(d, tag, dmap_type_date);
     uint32_t val = mtbl(date);
@@ -720,7 +717,7 @@ void dmap_add_date(dmap_p d, uint32_t date, uint32_t tag) {
     
 }
 
-void dmap_add_version(dmap_p d, dmap_version version, uint32_t tag) {
+void dmap_add_version(struct dmap_t* d, dmap_version version, uint32_t tag) {
     
     struct dmap_atom* new_atom = _add_atom(d, tag, dmap_type_version);
     
@@ -731,14 +728,14 @@ void dmap_add_version(dmap_p d, dmap_version version, uint32_t tag) {
     
 }
 
-void dmap_add_container(dmap_p d, dmap_p container, uint32_t tag) {
+void dmap_add_container(struct dmap_t* d, struct dmap_t* container, uint32_t tag) {
     
     struct dmap_atom* new_atom = _add_atom(d, tag, dmap_type_container);
     new_atom->container = dmap_copy(container);
     
 }
 
-void dmap_add_bytes(dmap_p d, const void* data, size_t size, uint32_t tag) {
+void dmap_add_bytes(struct dmap_t* d, const void* data, size_t size, uint32_t tag) {
     
     struct dmap_atom* new_atom = _add_atom(d, tag, dmap_type_unknown);
     _set_atom_buffer(new_atom, data, size);

@@ -21,6 +21,7 @@ struct alac_magic_cookie_t alac_format_parse(const char* rtp_fmtp) {
     
     uint32_t fmtp[11];
     uint32_t fmtp_c = 0;
+    bzero(fmtp, sizeof(uint32_t) * 11);
     
     char* read_pos = fmtp_s;
     

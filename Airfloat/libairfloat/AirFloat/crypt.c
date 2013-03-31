@@ -66,7 +66,7 @@ size_t crypt_apple_private_encrypt(void* data, size_t data_size, void* encrypted
     
     assert(encrypted_data_size >= RSA_size(key));
     
-    return RSA_private_encrypt(data_size, data, encrypted_data, key, RSA_NO_PADDING);
+    return RSA_private_encrypt((int32_t)data_size, data, encrypted_data, key, RSA_NO_PADDING);
     
 }
 
@@ -76,7 +76,7 @@ size_t crypt_apple_private_decrypt(void* encrypted_data, size_t encrypted_data_s
     
     assert(data_size >= RSA_size(key) - 11);
     
-    return RSA_private_decrypt(encrypted_data_size, encrypted_data, data, key, RSA_PKCS1_OAEP_PADDING);
+    return RSA_private_decrypt((uint32_t)encrypted_data_size, encrypted_data, data, key, RSA_PKCS1_OAEP_PADDING);
     
 }
 
