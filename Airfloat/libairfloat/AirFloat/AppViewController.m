@@ -371,16 +371,6 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
     
 }
 
-- (void)remoteControlReceivedWithEvent:(UIEvent *)event {
-    
-    if (event.type == UIEventTypeRemoteControl)
-        switch (event.subtype) {
-            default:
-                break;
-        }
-    
-}
-
 - (void)updateNowPlayingInfoCenter {
     
     if (NSClassFromString(@"MPNowPlayingInfoCenter")) {
@@ -415,10 +405,16 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
     
 }
 
+- (BOOL)canBecomeFirstResponder {
+    
+    return YES;
+    
+}
+
 - (void)clientStartedRecording {
     
-    [self becomeFirstResponder];
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    [self becomeFirstResponder];
     
     CGRect topViewFrame = self.topView.frame;
     topViewFrame.size.height = 96;
@@ -605,6 +601,28 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
     
     if (_dacp_client != NULL)
         dacp_client_previous(_dacp_client);
+    
+}
+
+- (void)remoteControlReceivedWithEvent:(UIEvent *)event {
+    
+    if (event.type == UIEventTypeRemoteControl)
+        switch (event.subtype) {
+            case UIEventSubtypeRemoteControlNextTrack:
+                [self playNext:nil];
+                break;
+            case UIEventSubtypeRemoteControlPause:
+            case UIEventSubtypeRemoteControlPlay:
+            case UIEventSubtypeRemoteControlTogglePlayPause:
+            case UIEventSubtypeRemoteControlStop:
+                [self playPause:nil];
+                break;
+            case UIEventSubtypeRemoteControlPreviousTrack:
+                [self playPrevious:nil];
+                break;
+            default:
+                break;
+        }
     
 }
 
