@@ -46,7 +46,6 @@
     if (!_settings) {
         _settings = [[NSDictionary alloc] initWithContentsOfFile:[self settingsPath]];
         _settings = (_settings ?: [[NSDictionary alloc] init]);
-        NSLog(@"%@", [_settings description]);
     }
     
     return _settings;
