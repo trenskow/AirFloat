@@ -55,7 +55,7 @@ bool _raop_server_web_connection_accept_callback(web_server_p server, web_server
     struct raop_server_t* rs = (struct raop_server_t*)ctx;
     
 #if (!defined(ALLOW_LOCALHOST))
-    if (!sockaddr_equals_host(web_connection_get_local_end_point(connection), web_connection_get_remote_end_point(connection))) {
+    if (!sockaddr_equals_host(web_server_connection_get_local_end_point(connection), web_server_connection_get_remote_end_point(connection))) {
 #endif
         raop_session_p new_session = raop_session_create(rs, connection, rs->settings);
         
