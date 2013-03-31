@@ -8,25 +8,22 @@
 
 #import <UIKit/UIKit.h>
 
-#define AirFloatiOSSharedAppDelegate ((AirFloatiOSAppDelegate*)[UIApplication sharedApplication].delegate)
+#import "AppViewController.h"
 
-@class AirFloatServerController;
-@class AirFloatMissingWifiViewController;
-@class AirFloatIntroViewController;
-@class AirFloatReceivingViewController;
+#import "raopserver.h"
 
-@interface AirFloatiOSAppDelegate : NSObject <UIApplicationDelegate> {
+#define AirFloatSharedAppDelegate ((AirFloatAppDelegate*)[UIApplication sharedApplication].delegate)
+
+@interface AirFloatAppDelegate : NSObject <UIApplicationDelegate> {
     
+    raop_server_p _server;
     UIBackgroundTaskIdentifier _backgroundTask;
-    AirFloatServerController* _serverController;
     
 }
 
-@property (nonatomic, retain) IBOutlet UIWindow *window;
-
-@property (nonatomic ,readonly) AirFloatServerController* serverController;
-@property (retain, nonatomic) IBOutlet AirFloatMissingWifiViewController *missingWifiViewController;
-@property (retain, nonatomic) IBOutlet AirFloatIntroViewController *introViewController;
-@property (retain, nonatomic) IBOutlet AirFloatReceivingViewController *receivingViewController;
+@property (nonatomic, strong) UIWindow *window;
+@property (nonatomic, strong) AppViewController* appViewController;
+@property (nonatomic, assign) raop_server_p server;
+@property (nonatomic, strong) NSDictionary* settings;
 
 @end

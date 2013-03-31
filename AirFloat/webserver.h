@@ -14,14 +14,14 @@
 #include "thread.h"
 #include "sockaddr.h"
 #include "socket.h"
-#include "webconnection.h"
+#include "webserverconnection.h"
 
 #ifndef _wsp
 typedef struct web_server_t *web_server_p;
 #define _wsp
 #endif
 
-typedef bool(*web_server_accept_callback)(web_server_p server, web_connection_p connection, void* ctx);
+typedef bool(*web_server_accept_callback)(web_server_p server, web_server_connection_p connection, void* ctx);
 
 web_server_p web_server_create(sockaddr_type socket_types);
 void web_server_destroy(web_server_p ws);

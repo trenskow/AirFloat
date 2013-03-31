@@ -107,17 +107,17 @@ struct rtp_packet_t _rtp_header_read(const void* buffer, size_t size) {
     struct rtp_packet_t ret;
     memset(&ret, 0, sizeof(struct rtp_packet_t));
     
-    char a = *((char*)&buffer[0]);
-    char b = *((char*)&buffer[1]);
+    char a = ((const char*)buffer)[0];
+    char b = ((const char*)buffer)[1];
     
-    ret.seq_num = ntohs(*((unsigned short*)&buffer[2]));
+    ret.seq_num = ntohs(((uint16_t*)buffer)[1]);
     
     ret.extension = (bool)(a & RTP_EXTENSION);
     ret.source = a & RTP_SOURCE;
     ret.payload_type = b & RTP_PAYLOAD_TYPE;
     ret.marker = b & RTP_MARKER;
     
-    ret.packet_data = (unsigned char*) &buffer[4];
+    ret.packet_data = (void*)buffer + 4;
     ret.packet_data_size = size - 4;
     
     return ret;
@@ -144,9 +144,9 @@ void _rtp_recorder_process_timing_packet(struct rtp_recorder_t* rr, struct rtp_p
     assert(packet != NULL);
     
     double current_time = hardware_get_time();
-    double reference_time = _ntp_time_to_hardware_time(*((struct ntp_time*)&packet->packet_data[4]));
-    double received_time = _ntp_time_to_hardware_time(*((struct ntp_time*)&packet->packet_data[12]));
-    double send_time = _ntp_time_to_hardware_time(*((struct ntp_time*)&packet->packet_data[20]));
+    double reference_time = _ntp_time_to_hardware_time(*(struct ntp_time*)(packet->packet_data + 4));
+    double received_time = _ntp_time_to_hardware_time(*(struct ntp_time*)(packet->packet_data + 12));
+    double send_time = _ntp_time_to_hardware_time(*(struct ntp_time*)(packet->packet_data + 20));
     
     double delay = ((current_time - reference_time) - (send_time - received_time)) / 2;
     double client_time = received_time + (send_time - received_time) + delay;
@@ -157,7 +157,7 @@ void _rtp_recorder_process_timing_packet(struct rtp_recorder_t* rr, struct rtp_p
     
     rr->initial_time_response_count++;
     
-    if (rr->initial_time_response_count == 3)
+    if (rr->initial_time_response_count == 2)
         condition_signal(rr->timer_cond);
     
 }
@@ -200,9 +200,9 @@ void _rtp_recorder_process_sync_packet(struct rtp_recorder_t* rr, struct rtp_pac
     
     assert(packet != NULL);
     
-    uint32_t current_rtp_time = ntohl(*(uint32_t*)&packet->packet_data[0]);
-    double current_time = _ntp_time_to_hardware_time(*((struct ntp_time*)&packet->packet_data[4]));
-    uint32_t next_rtp_time = ntohl(*(uint32_t*)&packet->packet_data[12]);
+    uint32_t current_rtp_time = ntohl(*((uint32_t*)packet->packet_data));
+    double current_time = _ntp_time_to_hardware_time(*(struct ntp_time*)(packet->packet_data + 4));
+    uint32_t next_rtp_time = ntohl(*((uint32_t*)packet->packet_data + 12));
     
     log_message(LOG_INFO, "Sync packet (Playhead frame: %u - current time: %1.6f - next frame: %u)", current_rtp_time, current_time, next_rtp_time);
     
@@ -233,10 +233,10 @@ void _rtp_recorder_process_audio_packet(struct rtp_recorder_t* rr, struct rtp_pa
     
     assert(packet != NULL);
     
-    uint32_t rtp_time = ntohl(*(uint32_t*)&packet->packet_data[0]);
+    uint32_t rtp_time = ntohl(*(uint32_t*)packet->packet_data);
     uint16_t c_seq = packet->seq_num;
     
-    char* packet_audio_data = &packet->packet_data[8];
+    char* packet_audio_data = packet->packet_data + 8;
     size_t len = packet->packet_data_size - 8;
     
     char* decoded_audio_data = (char*)malloc(len);
@@ -267,7 +267,7 @@ size_t _rtp_recorder_socket_data_received_airtunes_v1(struct rtp_recorder_t* rr,
         if (size < 4)
             break;
         
-        uint16_t packet_size = ntohs(*((uint16_t*)&buffer[read + 2]));
+        uint16_t packet_size = ntohs(*((uint16_t*)buffer + read + 2));
         if (size - read < packet_size + 4)
             break;
         
@@ -297,9 +297,6 @@ size_t _rtp_recorder_socket_data_received_airtunes_v2(struct rtp_recorder_t* rr,
     
     struct rtp_packet_t packet = _rtp_header_read(buffer, size);
     
-    if (packet.payload_type == RTP_AUDIO_RESEND_DATA)
-        packet = _rtp_header_read(&((char*)buffer)[4], size - 4);
-    
     switch (packet.payload_type) {
         case RTP_TIMING_RESPONSE:
             _rtp_recorder_process_timing_packet(rr, &packet);
@@ -307,8 +304,13 @@ size_t _rtp_recorder_socket_data_received_airtunes_v2(struct rtp_recorder_t* rr,
         case RTP_SYNC:
             _rtp_recorder_process_sync_packet(rr, &packet);
             break;
+        case RTP_AUDIO_RESEND_DATA:
+            packet = _rtp_header_read(&((char*)buffer)[4], size - 4);
+            log_message(LOG_INFO, "Received missing packet %d", packet.seq_num);
+            break;
         case RTP_AUDIO_DATA:
-            _rtp_recorder_process_audio_packet(rr, &packet);
+            if (packet.packet_data_size > 0)
+                _rtp_recorder_process_audio_packet(rr, &packet);
             break;
         default:
             log_message(LOG_ERROR, "Received unknown packet");

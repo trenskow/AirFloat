@@ -12,12 +12,13 @@
     
     NSInteger _currentImage;
     NSArray* _images;
+    NSMutableArray* _timers;
     BOOL _isAnimating;
     
 }
 
 @property (nonatomic,readonly) BOOL isAnimating;
-@property (nonatomic,retain) NSArray* images;
+@property (nonatomic,strong) NSArray* images;
 
 - (void)startAnimation;
 - (void)stopAnimation;

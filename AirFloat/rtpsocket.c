@@ -14,13 +14,8 @@
 #include "rtpsocket.h"
 
 struct rtp_socket_info_t {
-    
-    struct rtp_socket_t* owner;
     socket_p socket;
     bool is_data_socket;
-    thread_p thread;
-    char* name;
-    
 };
 
 struct rtp_socket_t {
@@ -57,16 +52,18 @@ void rtp_socket_destroy(struct rtp_socket_t* rs) {
     mutex_lock(rs->mutex);
     
     while (rs->sockets_count > 0) {
-        socket_close(rs->sockets[0]->socket);
         mutex_unlock(rs->mutex);
-        thread_join(rs->sockets[0]->thread);
+        socket_close(rs->sockets[0]->socket);
         mutex_lock(rs->mutex);
     }
+    
+    free(rs->sockets);
     
     mutex_unlock(rs->mutex);
     
     if (rs->allowed_remote_end_point)
         sockaddr_destroy(rs->allowed_remote_end_point);
+    
     if (rs->name)
         free(rs->name);
     
@@ -76,18 +73,56 @@ void rtp_socket_destroy(struct rtp_socket_t* rs) {
     
 }
 
-void _rtp_socket_thread_detach(struct rtp_socket_t* rs, const char *name, socket_p socket, bool is_data_socket, void (*fnc)(void *ctx)) {
+void _rtp_socket_socket_closed_callback(socket_p socket, void* ctx) {
+    
+    struct rtp_socket_t* rs = (struct rtp_socket_t*)ctx;
+    
+    mutex_lock(rs->mutex);
+    
+    for (uint32_t i = 0 ; i < rs->sockets_count ; i++)
+        if (rs->sockets[i]->socket == socket) {
+            
+            socket_destroy(rs->sockets[i]->socket);
+            
+            free(rs->sockets[i]);
+            
+            for (uint32_t a = i + 1 ; a < rs->sockets_count ; a++)
+                rs->sockets[a - 1] = rs->sockets[a];
+            
+            rs->sockets_count--;
+            
+            break;
+            
+        }
+    
+    mutex_unlock(rs->mutex);
+    
+}
+
+ssize_t _rtp_socket_socket_receive_callback(socket_p socket, const void* data, size_t data_size, struct sockaddr* remote_end_point, void* ctx) {
+    
+    struct rtp_socket_t* rs = (struct rtp_socket_t*)ctx;
+    
+    size_t used = data_size;
+    
+    if (sockaddr_equals_host(remote_end_point, rs->allowed_remote_end_point) && rs->received_callback != NULL)
+        used = rs->received_callback(rs, socket, (const char*)data, data_size, rs->received_callback_ctx);
+    
+    return used;
+    
+}
+
+struct rtp_socket_info_t* _rtp_socket_add_socket(struct rtp_socket_t* rs, socket_p socket, bool is_data_socket) {
     
     struct rtp_socket_info_t* info = (struct rtp_socket_info_t*)malloc(sizeof(struct rtp_socket_info_t));
     bzero(info, sizeof(struct rtp_socket_info_t));
-    info->owner = rs;
     info->socket = socket;
     info->is_data_socket = is_data_socket;
+        
+    if (is_data_socket)
+        socket_set_receive_callback(socket, _rtp_socket_socket_receive_callback, rs);
     
-    if (name != NULL && rs->name != NULL) {
-        info->name = (char*)malloc(strlen(rs->name) + 4 + strlen(name));
-        sprintf(info->name, "%s - %s", rs->name, name);
-    }
+    socket_set_closed_callback(socket, _rtp_socket_socket_closed_callback, rs);
     
     mutex_lock(rs->mutex);
     
@@ -97,106 +132,41 @@ void _rtp_socket_thread_detach(struct rtp_socket_t* rs, const char *name, socket
     
     mutex_unlock(rs->mutex);
     
-    info->thread = thread_create(fnc, info);
+    return info;
     
 }
 
-void _rtp_socket_remove_socket(struct rtp_socket_t* rs, struct rtp_socket_info_t* info) {
+bool _rtp_socket_accept_callback(socket_p socket, socket_p new_socket, void* ctx) {
     
-    mutex_lock(rs->mutex);
+    struct rtp_socket_t* rs = (struct rtp_socket_t*)ctx;
     
-    for (uint32_t i = 0 ; i < rs->sockets_count ; i++)
-        if (rs->sockets[i] == info) {
-            for (uint32_t a = i + 1 ; a < rs->sockets_count ; a++)
-                rs->sockets[a - 1] = rs->sockets[a];
-            rs->sockets_count--;
-            break;
-        }
-    
-    mutex_unlock(rs->mutex);
-    
-    socket_destroy(info->socket);
-    
-    if (info->name != NULL)
-        free(info->name);
-    
-    free(info);
-    
-}
-
-void _rtp_socket_receive_loop(void* ctx) {
-    
-    struct rtp_socket_info_t* info = (struct rtp_socket_info_t*)ctx;
-    struct rtp_socket_t* rs = info->owner;
-    
-    if (info->name != NULL)
-        thread_set_name(info->name);
-    
-    size_t offset = 0;
-    unsigned char buffer[32768];
-    
-    for (;;) {
+    if (new_socket != NULL) {
         
-        if (offset == 32768)
-            break;
-        
-        int64_t read = socket_receive(info->socket, &buffer[offset], 32768 - offset);
-        
-        if (read <= 0)
-            break;
-        
-        size_t used = read;
-        
-        if ((rs->allowed_remote_end_point == NULL || sockaddr_equals_host(socket_get_remote_end_point(info->socket), rs->allowed_remote_end_point)) && rs->received_callback != NULL)
-            used = rs->received_callback(rs, info->socket, (const char*)buffer, read + offset, rs->received_callback_ctx);
-        
-        assert(used <= read + offset);
-        
-        offset = read + offset - used;
-        if (used > 0 && offset > 0)
-            memcpy(buffer, &buffer[used], offset);
-        
-    }
-    
-    _rtp_socket_remove_socket(rs, info);
-    
-}
-
-void _rtp_socket_accept_loop(void* ctx) {
-    
-    struct rtp_socket_info_t* info = (struct rtp_socket_info_t*)ctx;
-    struct rtp_socket_t* rs = info->owner;
-    
-    thread_set_name(info->name);
-    
-    for (;;) {
-        
-        socket_p new_socket = socket_accept(info->socket);
-        
-        if (!new_socket)
-            break;
-        
-        if (rs->allowed_remote_end_point == NULL || sockaddr_equals_host(socket_get_remote_end_point(new_socket), rs->allowed_remote_end_point))
-            _rtp_socket_thread_detach(rs, "TCP Connection", new_socket, true, _rtp_socket_receive_loop);
-        else {
+        if (rs->allowed_remote_end_point == NULL || sockaddr_equals_host(socket_get_remote_end_point(new_socket), rs->allowed_remote_end_point)) {
+            _rtp_socket_add_socket(rs, new_socket, true);
+            return true;
+        } else {
             socket_close(new_socket);
             socket_destroy(new_socket);
         }
         
     }
     
-    _rtp_socket_remove_socket(rs, info);
+    return false;
     
 }
 
+
 bool rtp_socket_setup(struct rtp_socket_t* rs, struct sockaddr* local_end_point) {
     
-    socket_p udp_socket = socket_create(true);
-    socket_p tcp_socket = socket_create(false);
+    socket_p udp_socket = socket_create("RTP UDP Socket", true);
+    socket_p tcp_socket = socket_create("RTP TCP Listen Socket", false);
     
-    if (socket_bind(udp_socket, local_end_point) && socket_bind(tcp_socket, local_end_point) && socket_listen(tcp_socket)) {
-        _rtp_socket_thread_detach(rs, "UDP Socket", udp_socket, true, _rtp_socket_receive_loop);
-        _rtp_socket_thread_detach(rs, "TCP Accept", tcp_socket, false, _rtp_socket_accept_loop);
+    if (socket_bind(udp_socket, local_end_point) && socket_bind(tcp_socket, local_end_point)) {
+        _rtp_socket_add_socket(rs, udp_socket, true);
+        socket_set_receive_callback(udp_socket, _rtp_socket_socket_receive_callback, rs);
+        _rtp_socket_add_socket(rs, tcp_socket, false);
+        socket_set_accept_callback(tcp_socket, _rtp_socket_accept_callback, rs);
         return true;
     }
     

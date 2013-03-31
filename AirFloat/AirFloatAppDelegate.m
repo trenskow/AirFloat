@@ -6,129 +6,89 @@
 //  Copyright 2011 The Famous Software Company. All rights reserved.
 //
 
-#import "AirFloatMacros.h"
+#import "audioqueue.h"
+#import "raopserver.h"
+
+#import "AppViewController.h"
+
 #import "AirFloatAppDelegate.h"
-#import "AirFloatAdditions.h"
-#import "AirFloatServerController.h"
-#import "AirFloatMissingWifiViewController.h"
-#import "AirFloatIntroViewController.h"
-#import "AirFloatReceivingViewController.h"
-#import <AudioToolbox/AudioToolbox.h>
-#import <AVFoundation/AVFoundation.h>
 
-@interface AirFloatiOSAppDelegate (Private)
-
-- (void)_cleanUp;
-- (void)_updateIdleTimer;
-- (void)_applicationDidChangeStatus;
-- (void)_updateStatus:(BOOL)animated;
+@interface AirFloatAppDelegate () {
+    
+    NSDictionary* _settings;
+    
+}
 
 @end
 
-@implementation AirFloatiOSAppDelegate
-
-#pragma mark - Properties
+@implementation AirFloatAppDelegate
 
 @synthesize window=_window;
-@synthesize serverController=_serverController;
-@synthesize missingWifiViewController = _missingWifiViewController;
-@synthesize introViewController = _introViewController;
-@synthesize receivingViewController = _receivingViewController;
+@synthesize appViewController=_appViewController;
+@synthesize server=_server;
 
-#pragma mark - Private Methods
-
-- (void)_cleanUp {
+- (NSString *)settingsPath {
     
-    if (self.serverController && self.serverController.status != kAirFloatServerControllerStatusReceiving) {
-        
-        _backgroundTask = [UISharedApplication beginBackgroundTaskWithExpirationHandler:^{
-            [UISharedApplication endBackgroundTask:_backgroundTask];
-        }];
-        
-        [_serverController stop];
-        [_serverController release];
-        _serverController = nil;
-        
-        [UISharedApplication endBackgroundTask:_backgroundTask];
-        
-    }    
-
-}
-
-- (void)_updateIdleTimer {
+    NSString* filename = [[[NSBundle mainBundle] bundleIdentifier] stringByAppendingPathExtension:@"plist"];
     
-    BOOL isEnabled = [NSStandarUserDefaults boolForKey:kAirFloatUserDefaultsDoNotDimDisplayKey defaultValue:YES];
-    BOOL isCharging = (UICurrentDevice.batteryState == UIDeviceBatteryStateCharging || UICurrentDevice.batteryState == UIDeviceBatteryStateFull);
-    BOOL isRunning = (self.serverController.status > kAirFloatServerControllerStatusNeedsWifi);
-    BOOL isForeground = (UISharedApplication.applicationState == UIApplicationStateActive);
+#if TARGET_IPHONE_SIMULATOR
+    NSString* path = [[NSString stringWithFormat:@"/Users/%@/Library/Preferences/", NSUserName()] stringByAppendingPathComponent:filename];
+#else
+    NSString* path = [@"/var/mobile/Library/Preferences/" stringByAppendingPathComponent:filename];
+#endif
     
-    UISharedApplication.idleTimerDisabled = (isEnabled && isCharging && isRunning && isForeground);
-    
-    NSDLog(@"Idle timer disabled: %@", (UISharedApplication.idleTimerDisabled ? @"YES" : @"NO"));
+    return path;
     
 }
 
-- (void)_updateStatus:(BOOL)animated {
+- (NSDictionary *)settings {
     
-    // We cannot determine our state, so we wait until it is updated to determine what to display
+    if (!_settings) {
+        _settings = [[NSDictionary alloc] initWithContentsOfFile:[self settingsPath]];
+        _settings = (_settings ?: [[NSDictionary alloc] init]);
+        NSLog(@"%@", [_settings description]);
+    }
     
-    [self _updateIdleTimer];
-    
-    if (self.serverController.status == kAirFloatServerControllerStatusUnknown)
-        return;
-    
-    if (self.serverController.status == kAirFloatServerControllerStatusReceiving)
-        [self.receivingViewController setAppereance:YES animated:animated];
-    else
-        [self.receivingViewController setAppereance:NO animated:animated];
-    
-    if (self.serverController.status == kAirFloatServerControllerStatusReady)
-        [self.introViewController setAppereance:YES animated:animated];
-    else
-        [self.introViewController setAppereance:NO animated:animated];
-    
-    if (self.serverController.status == kAirFloatServerControllerStatusNeedsWifi)
-        [self.missingWifiViewController setAppereance:YES animated:animated];
-    else
-        [self.missingWifiViewController setAppereance:NO animated:animated];
+    return _settings;
     
 }
 
-- (void)_applicationDidChangeStatus {
+- (void)setSettings:(NSDictionary *)settings {
     
-    [self _updateStatus:YES];
+    [self willChangeValueForKey:@"settings"];
     
+    [_settings release];
+    _settings = [settings copy];
+    
+    [_settings writeToFile:[self settingsPath]
+                atomically:YES];
+    
+    if (self.server) {
+        
+        NSString* password = [_settings objectForKey:@"password"];
+        
+        raop_server_set_settings(self.server, (struct raop_server_settings_t) { [[_settings objectForKey:@"name"] cStringUsingEncoding:NSUTF8StringEncoding], ([[_settings objectForKey:@"authenticationEnabled"] boolValue] && password && [password length] > 0 ? [[_settings objectForKey:@"password"] cStringUsingEncoding:NSUTF8StringEncoding] : NULL) });
+        
+    }
+    
+    [self didChangeValueForKey:@"settings"];
+        
 }
 
-#pragma mark - Public Methods
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
-    AudioSessionInitialize(NULL, NULL, NULL, NULL);
+    self.appViewController = [[[AppViewController alloc] init] autorelease];
     
-    [[AVAudioSession sharedInstance] setPreferredIOBufferDuration:0.030 error:nil];
-
-    [NSDefaultNotificationCenter addObserver:self selector:@selector(_applicationDidChangeStatus) name:AirFloatServerControllerDidChangeStatusNotification object:nil];
+    self.window = [[[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds] autorelease];
     
-    [NSDefaultNotificationCenter addObserver:self selector:@selector(_updateIdleTimer) name:NSUserDefaultsDidChangeNotification object:nil];
-    [NSDefaultNotificationCenter addObserver:self selector:@selector(_updateIdleTimer) name:UIDeviceBatteryStateDidChangeNotification object:nil];
-    
-    UICurrentDevice.batteryMonitoringEnabled = YES;
-    
-    [self _updateIdleTimer];
-    
-    _serverController = [[AirFloatServerController alloc] init];
-    [_serverController start];
-    
-    self.window.rootViewController = self.receivingViewController;
-    
-    [self.window addSubview:self.missingWifiViewController.view];
-    [self.window addSubview:self.introViewController.view];
+    if ([self.window respondsToSelector:@selector(setRootViewController:)])
+        self.window.rootViewController = self.appViewController;
+    else {
+        self.appViewController.view.frame = CGRectMake(0, 20, 320, 460);
+        [self.window addSubview:self.appViewController.view];
+    }
     
     [self.window makeKeyAndVisible];
-    
-    [self _updateStatus:YES];
     
     return YES;
     
@@ -136,53 +96,46 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     
-    [self _updateStatus:YES];
+    if (!self.server) {
+        
+        struct raop_server_settings_t settings;
+        settings.name = [[self.settings objectForKey:@"name"] cStringUsingEncoding:NSUTF8StringEncoding];
+        settings.password = ([[self.settings objectForKey:@"authenticationEnabled"] boolValue] ? [[self.settings objectForKey:@"password"] cStringUsingEncoding:NSUTF8StringEncoding] : NULL);
+        
+        self.server = raop_server_create(settings);
+        
+    }
+    
+    if (!raop_server_is_running(self.server)) {
+        
+        uint16_t port = 5000;
+        while (port < 5010 && !raop_server_start(_server, port++));
+        
+        self.appViewController.server = _server;
+        
+    }
     
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     
-    [self _updateIdleTimer];
-    
-    if (self.introViewController.apparent)
-        self.introViewController.apparent = NO;
-    
-    [self _cleanUp];
-    
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     
-    if (!_serverController)
-        _serverController = [[AirFloatServerController alloc] init];
-    
-    [_serverController start];
-        
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     
-    [self _cleanUp];
+    if (self.server && !raop_server_is_recording(self.server)) {
+        raop_server_stop(self.server);
+        raop_server_destroy(self.server);
+        self.appViewController.server = self.server = NULL;
+    }
     
 }
 
-- (void)applicationWillTerminate:(UIApplication *)application
-{
-    
-    [self _cleanUp];
-    
-}
-
-- (void)dealloc
-{
-    
-    [_serverController release];
-    [_window release];
-    [_missingWifiViewController release];
-    [_introViewController release];
-    [_receivingViewController release];
-    
-    [super dealloc];
+- (void)applicationWillTerminate:(UIApplication *)application {
     
 }
 

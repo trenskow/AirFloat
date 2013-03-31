@@ -1,0 +1,13 @@
+//
+//  AirFloatReflectionView.h
+//  AirFloat
+//
+//  Created by Kristian Trenskow on 3/20/13.
+//
+//
+
+#import <UIKit/UIKit.h>
+
+@interface AirFloatReflectionView : UIView
+
+@end

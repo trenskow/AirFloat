@@ -7,7 +7,7 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
-#import "AirFloatAdditions.h"
+
 #import "AirFloatFlipInView.h"
 #import "AirFloatAdView.h"
 
@@ -34,6 +34,11 @@
     
     [_images release];
     
+    for (NSTimer* timer in _timers)
+        [timer invalidate];
+    
+    [_timers release];
+    
     [super dealloc];
     
 }
@@ -43,6 +48,7 @@
 - (void)awakeFromNib {
     
     _currentImage = 0;
+    _timers = [[NSMutableArray alloc] init];
     
 }
 
@@ -73,11 +79,15 @@
     
     if (_isAnimating) {
         
-        [NSObject cancelPreviousPerformRequestsWithTarget:self];
-
-        [UIView animateWithDuration:0.3
+        for (NSTimer* timer in _timers)
+            [timer invalidate];
+        
+        [_timers release];
+        _timers = [[NSMutableArray alloc] init];
+        
+        [UIView animateWithDuration:1.0
                               delay:0.0
-                            options:UIViewAnimationCurveEaseOut
+                            options:UIViewAnimationOptionCurveEaseOut
                          animations:^{
                              self.alpha = 0.0;
                          } completion:^(BOOL finished) {
@@ -95,6 +105,31 @@
 
 #pragma mark - Private Methods
 
+- (void)_invalidateTimer:(NSTimer *)timer {
+    
+    [timer invalidate];
+    [_timers removeObject:timer];
+    
+}
+
+- (void)_doFlip:(NSTimer*)timer {
+    
+    AirFloatFlipInView* flipView = [timer userInfo];
+    
+    [flipView flip:nil];
+    
+    [self _invalidateTimer:timer];
+    
+}
+
+- (void)_doDisplayNextImage:(NSTimer *)timer {
+    
+    [self _displayNextImage];
+    
+    [self _invalidateTimer:timer];
+    
+}
+
 - (void)_displayNextImage {
     
     self.hidden = NO;
@@ -111,6 +146,7 @@
     CGRect frame = imageView.frame;
     imageView.layer.anchorPoint = CGPointMake([[[image objectForKey:@"AirFloatAdImageCenter"] objectForKey:@"x"] doubleValue] / imageView.frame.size.width, 
                                               [[[image objectForKey:@"AirFloatAdImageCenter"] objectForKey:@"y"] doubleValue] / imageView.frame.size.height);
+    
     imageView.frame = frame;
     imageView.alpha = 0.0;
     
@@ -145,7 +181,7 @@
         UILabel* label = [[UILabel alloc] initWithFrame:CGRectZero];
         label.text = [[adText objectAtIndex:i] objectForKey:@"AirFloatAdText"];
         label.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:36];
-        if ([UICurrentDevice.systemVersion doubleValue] < 5)
+        if ([[UIDevice currentDevice].systemVersion doubleValue] < 5)
             label.font = [UIFont fontWithName:@"HelveticaNeue" size:36];
         if ([[[adText objectAtIndex:i] objectForKey:@"AirFloatAdTextIsBold"] boolValue])
             label.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:36];
@@ -162,7 +198,7 @@
         if ([[[image objectForKey:@"AirFloatAdTextPosition"] objectForKey:@"AirFloatVertical"] isEqualToString:@"bottom"])
             flipFrame.origin.y = self.frame.size.height - (([adText count] - i) * (flipFrame.size.height + 8)) - 2;
         else
-            flipFrame.origin.y = (i * (flipFrame.size.height + 8)) + 30;
+            flipFrame.origin.y = (i * (flipFrame.size.height + 8)) + 10;
         
         if ([[[image objectForKey:@"AirFloatAdTextPosition"] objectForKey:@"AirFloatHorizontal"] isEqualToString:@"left"])
             flipFrame.origin.x = 10;
@@ -191,7 +227,18 @@
         
         [textView addSubview:flipView];
         
-        [flipView performSelector:@selector(flip:) withObject:nil afterDelay:[[[adText objectAtIndex:i] objectForKey:@"AirFloatAdDelay"] doubleValue] + 2];
+        NSTimer* timer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:[[[adText objectAtIndex:i] objectForKey:@"AirFloatAdDelay"] doubleValue] + 2]
+                                                  interval:0
+                                                    target:self
+                                                  selector:@selector(_doFlip:)
+                                                  userInfo:flipView
+                                                   repeats:NO];
+        
+        [_timers addObject:timer];
+        
+        [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+        
+        [timer release];
         
         [label release];
         [flipView release];
@@ -209,6 +256,7 @@
                         options:UIViewAnimationCurveEaseInOut
                      animations:^{
                          imageView.alpha = 1.0;
+                         oldView.alpha = 0.0;
                      } completion:^(BOOL finished) {
                          [oldView removeFromSuperview];
                      }];
@@ -221,7 +269,18 @@
                          imageView.center = endCenter;
                      } completion:NULL];
     
-    [self performSelector:@selector(_displayNextImage) withObject:nil afterDelay:duration - 1.0];
+    NSTimer* timer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:duration - 1.0]
+                                              interval:0.0
+                                                target:self
+                                              selector:@selector(_doDisplayNextImage:)
+                                              userInfo:nil
+                                               repeats:NO];
+    
+    [_timers addObject:timer];
+    
+    [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+    
+    [timer release];
     
     [self addSubview:nextView];
     

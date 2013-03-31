@@ -11,7 +11,9 @@
 
 #include <stdint.h>
 
-size_t web_tools_convert_new_lines(void* buffer, size_t buffer_size);
-const char* web_tools_get_content_start(void* buffer, size_t length);
+#include "webheaders.h"
+
+size_t web_tools_convert_new_lines(void* data, size_t data_size);
+const char* web_tools_get_content_start(const void* data, size_t data_size);
 
 #endif

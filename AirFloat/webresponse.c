@@ -7,16 +7,17 @@
 //
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <assert.h>
 
+#include "log.h"
+#include "webtools.h"
 #include "webheaders.h"
 #include "webresponse.h"
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
-
-web_headers_p web_headers_create();
-void web_headers_destroy(web_headers_p wh);
 
 struct web_response_t {
     uint16_t status_code;
@@ -53,6 +54,87 @@ void web_response_destroy(struct web_response_t* wr) {
     
 }
 
+ssize_t web_response_parse(web_response_p wr, const void* data, size_t data_size) {
+    
+    size_t ret = 0;
+    
+    char* buffer = malloc(data_size);
+    memcpy(buffer, data, data_size);
+    
+    const char* content_start = web_tools_get_content_start(buffer, data_size);;
+    
+    if (content_start != NULL) {
+        
+        size_t header_length = content_start - buffer;
+        char header[header_length];
+        memcpy(header, buffer, content_start - buffer);
+        
+        log_data(LOG_INFO, data, content_start - buffer);
+        
+        char* header_start = header;
+        header_length = web_tools_convert_new_lines(header_start, header_length);
+        
+        char* s_status_code = NULL;
+        char* status_message = NULL;
+        while (header_start[0] != '\n') {
+            if (header_start[0] == ' ' && status_message == NULL) {
+                if (s_status_code == NULL)
+                    s_status_code = (char*)&header_start[1];
+                else if (status_message == NULL)
+                    status_message = (char*)&header_start[1];
+                header_start[0] = '\0';
+            }
+            header_start++;
+            header_length--;
+        }
+        
+        header_start[0] = '\0';
+        
+        if (s_status_code == NULL || status_message == NULL) {
+            free(buffer);
+            return -1;
+        }
+        
+        header_start++;
+        header_length--;
+        
+        web_headers_p headers = web_headers_create();
+        web_headers_parse(headers, header_start, header_length);
+        
+        size_t content_length = 0;
+        const char* s_content_length = web_headers_value(headers, "Content-Length");
+        if (s_content_length != NULL)
+            content_length = atoi(s_content_length);
+        
+        size_t actual_content_length = data_size - (content_start - buffer);
+        if (content_length <= actual_content_length) {
+            
+            wr->status_code = atoi(s_status_code);
+            wr->status_message = (char*)malloc(strlen(status_message) + 1);
+            strcpy(wr->status_message, status_message);
+            
+            web_headers_destroy(wr->headers);
+            wr->headers = headers;
+            
+            log_message(LOG_INFO, "(Complete) - %d bytes", content_length);
+            
+            web_response_set_content(wr, (void*)content_start, content_length);
+            
+            ret = content_start + content_length - buffer;
+            
+        } else {
+            log_message(LOG_INFO, "(Incomplete)");
+            web_headers_destroy(headers);
+        }
+        
+    }
+    
+    free(buffer);
+    
+    return ret;
+    
+}
+
 web_headers_p web_response_get_headers(struct web_response_t* wr) {
     
     return wr->headers;
@@ -60,6 +142,8 @@ web_headers_p web_response_get_headers(struct web_response_t* wr) {
 }
 
 void web_response_set_status(struct web_response_t* wr, uint16_t code, const char* message) {
+    
+    assert(code < 1000);
     
     if (wr->status_message != NULL) {
         free(wr->status_message);
@@ -115,7 +199,7 @@ void web_response_set_content(struct web_response_t* wr, void* content, size_t s
 
 size_t web_response_get_content(struct web_response_t* wr, void* content, size_t size) {
     
-    if (content)
+    if (content != NULL && wr->content != NULL)
         memcpy(content, wr->content, MIN(size, wr->content_length));
     
     return wr->content_length;
@@ -131,5 +215,28 @@ void web_response_set_keep_alive(struct web_response_t* wr, bool keep_alive) {
 bool web_response_get_keep_alive(struct web_response_t* wr) {
     
     return wr->keep_alive;
+    
+}
+
+size_t web_response_write(web_response_p wr, const char* protocol, void* data, size_t data_size) {
+    
+    assert(protocol != NULL);
+    
+    size_t write_pos = 0;
+
+    size_t status_message_length = strlen(wr->status_message);
+    size_t protocol_length = strlen(protocol);
+    
+    if (data != NULL && write_pos + status_message_length + protocol_length + 7 <= data_size)
+        sprintf(data, "%s %d %s\r\n", protocol, wr->status_code, wr->status_message);
+    
+    write_pos += status_message_length + protocol_length + 7;
+    
+    size_t headers_length = web_headers_write(wr->headers, NULL, 0);
+    
+    if (data != NULL && write_pos + headers_length <= data_size)
+        web_headers_write(wr->headers, data + write_pos, data_size - write_pos);
+    
+    return write_pos + headers_length;
     
 }
