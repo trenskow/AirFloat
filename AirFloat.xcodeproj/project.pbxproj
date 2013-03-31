@@ -1127,6 +1127,7 @@
 			buildSettings = {
 				ARCHS = armv7;
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Kristian Trenskow (4LS78LP7HM)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
@@ -1144,6 +1145,7 @@
 					"-ObjC",
 				);
 				PRODUCT_NAME = AirFloat;
+				PROVISIONING_PROFILE = "EAEDF9D1-0C9A-4A51-A6B6-4CD15C530CEA";
 				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
