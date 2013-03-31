@@ -87,7 +87,9 @@ void _dacp_client_web_connection_response_received_callback(web_client_connectio
         web_headers_p headers = web_response_get_headers(response);
         
         size_t content_length;
-        if (strcmp(web_headers_value(headers, "Content-Type"), "application/x-dmap-tagged") == 0 && (content_length = web_response_get_content(response, NULL, 0)) > 0) {
+        const char* s_content_type = web_headers_value(headers, "Content-Type");
+        
+        if (s_content_type != NULL && strcmp(s_content_type, "application/x-dmap-tagged") == 0 && (content_length = web_response_get_content(response, NULL, 0)) > 0) {
             
             char data[content_length];
             
