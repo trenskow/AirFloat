@@ -558,10 +558,10 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
                 
             } else if (0 == strcmp(cmd, "TEARDOWN") && rtp_session != NULL) {
                 
-                keep_alive = false;
-                
                 if (rs->callbacks.ended_recording != NULL)
                     rs->callbacks.ended_recording(rs, rs->callbacks.ctx.ended_recording);
+                
+                keep_alive = false;
                 
             } else
                 web_response_set_status(response, 400, "Bad Request");
