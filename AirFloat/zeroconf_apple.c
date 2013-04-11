@@ -107,7 +107,7 @@ struct zeroconf_raop_ad_t* zeroconf_raop_ad_create(uint16_t port, const char *na
     
     struct zeroconf_raop_ad_t* za = (struct zeroconf_raop_ad_t*)malloc(sizeof(struct zeroconf_raop_ad_t));
         
-    CFStringRef service_name = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingUTF8);
+    CFStringRef service_name = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
     uint64_t hardware_id = hardware_identifier();
     
     uint8_t* hardware_chars = (uint8_t*)&hardware_id;

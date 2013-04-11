@@ -88,7 +88,7 @@
         
         NSString* password = [_settings objectForKey:@"password"];
         
-        raop_server_set_settings(self.server, (struct raop_server_settings_t) { [[_settings objectForKey:@"name"] cStringUsingEncoding:NSUTF8StringEncoding], ([[_settings objectForKey:@"authenticationEnabled"] boolValue] && password && [password length] > 0 ? [[_settings objectForKey:@"password"] cStringUsingEncoding:NSUTF8StringEncoding] : NULL) });
+        raop_server_set_settings(self.server, (struct raop_server_settings_t) { [[_settings objectForKey:@"name"] cStringUsingEncoding:NSASCIIStringEncoding], ([[_settings objectForKey:@"authenticationEnabled"] boolValue] && password && [password length] > 0 ? [[_settings objectForKey:@"password"] cStringUsingEncoding:NSUTF8StringEncoding] : NULL) });
         
     }
     

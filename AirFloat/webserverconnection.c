@@ -71,14 +71,11 @@ ssize_t _web_server_connection_socket_recieve_callback(socket_p socket, const vo
         if (wc->request_callback != NULL) {
             mutex_unlock(wc->mutex);
             wc->request_callback(wc, request, wc->request_callback_ctx);
-            mutex_lock(wc->mutex);
         }
         
     }
     
     web_request_destroy(request);
-    
-    mutex_unlock(wc->mutex);
     
     return ret;
         
