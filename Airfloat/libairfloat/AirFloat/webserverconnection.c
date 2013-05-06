@@ -68,12 +68,13 @@ ssize_t _web_server_connection_socket_recieve_callback(socket_p socket, const vo
     
     if ((ret = web_request_parse(request, data, data_size)) > 0) {
         
-        if (wc->request_callback != NULL) {
-            mutex_unlock(wc->mutex);
-            wc->request_callback(wc, request, wc->request_callback_ctx);
-        }
+        mutex_unlock(wc->mutex);
         
-    }
+        if (wc->request_callback != NULL)
+            wc->request_callback(wc, request, wc->request_callback_ctx);
+        
+    } else
+        mutex_unlock(wc->mutex);
     
     web_request_destroy(request);
     
@@ -105,7 +106,7 @@ void web_server_connection_destroy(struct web_server_connection_t* wc) {
     
     web_server_connection_close(wc);
     
-    mutex_destroy(wc->mutex);
+    mutex_destroy(wc->mutex, true);
     
     free(wc);
     
