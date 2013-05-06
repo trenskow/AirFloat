@@ -32,6 +32,7 @@
 
 @interface UIImage (AirFloatAdditions)
 
+- (UIImage*)imageWithScale:(CGFloat)scale;
 - (UIImage*)imageAspectedFilledWithSize:(CGSize)size;
 - (UIImage*)imageGaussianBlurredWithRadius:(CGFloat)radius;
 

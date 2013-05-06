@@ -145,7 +145,7 @@ void clientUpdatedArtwork(raop_session_p raop_session, const void* data, size_t 
     
     if (strcmp(mime_type, "image/none") != 0) {
         NSData* imageData = [[NSData alloc] initWithBytes:data length:data_size];
-        image = [[[UIImage alloc] initWithData:imageData scale:[UIScreen mainScreen].scale] autorelease];
+        image = [[UIImage imageWithData:imageData] imageWithScale:[UIScreen mainScreen].scale];
         [imageData release];
     }
     
