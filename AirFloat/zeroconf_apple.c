@@ -152,7 +152,7 @@ void zeroconf_raop_ad_destroy(struct zeroconf_raop_ad_t* za) {
     CFRunLoopStop(za->run_loop);
     
     condition_destroy(za->condition);
-    mutex_destroy(za->mutex);
+    mutex_destroy(za->mutex, false);
     thread_join(za->thread);
     
     CFRelease(za->service);
@@ -302,7 +302,7 @@ void zeroconf_dacp_discover_destroy(struct zeroconf_dacp_discover_t* zd) {
     }
     
     thread_destroy(zd->thread);
-    mutex_destroy(zd->mutex);
+    mutex_destroy(zd->mutex, false);
     
     CFRelease(zd->domain_browser);
     

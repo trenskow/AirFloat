@@ -264,7 +264,7 @@ void socket_destroy(struct socket_t* s) {
     
     mutex_unlock(s->mutex);
     
-    mutex_destroy(s->mutex);
+    mutex_destroy(s->mutex, true);
     
     free(s);
     

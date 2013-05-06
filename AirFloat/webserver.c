@@ -97,7 +97,7 @@ void web_server_destroy(struct web_server_t* ws) {
     
     web_server_stop(ws);
     
-    mutex_destroy(ws->mutex);
+    mutex_destroy(ws->mutex, true);
     
     free(ws);
     
