@@ -34,6 +34,12 @@
 
 @implementation UIImage (AirFloatAdditions)
 
+- (UIImage *)imageWithScale:(CGFloat)scale {
+    
+    return [UIImage imageWithCGImage:self.CGImage scale:scale orientation:self.imageOrientation];
+    
+}
+
 - (UIImage *)imageAspectedFilledWithSize:(CGSize)size {
     
     CGSize aspect = CGSizeMake(size.width / self.size.width,
