@@ -155,7 +155,7 @@ void audio_packet_destroy(struct audio_packet_t* ap) {
     
     audio_packet_set_buffer(ap, NULL, 0);
     
-    mutex_destroy(ap->mutex, false);
+    mutex_destroy(ap->mutex);
     
     free(ap);
     
@@ -538,7 +538,7 @@ void audio_queue_destroy(struct audio_queue_t* aq) {
     
     audio_output_destroy(aq->output);
     
-    mutex_destroy(aq->mutex, false);
+    mutex_destroy(aq->mutex);
     condition_destroy(aq->condition);
     
     free(aq);

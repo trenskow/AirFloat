@@ -106,7 +106,7 @@ void web_server_connection_destroy(struct web_server_connection_t* wc) {
     
     web_server_connection_close(wc);
     
-    mutex_destroy(wc->mutex, true);
+    mutex_destroy(wc->mutex);
     
     free(wc);
     
