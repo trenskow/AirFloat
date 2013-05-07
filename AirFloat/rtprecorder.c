@@ -426,7 +426,7 @@ void rtp_recorder_destroy(struct rtp_recorder_t* rr) {
     sockaddr_destroy(rr->remote_control_end_point);
     sockaddr_destroy(rr->remote_timing_end_point);
     
-    mutex_destroy(rr->timer_mutex, false);
+    mutex_destroy(rr->timer_mutex);
     condition_destroy(rr->timer_cond);
     
     free(rr);

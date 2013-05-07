@@ -124,7 +124,7 @@ void raop_server_destroy(struct raop_server_t* rs) {
     
     web_server_destroy(rs->server);
     
-    mutex_destroy(rs->mutex, true);
+    mutex_destroy(rs->mutex);
     
     free(rs);
     

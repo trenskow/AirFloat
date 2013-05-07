@@ -89,7 +89,7 @@ void rtp_socket_destroy(struct rtp_socket_t* rs) {
     if (rs->name)
         free(rs->name);
     
-    mutex_destroy(rs->mutex, false);
+    mutex_destroy(rs->mutex);
     
     free(rs);
     

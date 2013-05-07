@@ -65,8 +65,8 @@ void _web_server_socket_closed(socket_p socket, void* ctx) {
     for (uint32_t i = 0 ; i < ws->connection_count ; i++)
         if (ws->connections[i].socket == socket) {
             
-            socket_destroy(ws->connections[i].socket);
             web_server_connection_destroy(ws->connections[i].web_connection);
+            socket_destroy(ws->connections[i].socket);
             
             for (uint32_t x = i ; x < ws->connection_count - 1 ; x++)
                 ws->connections[x] = ws->connections[x + 1];
@@ -97,7 +97,7 @@ void web_server_destroy(struct web_server_t* ws) {
     
     web_server_stop(ws);
     
-    mutex_destroy(ws->mutex, true);
+    mutex_destroy(ws->mutex);
     
     free(ws);
     
