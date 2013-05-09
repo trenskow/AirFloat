@@ -76,8 +76,6 @@ struct raop_rtp_session_t {
 struct raop_session_t {
     mutex_p mutex;
     bool is_running;
-    bool is_stopping;
-    bool is_destroyed;
     raop_server_p server;
     char* password;
     web_server_connection_p raop_connection;
@@ -653,32 +651,23 @@ void raop_session_destroy(struct raop_session_t* rs) {
     
     mutex_lock(rs->mutex);
     
-    if (rs->is_stopping == false) {
-        
-        if (rs->is_running) {
-            mutex_unlock(rs->mutex);
-            raop_session_stop(rs);
-            mutex_lock(rs->mutex);
-        }
-        
-        if (rs->password != NULL) {
-            free(rs->password);
-            rs->password = NULL;
-        }
-        
+    if (rs->is_running) {
         mutex_unlock(rs->mutex);
-        
-        mutex_destroy(rs->mutex);
-        rs->mutex = NULL;
-        
-        free(rs);
-        
-        return;
-        
-    } else
-        rs->is_destroyed = true;
+        raop_session_stop(rs);
+        mutex_lock(rs->mutex);
+    }
+    
+    if (rs->password != NULL) {
+        free(rs->password);
+        rs->password = NULL;
+    }
     
     mutex_unlock(rs->mutex);
+    
+    mutex_destroy(rs->mutex);
+    rs->mutex = NULL;
+    
+    free(rs);
     
 }
 
@@ -698,8 +687,6 @@ void raop_session_stop(struct raop_session_t* rs) {
     bool stopped = false;
     
     mutex_lock(rs->mutex);
-    
-    rs->is_stopping = true;
     
     if (rs->is_running) {
         
@@ -742,16 +729,11 @@ void raop_session_stop(struct raop_session_t* rs) {
         rs->user_agent = NULL;
     }
     
-    rs->is_stopping = false;
-    
     mutex_unlock(rs->mutex);
     
     if (stopped)
         raop_server_session_ended(rs->server, rs);
-    
-    if (rs->is_destroyed)
-        raop_session_destroy(rs);
-    
+        
 }
 
 void raop_session_set_client_initiated_callback(struct raop_session_t* rs, raop_session_client_initiated_callback callback, void* ctx) {

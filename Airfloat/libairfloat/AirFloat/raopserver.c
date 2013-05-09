@@ -53,25 +53,6 @@ struct raop_server_t {
     void* new_session_ctx;
 };
 
-void _raop_server_session_ended_callback(raop_session_p session, void* ctx) {
-    
-    struct raop_server_t* rs = (struct raop_server_t*)ctx;
-    
-    mutex_lock(rs->mutex);
-    
-    for (uint32_t i = 0 ; i < rs->sessions_count ; i++)
-        if (rs->sessions[i] == session) {
-            raop_session_destroy(rs->sessions[i]);
-            for (uint32_t a = i + 1 ; a < rs->sessions_count ; a++)
-                rs->sessions[a - 1] = rs->sessions[a];
-            rs->sessions_count--;
-            break;
-        }
-    
-    mutex_unlock(rs->mutex);
-    
-}
-
 bool _raop_server_web_connection_accept_callback(web_server_p server, web_server_connection_p connection, void* ctx) {
     
     struct raop_server_t* rs = (struct raop_server_t*)ctx;
@@ -88,9 +69,7 @@ bool _raop_server_web_connection_accept_callback(web_server_p server, web_server
         rs->sessions_count++;
         
         mutex_unlock(rs->mutex);
-        
-        raop_session_set_ended_callback(new_session, _raop_server_session_ended_callback, rs);
-        
+                
         raop_session_start(new_session);
         
         if (rs->new_session_callback != NULL)
@@ -247,12 +226,14 @@ void raop_server_session_ended(struct raop_server_t* rs, raop_session_p session)
     
     for (uint32_t i = 0 ; i < rs->sessions_count ; i++)
         if (rs->sessions[i] == session) {
-            raop_session_destroy(session);
-            for (uint32_t x = i ; x < rs->sessions_count - 1 ; x++)
-                rs->sessions[x] = rs->sessions[x + 1];
+            raop_session_destroy(rs->sessions[i]);
+            for (uint32_t a = i + 1 ; a < rs->sessions_count ; a++)
+                rs->sessions[a - 1] = rs->sessions[a];
+            rs->sessions_count--;
             break;
         }
     
     mutex_unlock(rs->mutex);
+    
     
 }
