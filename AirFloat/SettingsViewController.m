@@ -34,6 +34,8 @@
 #import "AirFloatSwitch.h"
 #import "SettingsViewController.h"
 
+NSString *const SettingsUpdatedNotification = @"SettingsUpdatedNotification";
+
 @interface SettingsViewController () <UITextFieldDelegate, UIScrollViewDelegate>
 
 @property (nonatomic, strong) IBOutlet UITextField* nameField;
@@ -43,6 +45,13 @@
 @property (nonatomic, strong) IBOutlet UIView* authenticationFieldHighlightedBackground;
 @property (nonatomic, strong) IBOutlet UIButton* authenticationClearButton;
 @property (nonatomic, strong) IBOutlet AirFloatSwitch* authenticationEnabledSwitch;
+@property (nonatomic, strong) IBOutlet AirFloatSwitch* keepScreenLitSwitch;
+@property (nonatomic, strong) IBOutlet UILabel* keepScreenLitOnlyWhenReceivingLabel;
+@property (nonatomic, strong) IBOutlet AirFloatSwitch* keepScreenLitOnlyWhenReceivingSwitch;
+@property (nonatomic, strong) IBOutlet UILabel* keepScreenLitOnlyWhenConnectedToPowerLabel;
+@property (nonatomic, strong) IBOutlet AirFloatSwitch* keepScreenLitOnlyWhenConnectedToPowerSwitch;
+
+- (void)updateVisuals:(NSDictionary *)visuals;
 
 @end
 
@@ -52,15 +61,25 @@
     
     [super viewDidLoad];
     
-    ((UIScrollView*)self.view).contentSize = CGSizeMake(320, 302);
+    ((UIScrollView*)self.view).contentSize = CGSizeMake(320, 358);
     
     NSDictionary* settings = AirFloatSharedAppDelegate.settings;
     
     self.nameField.text = [settings objectForKey:@"name"];
     self.authenticationField.text = [settings objectForKey:@"password"];
     self.authenticationEnabledSwitch.on = [[settings objectForKey:@"authenticationEnabled"] boolValue];
+    self.keepScreenLitSwitch.on = [[settings objectForKey:@"keepScreenLit"] boolValue];
+    self.keepScreenLitOnlyWhenReceivingSwitch.on = [[settings objectForKey:@"keepScreenLitOnlyWhenReceiving"] boolValue];
+    self.keepScreenLitOnlyWhenConnectedToPowerSwitch.on = [[settings objectForKey:@"keepScreenLitOnlyWhenConnectedToPower"] boolValue];
+    
+    [self updateVisuals:settings];
     
     [self.authenticationEnabledSwitch addTarget:self action:@selector(authenticationSwitchValueChanged:) forControlEvents:UIControlEventValueChanged];
+    [self.keepScreenLitSwitch addTarget:self action:@selector(litSwitchChangedValue:) forControlEvents:UIControlEventValueChanged];
+    [self.keepScreenLitOnlyWhenReceivingSwitch addTarget:self action:@selector(litSwitchChangedValue:) forControlEvents:UIControlEventValueChanged];
+    [self.keepScreenLitOnlyWhenConnectedToPowerSwitch addTarget:self action:@selector(litSwitchChangedValue:) forControlEvents:UIControlEventValueChanged];
+    
+}
     
 }
 
@@ -82,6 +101,19 @@
     
 }
 
+- (void)updateVisuals:(NSDictionary *)settings {
+    
+    self.keepScreenLitOnlyWhenReceivingSwitch.userInteractionEnabled = self.keepScreenLitOnlyWhenConnectedToPowerSwitch.userInteractionEnabled = self.keepScreenLitSwitch.on;
+    
+    [UIView animateWithDuration:0.3f
+                          delay:0.0f
+                        options:UIViewAnimationOptionCurveEaseOut
+                     animations:^{
+                         self.keepScreenLitOnlyWhenConnectedToPowerLabel.alpha = self.keepScreenLitOnlyWhenConnectedToPowerSwitch.alpha = self.keepScreenLitOnlyWhenReceivingLabel.alpha = self.keepScreenLitOnlyWhenReceivingSwitch.alpha = (self.keepScreenLitSwitch.on ? 1.0f : 0.3f);
+                     } completion:nil];
+    
+}
+
 - (void)updateSettings {
     
     NSMutableDictionary* settings = [[NSMutableDictionary alloc] init];
@@ -95,7 +127,22 @@
     if (self.authenticationEnabledSwitch.on)
         [settings setObject:[NSNumber numberWithBool:self.authenticationEnabledSwitch.on] forKey:@"authenticationEnabled"];
     
+    if (self.keepScreenLitSwitch.on) {
+        
+        [settings setObject:[NSNumber numberWithBool:self.keepScreenLitSwitch.on] forKey:@"keepScreenLit"];
+        
+        if (self.keepScreenLitOnlyWhenReceivingSwitch.on)
+            [settings setObject:[NSNumber numberWithBool:self.keepScreenLitOnlyWhenReceivingSwitch.on] forKey:@"keepScreenLitOnlyWhenReceiving"];
+        if (self.keepScreenLitOnlyWhenConnectedToPowerSwitch.on)
+            [settings setObject:[NSNumber numberWithBool:self.keepScreenLitOnlyWhenConnectedToPowerSwitch.on] forKey:@"keepScreenLitOnlyWhenConnectedToPower"];
+        
+    }
+    
     AirFloatSharedAppDelegate.settings = settings;
+    
+    [self updateVisuals:settings];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:SettingsUpdatedNotification object:nil userInfo:settings];
     
     [settings release];
     
@@ -121,6 +168,12 @@
     
     if (![self.authenticationField isFirstResponder])
         [self updateSettings];
+    
+}
+
+- (IBAction)litSwitchChangedValue:(id)sender {
+    
+    [self updateSettings];
     
 }
 
