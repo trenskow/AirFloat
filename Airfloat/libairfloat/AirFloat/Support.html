@@ -8,7 +8,7 @@
                 -webkit-touch-callout: none;
                 -webkit-user-select: none; /* Disable selection/Copy of UIWebView */
             }
-            
+                        
             body {
                 font-family: Helvetica;
                 font-weight: bold;
@@ -26,6 +26,11 @@
                 font-size: 12px;
                 text-align: center;
                 line-height: 1.3em;
+            }
+            
+            #contentholder {
+                width: 280px;
+                margin: 0px auto 0px auto;
             }
             
             #header {
@@ -75,18 +80,24 @@
 					}
                 }
                 
+                var rect = document.getElementById('contentholder').getBoundingClientRect()
+                
+                console.log(rect.top + rect.height);
+                
             }
             
         </script>
 	</head>
 	<body>
-		<img id="logo" data-retina="true" src="AirFloatLogo-Support.png" />
-		<h1>Support</h1>
-		<p>AirFloat is the result of countless hours of work. It is a complete reimplementation of the AirPlay audio protocol. And as such it has been almost four months in the works as a full time project.</p>
-		<p>AirFloat is made freely available to the jailbreak community as an homage to all the great work being done in the pursuit of making iOS an even greater platform.</p>
-		<p>If you like AirFloat and like using it, please consider supporting me in the continuous development and maintenance of the app.</p>
-		<p>Thanks!</p>
-		<p id="donate"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=R59FM5PEGHT6E"><img src="PayPalDonate.png" data-retina="true" alt="Donate" /></a></p>
-		<p id="source">Source codes are available through <a href="https://www.github.com/trenskow/AirFloat">GitHub</a>.</p>
+        <div id="contentholder">
+            <img id="logo" data-retina="true" src="AirFloatLogo-Support.png" alt="Logo" />
+            <h1>Support</h1>
+            <p>AirFloat is the result of countless hours of work. It is a complete reimplementation of the AirPlay audio protocol. And as such  it has been almost four months in the works as a full time project.</p>
+            <p>AirFloat is made freely available to the jailbreak community as an homage to all the great work being done in the pursuit of making  iOS an even greater platform.</p>
+            <p>If you like AirFloat and like using it, please consider supporting me in the continuous development and maintenance of the app.</p>
+            <p>Thanks!</p>
+            <p id="donate"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=R59FM5PEGHT6E"><img src="PayPalDonate.png" data-retina="true" alt="Donate" /></a></p>
+            <p id="source">Source codes are available through <a href="https://www.github.com/trenskow/AirFloat">GitHub</a>.</p>
+        </div>
 	</body>
 </html>

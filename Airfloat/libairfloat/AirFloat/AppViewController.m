@@ -259,7 +259,13 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
     
     [super viewDidLoad];
     
-    [self.adView setImages:[NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Images" ofType:@"plist"]]];
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)
+        [self.adView setImages:[NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Images" ofType:@"plist"]]];
+    else
+        [self.adView setImages:[NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Images~ipad" ofType:@"plist"]]];
+    
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
+        self.artworkImageView.contentMode = UIViewContentModeScaleAspectFit;
     
     if ([[UIDevice currentDevice].systemVersion floatValue] >= 6) {
         
@@ -533,7 +539,6 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
     
     [self updateNowPlayingInfoCenter];
     
-    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
     [self updateScreenIdleState];
     
 }
@@ -557,7 +562,17 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
 
 - (void)setAndScaleImage:(UIImage *)image {
     
-    UIImage* actualImage = [image imageAspectedFilledWithSize:self.artworkImageView.bounds.size];
+    CGSize size = self.artworkImageView.bounds.size;
+    
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        
+        CGSize screenSize = [UIScreen mainScreen].bounds.size;
+        size = CGSizeMake(MAX(screenSize.width, screenSize.height),
+                          MAX(screenSize.width, screenSize.height));
+        
+    }
+    
+    UIImage* actualImage = [image imageAspectedFilledWithSize:size];
     UIImage* blurredImage = [actualImage imageGaussianBlurredWithRadius:10.0];
     
     [self.artworkImageView performSelectorOnMainThread:@selector(setImage:) withObject:actualImage waitUntilDone:NO];
@@ -682,6 +697,18 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
             default:
                 break;
         }
+    
+}
+
+- (BOOL)shouldAutorotate {
+    
+    return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad);
+    
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
+    
+    return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad || toInterfaceOrientation == UIDeviceOrientationPortrait);
     
 }
 

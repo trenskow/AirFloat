@@ -80,6 +80,12 @@ NSString *const SettingsUpdatedNotification = @"SettingsUpdatedNotification";
     [self.keepScreenLitOnlyWhenConnectedToPowerSwitch addTarget:self action:@selector(litSwitchChangedValue:) forControlEvents:UIControlEventValueChanged];
     
 }
+
+- (void)viewWillAppear:(BOOL)animated {
+    
+    [super viewWillAppear:animated];
+    
+    [self centerContent];
     
 }
 

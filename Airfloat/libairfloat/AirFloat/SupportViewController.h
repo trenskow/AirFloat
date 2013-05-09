@@ -28,8 +28,8 @@
 //  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <UIKit/UIKit.h>
+#import "PanelViewController.h"
 
-@interface SupportViewController : UIViewController <UIWebViewDelegate>
+@interface SupportViewController : PanelViewController <UIWebViewDelegate>
 
 @end

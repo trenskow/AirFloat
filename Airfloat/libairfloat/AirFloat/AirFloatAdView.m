@@ -166,8 +166,10 @@
     UIImageView* imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:[image objectForKey:@"AirFloatAdImage"]]];
     
     CGRect frame = imageView.frame;
-    imageView.layer.anchorPoint = CGPointMake([[[image objectForKey:@"AirFloatAdImageCenter"] objectForKey:@"x"] doubleValue] / imageView.frame.size.width, 
+    
+    CGPoint anchorPoint = CGPointMake([[[image objectForKey:@"AirFloatAdImageCenter"] objectForKey:@"x"] doubleValue] / imageView.frame.size.width,
                                               [[[image objectForKey:@"AirFloatAdImageCenter"] objectForKey:@"y"] doubleValue] / imageView.frame.size.height);
+    imageView.layer.anchorPoint = anchorPoint;
     
     imageView.frame = frame;
     imageView.alpha = 0.0;
@@ -175,10 +177,17 @@
     [nextView addSubview:imageView];
     
     CGFloat startScale = 1.1 - ((CGFloat)(arc4random() % 10) / 50.0);
+    CGFloat endScale = 1.0;
+    
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        endScale = MAX(self.bounds.size.width / frame.size.width, self.bounds.size.height / frame.size.height);
+        startScale = endScale + ((CGFloat)(arc4random() % 10) / 50.0);
+    }
+    
     imageView.layer.transform = CATransform3DMakeScale(startScale, startScale, 1.0);
     
-    CGPoint startCenter = CGPointMake([[[image objectForKey:@"AirFloatAdScreenCenter"] objectForKey:@"x"] doubleValue] * self.frame.size.width, 
-                                      [[[image objectForKey:@"AirFloatAdScreenCenter"] objectForKey:@"y"] doubleValue] * self.frame.size.height);
+    CGPoint startCenter = CGPointMake([[[image objectForKey:@"AirFloatAdScreenCenter"] objectForKey:@"x"] doubleValue] * self.bounds.size.width,
+                                      [[[image objectForKey:@"AirFloatAdScreenCenter"] objectForKey:@"y"] doubleValue] * self.bounds.size.height);
     
     CGPoint endCenter = startCenter;
     
@@ -196,17 +205,21 @@
     UIView* textView = [[UIView alloc] initWithFrame:self.bounds];
     [nextView addSubview:textView];
     
+    nextView.autoresizingMask = textView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+    
     NSArray* adText = [image objectForKey:@"AirFloatAdTexts"];
     
     for (NSInteger i = 0 ; i < [adText count] ; i++) {
         
+        CGFloat fontSize = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone ? 36 : 52);
+        
         UILabel* label = [[UILabel alloc] initWithFrame:CGRectZero];
         label.text = [[adText objectAtIndex:i] objectForKey:@"AirFloatAdText"];
-        label.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:36];
+        label.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:fontSize];
         if ([[UIDevice currentDevice].systemVersion doubleValue] < 5)
-            label.font = [UIFont fontWithName:@"HelveticaNeue" size:36];
+            label.font = [UIFont fontWithName:@"HelveticaNeue" size:fontSize];
         if ([[[adText objectAtIndex:i] objectForKey:@"AirFloatAdTextIsBold"] boolValue])
-            label.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:36];
+            label.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:fontSize];
         
         label.textColor = [UIColor whiteColor];
         label.backgroundColor = [UIColor blackColor];
@@ -215,20 +228,29 @@
         
         CGRect flipFrame = label.frame;
         flipFrame.size.width = flipFrame.size.width * 1.5;
-        flipFrame.size.height = 46;
+        flipFrame.size.height = fontSize + 10;
         
-        if ([[[image objectForKey:@"AirFloatAdTextPosition"] objectForKey:@"AirFloatVertical"] isEqualToString:@"bottom"])
+        UIViewAutoresizing autoresizingMask = UIViewAutoresizingNone;
+        
+        if ([[[image objectForKey:@"AirFloatAdTextPosition"] objectForKey:@"AirFloatVertical"] isEqualToString:@"bottom"]) {
             flipFrame.origin.y = self.frame.size.height - (([adText count] - i) * (flipFrame.size.height + 8)) - 2;
-        else
+            autoresizingMask |= UIViewAutoresizingFlexibleTopMargin;
+        } else {
             flipFrame.origin.y = (i * (flipFrame.size.height + 8)) + 10;
+            autoresizingMask |= UIViewAutoresizingFlexibleBottomMargin;
+        }
         
-        if ([[[image objectForKey:@"AirFloatAdTextPosition"] objectForKey:@"AirFloatHorizontal"] isEqualToString:@"left"])
+        if ([[[image objectForKey:@"AirFloatAdTextPosition"] objectForKey:@"AirFloatHorizontal"] isEqualToString:@"left"]) {
             flipFrame.origin.x = 10;
-        else
+            autoresizingMask |= UIViewAutoresizingFlexibleRightMargin;
+        } else {
             flipFrame.origin.x = self.frame.size.width - flipFrame.size.width - 10;
+            autoresizingMask |= UIViewAutoresizingFlexibleLeftMargin;
+        }
         
         AirFloatFlipInView* flipView = [[AirFloatFlipInView alloc] initWithFrame:flipFrame];
         flipView.backgroundColor = [UIColor blackColor];
+        flipView.autoresizingMask = autoresizingMask;
         
         if ([[image objectForKey:@"AirFloatAdTextColor"] isEqualToString:@"black"]) {
             label.textColor = [UIColor blackColor];
@@ -242,7 +264,7 @@
         else
             labelFrame.origin.x = flipFrame.size.width - labelFrame.size.width - 10;
         
-        labelFrame.size.height = 46;
+        labelFrame.size.height = fontSize + 10;
         label.frame = labelFrame;
         
         [flipView addSubview:label];
@@ -287,7 +309,7 @@
                           delay:0.0
                         options:UIViewAnimationCurveEaseOut
                      animations:^{
-                         imageView.layer.transform = CATransform3DMakeScale(1.0, 1.0, 1.0);
+                         imageView.layer.transform = CATransform3DMakeScale(endScale, endScale, 1.0);
                          imageView.center = endCenter;
                      } completion:NULL];
     
@@ -309,6 +331,36 @@
     [imageView release];
     [textView release];
     [nextView release];
+    
+}
+
+- (void)setFrame:(CGRect)frame {
+    
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        
+        CGRect oldFrame = self.frame;
+        
+        CGPoint frameDiff = CGPointMake(round((frame.size.width - oldFrame.size.width) / 2),
+                                        round((frame.size.height - oldFrame.size.height) / 2));
+        
+        for (UIView* view in self.subviews) {
+            
+            UIView* imageView = [view.subviews objectAtIndex:0];
+            
+            CGPoint center = imageView.center;
+            center.x += frameDiff.x;
+            center.y += frameDiff.y;
+            imageView.center = center;
+            
+            CGFloat scale = MAX(frame.size.width / imageView.bounds.size.width, frame.size.height / imageView.bounds.size.height);
+            
+            imageView.layer.transform = CATransform3DMakeScale(scale, scale, 1.0);
+            
+        }
+        
+    }
+    
+    [super setFrame:frame];
     
 }
 
