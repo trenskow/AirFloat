@@ -36,6 +36,7 @@
 
 #import "UIImage+AirFloatAdditions.h"
 
+#import "AirFloatAppDelegate.h"
 #import "AirFloatAdView.h"
 #import "SupportViewController.h"
 #import "SettingsViewController.h"
@@ -195,7 +196,7 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
 
 - (void)dealloc {
     
-    [super dealloc];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     self.adView = nil;
     self.topView = self.bottomView = nil;
@@ -204,6 +205,8 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
     
     [_artworkImage release];
     [_albumTitle release];
+    
+    [super dealloc];
     
 }
 
@@ -264,6 +267,13 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
                                                    object:nil];
         
     }
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(settingsUpdated:) name:SettingsUpdatedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(batteryStateChanged:) name:UIDeviceBatteryStateDidChangeNotification object:nil];
+    
+    [UIDevice currentDevice].batteryMonitoringEnabled = YES;
+    
+    [self updateScreenIdleState];
     
 }
 
@@ -469,6 +479,8 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
     
     [self updateControlsAvailability];
     
+    [self updateScreenIdleState];
+    
 }
 
 - (void)clientEndedRecording {
@@ -512,6 +524,7 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
     [self updateNowPlayingInfoCenter];
     
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+    [self updateScreenIdleState];
         raop_server_stop(self.server);
         [[UIApplication sharedApplication] endBackgroundTask:backgroundTask];
     }
@@ -645,6 +658,30 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
             default:
                 break;
         }
+    
+}
+
+- (void)updateScreenIdleState {
+    
+    BOOL disabled = [[AirFloatSharedAppDelegate.settings objectForKey:@"keepScreenLit"] boolValue];
+    
+    disabled &= (![[AirFloatSharedAppDelegate.settings objectForKey:@"keepScreenLitOnlyWhenReceiving"] boolValue] || (_server != NULL && raop_server_is_recording(_server)));
+    
+    disabled &= (![[AirFloatSharedAppDelegate.settings objectForKey:@"keepScreenLitOnlyWhenConnectedToPower"] boolValue] || ([UIDevice currentDevice].batteryState == UIDeviceBatteryStateCharging || [UIDevice currentDevice].batteryState == UIDeviceBatteryStateFull));
+    
+    [UIApplication sharedApplication].idleTimerDisabled = disabled;
+    
+}
+
+- (void)settingsUpdated:(NSNotification *)notification {
+    
+    [self updateScreenIdleState];
+    
+}
+
+- (void)batteryStateChanged:(NSNotification *)notification {
+    
+    [self updateScreenIdleState];
     
 }
 

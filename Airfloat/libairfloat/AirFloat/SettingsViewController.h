@@ -30,7 +30,7 @@
 
 #import <UIKit/UIKit.h>
 
-@class AirFloatSwitch;
+NSString *const SettingsUpdatedNotification;
 
 @interface SettingsViewController : UIViewController
 
