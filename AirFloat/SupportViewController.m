@@ -52,10 +52,22 @@
         if([view isKindOfClass:[UIImageView class]])
             [view removeFromSuperview];
     
-    if ([self.webView respondsToSelector:@selector(scrollView)])
+    if ([self.webView respondsToSelector:@selector(scrollView)]) {
         self.webView.scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
+        self.webView.scrollView.showsVerticalScrollIndicator = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone);
+    }
     
     self.webView.alpha = 0.0;
+    
+    [self centerContent];
+    
+}
+
+- (CGFloat)heightOfContentInScrollView:(UIScrollView *)scrollView {
+    
+    NSString* documentHeight = [self.webView stringByEvaluatingJavaScriptFromString:@"document.getElementById('contentholder').getBoundingClientRect().top + document.getElementById('contentholder').getBoundingClientRect().height"];
+    
+    return [documentHeight doubleValue];
     
 }
 
@@ -67,6 +79,8 @@
                      animations:^{
                          self.webView.alpha = 1.0;
                      } completion:nil];
+    
+    [self centerContent];
     
 }
 

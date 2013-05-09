@@ -28,10 +28,10 @@
 //  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <UIKit/UIKit.h>
+#import "PanelViewController.h"
 
 NSString *const SettingsUpdatedNotification;
 
-@interface SettingsViewController : UIViewController
+@interface SettingsViewController : PanelViewController
 
 @end

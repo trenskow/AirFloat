@@ -70,6 +70,8 @@
         __block CGRect endFrame = label.frame;
         endFrame.origin.x = -widthDiff;
         
+        label.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+        
         [UIView animateWithDuration:widthDiff / 25.0
                               delay:0.3
                             options:UIViewAnimationOptionCurveLinear
@@ -150,6 +152,7 @@
     newLabel.backgroundColor = [UIColor clearColor];
     newLabel.opaque = NO;
     newLabel.textAlignment = self.textAlignment;
+    newLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     
     super.text = nil;
     
