@@ -67,6 +67,7 @@
 
 - (void)clientStartedRecording;
 - (void)clientEndedRecording;
+- (void)clientEnded;
 - (void)clientUpdatedArtwork:(UIImage *)image;
 - (void)clientUpdatedTrackInfo:(NSString *)trackTitle artistName:(NSString *)artistName andAlbumTitle:(NSString *)albumTitle;
 - (void)setDacpClient:(NSValue*)pointer;
@@ -130,9 +131,17 @@ void clientEndedRecording(raop_session_p raop_session, void* ctx) {
     AppViewController* viewController = (AppViewController*)ctx;
     
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground)
-        [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:nil];
+        backgroundTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:nil];
     
     [viewController performSelectorOnMainThread:@selector(clientEndedRecording) withObject:nil waitUntilDone:NO];
+    
+}
+
+void clientEnded(raop_session_p raop_session, void* ctx) {
+    
+    AppViewController* viewController = (AppViewController*)ctx;
+    
+    [viewController performSelectorOnMainThread:@selector(clientEnded) withObject:nil waitUntilDone:NO];
     
 }
 
@@ -189,6 +198,7 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
     raop_session_set_client_ended_recording_callback(new_session, clientEndedRecording, ctx);
     raop_session_set_client_updated_artwork_callback(new_session, clientUpdatedArtwork, ctx);
     raop_session_set_client_updated_track_info_callback(new_session, clientUpdatedTrackInfo, ctx);
+    raop_session_set_ended_callback(new_session, clientEnded, ctx);
     
 }
 
@@ -525,8 +535,22 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
     
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
     [self updateScreenIdleState];
+    
+}
+
+- (void)stopBackgroundTask {
+    
+    UIBackgroundTaskIdentifier identifier = backgroundTask;
+    backgroundTask = 0;
+    [[UIApplication sharedApplication] endBackgroundTask:identifier];
+    
+}
+
+- (void)clientEnded {
+    
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground && backgroundTask > 0) {
         raop_server_stop(self.server);
-        [[UIApplication sharedApplication] endBackgroundTask:backgroundTask];
+        [self performSelector:@selector(stopBackgroundTask) withObject:nil afterDelay:1.0];
     }
     
 }
