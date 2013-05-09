@@ -127,8 +127,6 @@
 		A1ACB4F216FA2350008E4C4F /* UIImage+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A1ACB4F116FA2350008E4C4F /* UIImage+AirFloatAdditions.m */; };
 		A1ACB4F416FA286F008E4C4F /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1ACB4F316FA286F008E4C4F /* OpenGLES.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A1B5D8E116DABEDA00181FCE /* settings.c in Sources */ = {isa = PBXBuildFile; fileRef = A1B5D8E016DABEDA00181FCE /* settings.c */; };
-		A1C7F7931500CA6E00D7DE52 /* WiFi.png in Resources */ = {isa = PBXBuildFile; fileRef = A1C7F7901500CA6E00D7DE52 /* WiFi.png */; };
-		A1C7F7981500CB0100D7DE52 /* WiFi@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1C7F7971500CB0100D7DE52 /* WiFi@2x.png */; };
 		A1C7F79A1500D22100D7DE52 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1C7F7991500D22100D7DE52 /* Default@2x.png */; };
 		A1C7F79C1500D2B600D7DE52 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = A1C7F79B1500D2B600D7DE52 /* Default.png */; };
 		A1CD9F2A17076E720015CBBA /* webclientconnection.c in Sources */ = {isa = PBXBuildFile; fileRef = A1CD9F2917076E720015CBBA /* webclientconnection.c */; };
@@ -307,8 +305,6 @@
 		A1ACB4F116FA2350008E4C4F /* UIImage+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+AirFloatAdditions.m"; sourceTree = "<group>"; };
 		A1ACB4F316FA286F008E4C4F /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		A1B5D8E016DABEDA00181FCE /* settings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = settings.c; sourceTree = "<group>"; };
-		A1C7F7901500CA6E00D7DE52 /* WiFi.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = WiFi.png; sourceTree = "<group>"; };
-		A1C7F7971500CB0100D7DE52 /* WiFi@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WiFi@2x.png"; sourceTree = "<group>"; };
 		A1C7F7991500D22100D7DE52 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "../Default@2x.png"; sourceTree = "<group>"; };
 		A1C7F79B1500D2B600D7DE52 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = ../Default.png; sourceTree = "<group>"; };
 		A1CD9F2817076E6A0015CBBA /* webclientconnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = webclientconnection.h; sourceTree = "<group>"; };
@@ -605,15 +601,6 @@
 			name = "Application Wide";
 			sourceTree = "<group>";
 		};
-		A188ECE9150BD5C600CC089E /* WiFi */ = {
-			isa = PBXGroup;
-			children = (
-				A1C7F7901500CA6E00D7DE52 /* WiFi.png */,
-				A1C7F7971500CB0100D7DE52 /* WiFi@2x.png */,
-			);
-			name = WiFi;
-			sourceTree = "<group>";
-		};
 		A188ECEA150BD5D700CC089E /* Connect Intro */ = {
 			isa = PBXGroup;
 			children = (
@@ -674,7 +661,6 @@
 				A146A93216FA5C0300698A49 /* Support */,
 				A188ECE8150BD5A300CC089E /* Application Wide */,
 				A188ECE5150BD56C00CC089E /* App Graphics */,
-				A188ECE9150BD5C600CC089E /* WiFi */,
 				A188ECEA150BD5D700CC089E /* Connect Intro */,
 				A188ECED150BD62500CC089E /* Streaming */,
 			);
@@ -998,8 +984,6 @@
 				A10392D514E9B58400DB356F /* BarButtonHighlighted.png in Resources */,
 				A10392D614E9B58400DB356F /* BarButtonHighlighted@2x.png in Resources */,
 				A12B7B0914FDCCB20068538D /* Images.plist in Resources */,
-				A1C7F7931500CA6E00D7DE52 /* WiFi.png in Resources */,
-				A1C7F7981500CB0100D7DE52 /* WiFi@2x.png in Resources */,
 				A1C7F79A1500D22100D7DE52 /* Default@2x.png in Resources */,
 				A1C7F79C1500D2B600D7DE52 /* Default.png in Resources */,
 				A15F64F8151A343A00A7D712 /* iTunes@2x.jpg in Resources */,
