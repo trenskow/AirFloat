@@ -92,7 +92,8 @@
     
     if (!_isAnimating) {
         _isAnimating = YES;
-        [self _displayNextImage];
+        // Wait a while. Framing must be in place before starting.
+        [self performSelector:@selector(_displayNextImage) withObject:nil afterDelay:0.1];
     }
     
 }
