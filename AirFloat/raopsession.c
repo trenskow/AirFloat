@@ -474,11 +474,15 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
                     const char* volume;
                     const char* progress;
                     if ((volume = parameters_value_for_key(parameters, "volume"))) {
-                        float f_volume;
-                        sscanf(volume, "%f", &f_volume);
-                        log_message(LOG_INFO, "Client set volume: %f", (30.0 + f_volume) / 30.0);
                         
-                        audio_output_set_volume(audio_queue_get_output(rtp_session->queue), MAX(pow(10.0, 0.05 * f_volume), 0.0));
+                        float volume_db;
+                        sscanf(volume, "%f", &volume_db);
+                        
+                        float volume_p = MAX(pow(10.0, 0.05 * volume_db), 0.0);
+                        
+                        log_message(LOG_INFO, "Client set volume: %f", volume_p);
+                        
+                        audio_output_set_volume(audio_queue_get_output(rtp_session->queue), volume_p);
                         
                     } else if (rs->callbacks.updated_track_position != NULL && (progress = parameters_value_for_key(parameters, "progress"))) {
                         
