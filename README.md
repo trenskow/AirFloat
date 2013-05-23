@@ -4,7 +4,14 @@ AirFloat implements the RAOP (Remote Audio Output Protocol) also known as AirPla
 
 ## Support
 
-If you like using AirFloat - Please consider a donation using [PayPal](https://www.paypal.com/dk/cgi-bin/webscr?cmd=_flow&SESSION=dhcwGK_Y2vdHbKS0aOC-AZ0AG3me8epKWe5ARKrdByuhPnHBMeMaahrO5aC&dispatch=5885d80a13c0db1f8e263663d3faee8d14f86393d55a810282b64afed84968ec).
+If you like using AirFloat - Please consider a donation using PayPal.
+
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="hosted_button_id" value="R59FM5PEGHT6E">
+<input type="image" src="https://www.paypalobjects.com/en_US/DK/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+</form>
 
 ##Contributions
 
