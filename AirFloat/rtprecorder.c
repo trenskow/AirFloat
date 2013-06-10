@@ -390,11 +390,15 @@ struct rtp_recorder_t* rtp_recorder_create(crypt_aes_p crypt, audio_queue_p audi
     rr->timer_mutex = mutex_create();
     rr->timer_cond = condition_create();
     
-    rr->remote_control_end_point = sockaddr_copy(remote_end_point);
-    rr->remote_timing_end_point = sockaddr_copy(remote_end_point);
+    if (remote_timing_port > 0) {
+        rr->remote_timing_end_point = sockaddr_copy(remote_end_point);
+        sockaddr_set_port(rr->remote_timing_end_point, remote_timing_port);
+    }
     
-    sockaddr_set_port(rr->remote_control_end_point, remote_control_port);
-    sockaddr_set_port(rr->remote_timing_end_point, remote_timing_port);
+    if (remote_control_port > 0) {
+        rr->remote_control_end_point = sockaddr_copy(remote_end_point);
+        sockaddr_set_port(rr->remote_control_end_point, remote_control_port);
+    }
     
     rr->streaming_socket = _rtp_recorder_create_socket(rr, "Straming socket", local_end_point, remote_end_point);
     rr->control_socket = _rtp_recorder_create_socket(rr, "Control socket", local_end_point, remote_end_point);
@@ -423,8 +427,11 @@ void rtp_recorder_destroy(struct rtp_recorder_t* rr) {
     rtp_socket_destroy(rr->control_socket);
     rtp_socket_destroy(rr->timing_socket);
     
-    sockaddr_destroy(rr->remote_control_end_point);
-    sockaddr_destroy(rr->remote_timing_end_point);
+    if (rr->remote_timing_end_point != NULL)
+        sockaddr_destroy(rr->remote_timing_end_point);
+    
+    if (rr->remote_control_end_point != NULL)
+        sockaddr_destroy(rr->remote_control_end_point);
     
     mutex_destroy(rr->timer_mutex);
     condition_destroy(rr->timer_cond);
@@ -437,7 +444,7 @@ bool rtp_recorder_start(struct rtp_recorder_t* rr) {
     
     bool complete = true;
     
-    if (rr->initial_time_response_count < 3) {
+    if (rr->remote_timing_end_point != NULL && rr->initial_time_response_count < 3) {
         
         _rtp_recorder_send_timing_request(rr);
         _rtp_recorder_send_timing_request(rr);
