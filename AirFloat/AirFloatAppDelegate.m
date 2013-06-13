@@ -121,6 +121,13 @@
         
         struct raop_server_settings_t settings;
         settings.name = [[self.settings objectForKey:@"name"] cStringUsingEncoding:NSUTF8StringEncoding];
+        if (settings.name == nil) {
+            UIDevice *device=[UIDevice currentDevice];
+            NSString *name=[device name];
+            NSString *model=[device model];
+            
+            settings.name = [[NSString stringWithFormat:@"%@, %@", name, model] cStringUsingEncoding:NSUTF8StringEncoding];
+        }
         settings.password = ([[self.settings objectForKey:@"authenticationEnabled"] boolValue] ? [[self.settings objectForKey:@"password"] cStringUsingEncoding:NSUTF8StringEncoding] : NULL);
         
         self.server = raop_server_create(settings);
