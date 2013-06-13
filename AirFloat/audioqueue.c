@@ -113,6 +113,28 @@ void audio_packet_set_buffer(struct audio_packet_t* ap, void* buffer, size_t siz
     
 }
 
+void audio_packet_set_buffer_with_padding(struct audio_packet_t* ap, void* buffer, size_t size, size_t final_size) {
+    
+    assert(final_size > size);
+    
+    mutex_lock(ap->mutex);
+    
+    if (ap->buffer != NULL)
+        free(ap->buffer);
+    ap->buffer_size = 0;
+    
+    if (buffer != NULL) {
+        ap->buffer = malloc(final_size);
+        memcpy(ap->buffer, buffer, size);
+        memset(ap->buffer + size, 1, final_size - size);
+        ap->buffer_size = final_size;
+    } else
+        ap->buffer = NULL;
+    
+    mutex_unlock(ap->mutex);
+    
+}
+
 size_t audio_packet_get_buffer(struct audio_packet_t* ap, void* buffer, size_t size) {
     
     size_t ret = 0;
@@ -683,7 +705,20 @@ uint32_t audio_queue_add_packet(struct audio_queue_t* aq, void* encoded_buffer, 
             
             new_packet->sample_time = sample_time;
             new_packet->seq_no = seq_no;
-            audio_packet_set_buffer(new_packet, decoded_buffer, decoded_buffer_size);
+            
+            if (aq->queue_count > 0) {
+                // Compute sample time gap, it will appear if some package is lost.
+                size_t ideal_sample_time = sample_time - aq->queue_tail->sample_time;
+                size_t ideal_buffer_size = ideal_sample_time * aq->output_format.frame_size;
+                
+                if (ideal_buffer_size <= decoded_buffer_size) { // cut buffer in this case.
+                    audio_packet_set_buffer(new_packet, decoded_buffer, ideal_buffer_size);
+                } else { // Add padding append buffer in this case.
+                    audio_packet_set_buffer_with_padding(new_packet, decoded_buffer, decoded_buffer_size, ideal_buffer_size);
+                }
+            } else {
+                audio_packet_set_buffer(new_packet, decoded_buffer, decoded_buffer_size);
+            }
             
             aq->frame_count += decoded_buffer_size / aq->output_format.frame_size;
             
