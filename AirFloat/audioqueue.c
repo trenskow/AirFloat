@@ -708,19 +708,21 @@ uint32_t audio_queue_add_packet(struct audio_queue_t* aq, void* encoded_buffer, 
             
             if (aq->queue_count > 0) {
                 // Compute sample time gap, it will appear if some package is lost.
-                size_t ideal_sample_time = sample_time - aq->queue_tail->sample_time;
-                size_t ideal_buffer_size = ideal_sample_time * aq->output_format.frame_size;
+                size_t sample_time_lag = sample_time - aq->queue_tail->sample_time - aq->queue_tail->buffer_size / aq->output_format.frame_size;
+                size_t ideal_buffer_size = sample_time_lag * aq->output_format.frame_size + decoded_buffer_size;
+                
+                new_packet->sample_time = aq->queue_tail->sample_time + aq->queue_tail->buffer_size / aq->output_format.frame_size;
                 
                 if (ideal_buffer_size <= decoded_buffer_size) { // cut buffer in this case.
                     audio_packet_set_buffer(new_packet, decoded_buffer, ideal_buffer_size);
                 } else { // Add padding append buffer in this case.
                     audio_packet_set_buffer_with_padding(new_packet, decoded_buffer, decoded_buffer_size, ideal_buffer_size);
                 }
+                aq->frame_count += ideal_buffer_size / aq->output_format.frame_size;
             } else {
                 audio_packet_set_buffer(new_packet, decoded_buffer, decoded_buffer_size);
-            }
-            
-            aq->frame_count += decoded_buffer_size / aq->output_format.frame_size;
+                aq->frame_count += decoded_buffer_size / aq->output_format.frame_size;
+            }            
             
             _audio_queue_add_packet_to_tail(aq, new_packet);
             
