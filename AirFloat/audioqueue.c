@@ -1,5 +1,5 @@
 //
-//  AudioQueue.cpp
+//  audioqueue.c
 //  AirFloat
 //
 //  Copyright (c) 2013, Kristian Trenskow All rights reserved.
