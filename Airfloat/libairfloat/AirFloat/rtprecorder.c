@@ -232,7 +232,7 @@ void _rtp_recorder_process_sync_packet(struct rtp_recorder_t* rr, struct rtp_pac
     
 }
 
-void _rtp_recorder_send_resend_request(struct rtp_recorder_t* rr, uint16_t seqNum, uint16_t count) {
+void _rtp_recorder_send_resend_request(struct rtp_recorder_t* rr, uint16_t seq_num, uint16_t count) {
     
     assert(count > 0);
     
@@ -243,11 +243,11 @@ void _rtp_recorder_send_resend_request(struct rtp_recorder_t* rr, uint16_t seqNu
     pckt.a = 0x80;
     pckt.b = RTP_RANGE_RESEND_REQUEST | ~RTP_PAYLOAD_TYPE;
     pckt.seq_num = pckt.count = htons(count);
-    pckt.missed_seq = htons(seqNum);
+    pckt.missed_seq = htons(seq_num);
     
     rtp_socket_send_to(rr->control_socket, rr->remote_control_end_point, &pckt, RTP_RESEND_PACKET_SIZE);
     
-    log_message(LOG_INFO, "Requested packet resend (seq: %d / count %d)", seqNum, count);
+    log_message(LOG_INFO, "Requested packet resend (seq: %d / count %d)", seq_num, count);
     
 }
 

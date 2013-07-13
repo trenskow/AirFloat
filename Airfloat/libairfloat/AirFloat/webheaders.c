@@ -207,19 +207,19 @@ void web_headers_set_value(struct web_headers_t* wh, const char* name, const cha
         
     } else {
         
-        struct web_header_t newHeader;
-        bzero(&newHeader, sizeof(struct web_header_t));
+        struct web_header_t new_header;
+        bzero(&new_header, sizeof(struct web_header_t));
         
-        size_t nameLen = strlen(name);
-        size_t valueLen = strlen(fvalue);
+        size_t name_len = strlen(name);
+        size_t value_len = strlen(fvalue);
         
-        newHeader.name = (char*)malloc(nameLen + valueLen + 2);
-        newHeader.value = &newHeader.name[nameLen + 1];
-        strcpy(newHeader.name, name);
-        strcpy(newHeader.value, fvalue);
+        new_header.name = (char*)malloc(name_len + value_len + 2);
+        new_header.value = &new_header.name[name_len + 1];
+        strcpy(new_header.name, name);
+        strcpy(new_header.value, fvalue);
         
         wh->headers = (struct web_header_t*)realloc(wh->headers, sizeof(struct web_header_t) * (wh->count + 1));
-        wh->headers[wh->count] = newHeader;
+        wh->headers[wh->count] = new_header;
         
         wh->count++;
         
