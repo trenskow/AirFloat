@@ -110,11 +110,11 @@ socket_p _web_server_bind(struct web_server_t* ws, uint16_t port, sockaddr_type 
     if (ws->socket_types & socket_type) {
         
         socket = socket_create("Web server", false);
-        struct sockaddr* endPoint = sockaddr_create(NULL, port, socket_type, 0);
+        struct sockaddr* end_point = sockaddr_create(NULL, port, socket_type, 0);
         
-        bool ret = socket_bind(socket, endPoint);
+        bool ret = socket_bind(socket, end_point);
         
-        sockaddr_destroy(endPoint);
+        sockaddr_destroy(end_point);
         
         if (!ret) {
             socket_destroy(socket);
