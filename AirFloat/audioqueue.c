@@ -94,7 +94,9 @@ struct audio_packet_t* audio_packet_create(enum audio_packet_state state) {
     
 }
 
-void audio_packet_set_buffer(struct audio_packet_t* ap, void* buffer, size_t size) {
+void audio_packet_set_buffer(struct audio_packet_t* ap, void* in_buffer, size_t in_buffer_size, size_t packet_size) {
+    
+    packet_size = MAX(in_buffer_size, packet_size);
     
     mutex_lock(ap->mutex);
     
@@ -102,32 +104,11 @@ void audio_packet_set_buffer(struct audio_packet_t* ap, void* buffer, size_t siz
         free(ap->buffer);
     ap->buffer_size = 0;
     
-    if (buffer != NULL) {
-        ap->buffer = malloc(size);
-        memcpy(ap->buffer, buffer, size);
-        ap->buffer_size = size;
-    } else
-        ap->buffer = NULL;
-    
-    mutex_unlock(ap->mutex);
-    
-}
-
-void audio_packet_set_buffer_with_padding(struct audio_packet_t* ap, void* buffer, size_t size, size_t final_size) {
-    
-    assert(final_size > size);
-    
-    mutex_lock(ap->mutex);
-    
-    if (ap->buffer != NULL)
-        free(ap->buffer);
-    ap->buffer_size = 0;
-    
-    if (buffer != NULL) {
-        ap->buffer = malloc(final_size);
-        memcpy(ap->buffer, buffer, size);
-        memset(ap->buffer + size, 1, final_size - size);
-        ap->buffer_size = final_size;
+    if (in_buffer != NULL) {
+        ap->buffer = malloc(packet_size);
+        memcpy(ap->buffer, in_buffer, in_buffer_size);
+        bzero(&ap->buffer[in_buffer_size], packet_size - in_buffer_size);
+        ap->buffer_size = packet_size;
     } else
         ap->buffer = NULL;
     
@@ -175,7 +156,7 @@ void audio_packet_shift_buffer(struct audio_packet_t* ap, size_t size) {
 
 void audio_packet_destroy(struct audio_packet_t* ap) {
     
-    audio_packet_set_buffer(ap, NULL, 0);
+    audio_packet_set_buffer(ap, NULL, 0, 0);
     
     mutex_destroy(ap->mutex);
     
@@ -306,7 +287,7 @@ struct audio_packet_t* _audio_queue_add_empty_packet(struct audio_queue_t* aq) {
     size_t size = aq->output_format.frame_size * aq->output_format.frames_per_packet;
     char* emptyBuffer[size];
     bzero(emptyBuffer, size);
-    audio_packet_set_buffer(new_packet, emptyBuffer, size);
+    audio_packet_set_buffer(new_packet, emptyBuffer, size, size);
     
     aq->frame_count += aq->output_format.frames_per_packet;
     
@@ -707,18 +688,15 @@ uint32_t audio_queue_add_packet(struct audio_queue_t* aq, void* encoded_buffer, 
             new_packet->seq_no = seq_no;
             
             if (aq->queue_count > 0) {
+                
                 // Compute sample time gap, it will appear if some package is lost.
                 size_t ideal_sample_time = sample_time - aq->queue_tail->sample_time;
                 size_t ideal_buffer_size = ideal_sample_time * aq->output_format.frame_size;
                 
-                if (ideal_buffer_size <= decoded_buffer_size) { // cut buffer in this case.
-                    audio_packet_set_buffer(new_packet, decoded_buffer, ideal_buffer_size);
-                } else { // Add padding append buffer in this case.
-                    audio_packet_set_buffer_with_padding(new_packet, decoded_buffer, decoded_buffer_size, ideal_buffer_size);
-                }
-            } else {
-                audio_packet_set_buffer(new_packet, decoded_buffer, decoded_buffer_size);
-            }
+                audio_packet_set_buffer(new_packet, decoded_buffer, decoded_buffer_size, ideal_buffer_size);
+                
+            } else
+                audio_packet_set_buffer(new_packet, decoded_buffer, decoded_buffer_size, decoded_buffer_size);
             
             aq->frame_count += decoded_buffer_size / aq->output_format.frame_size;
             
@@ -733,7 +711,7 @@ uint32_t audio_queue_add_packet(struct audio_queue_t* aq, void* encoded_buffer, 
                     if (current_packet->state != audio_packet_state_complete) {
                         aq->missing_count--;
                         
-                        audio_packet_set_buffer(current_packet, decoded_buffer, decoded_buffer_size);
+                        audio_packet_set_buffer(current_packet, decoded_buffer, decoded_buffer_size, decoded_buffer_size);
                         current_packet->state = audio_packet_state_complete;
                         
                     } else
