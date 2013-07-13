@@ -216,20 +216,20 @@ void _raop_session_get_apple_response(struct raop_session_t* rs, const char* cha
         
     }
     
-    unsigned char clearResponse[256];
-    memset(clearResponse, 0xFF, 256);
-    clearResponse[0] = 0;
-    clearResponse[1] = 1;
-    clearResponse[256 - (response_size + 1)] = 0;
-    memcpy(&clearResponse[256 - response_size], a_response, response_size);
+    unsigned char clear_response[256];
+    memset(clear_response, 0xFF, 256);
+    clear_response[0] = 0;
+    clear_response[1] = 1;
+    clear_response[256 - (response_size + 1)] = 0;
+    memcpy(&clear_response[256 - response_size], a_response, response_size);
     
-    unsigned char encryptedResponse[256];
-    size_t size = crypt_apple_private_encrypt(clearResponse, 256, encryptedResponse, 256);
+    unsigned char encrypted_response[256];
+    size_t size = crypt_apple_private_encrypt(clear_response, 256, encrypted_response, 256);
     
     if (size > 0) {
         
         char* a_encrypted_response;
-        size_t a_len = base64_encode(encryptedResponse, size, &a_encrypted_response);
+        size_t a_len = base64_encode(encrypted_response, size, &a_encrypted_response);
         
         if (response != NULL)
             memcpy(response, a_encrypted_response, a_len);
