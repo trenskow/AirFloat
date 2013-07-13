@@ -285,9 +285,9 @@ struct audio_packet_t* _audio_queue_add_empty_packet(struct audio_queue_t* aq) {
         new_packet->seq_no = aq->queue_tail->seq_no + 1;
     
     size_t size = aq->output_format.frame_size * aq->output_format.frames_per_packet;
-    char* emptyBuffer[size];
-    bzero(emptyBuffer, size);
-    audio_packet_set_buffer(new_packet, emptyBuffer, size, size);
+    char* empty_buffer[size];
+    bzero(empty_buffer, size);
+    audio_packet_set_buffer(new_packet, empty_buffer, size, size);
     
     aq->frame_count += aq->output_format.frames_per_packet;
     

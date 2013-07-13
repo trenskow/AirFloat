@@ -48,10 +48,10 @@ double hardware_host_time_to_seconds(double host_time) {
     
     if (!_hardware_time_initiated) {
         
-        struct mach_timebase_info theTimeBaseInfo;
-        mach_timebase_info(&theTimeBaseInfo);
-        _hardware_time_to_nanos_numerator = theTimeBaseInfo.numer;
-        _hardware_time_to_nanos_denominator = theTimeBaseInfo.denom;
+        struct mach_timebase_info time_base_info;
+        mach_timebase_info(&time_base_info);
+        _hardware_time_to_nanos_numerator = time_base_info.numer;
+        _hardware_time_to_nanos_denominator = time_base_info.denom;
         
     }
     

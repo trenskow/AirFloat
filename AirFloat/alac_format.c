@@ -61,7 +61,7 @@ struct alac_magic_cookie_t alac_format_parse(const char* rtp_fmtp) {
     struct alac_magic_cookie_t cookie;
     bzero(&cookie, sizeof(struct alac_magic_cookie_t));
     
-    cookie.format_atom.atomSize = mtbl(12);
+    cookie.format_atom.atom_size = mtbl(12);
     cookie.format_atom.channel_layout_info_id = mtbl('frma');
     cookie.format_atom.type = mtbl('alac');
     cookie.alac_specific_info.info_size = mtbl(36);

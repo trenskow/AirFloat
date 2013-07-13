@@ -50,7 +50,7 @@ struct alac_specific_config_t {
 struct alac_magic_cookie_t {
     
     struct {
-        uint32_t atomSize;
+        uint32_t atom_size;
         uint32_t channel_layout_info_id;
         uint32_t type;
     } format_atom;
