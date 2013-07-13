@@ -398,27 +398,27 @@ size_t dmap_get_length(struct dmap_t* d) {
 
 size_t dmap_get_content(struct dmap_t* d, void* content, size_t size) {
     
-    size_t writePos = 0;
+    size_t write_pos = 0;
     
     for (uint32_t i = 0 ; i < d->count ; i++) {
         
-        size_t atomSize = (d->atoms[i].type == dmap_type_container ? dmap_get_length(d->atoms[i].container) : d->atoms[i].size);
-        if (size - writePos >= atomSize + 8) {
+        size_t atom_size = (d->atoms[i].type == dmap_type_container ? dmap_get_length(d->atoms[i].container) : d->atoms[i].size);
+        if (size - write_pos >= atom_size + 8) {
             
             uint32_t tag = mtbl(d->atoms[i].tag);
-            size_t aSize = mtbl(atomSize);
-            memcpy(&((char*)content)[writePos], &tag, 4);
-            memcpy(&((char*)content)[writePos + 4], &aSize, 4);
+            size_t a_size = mtbl(atom_size);
+            memcpy(&((char*)content)[write_pos], &tag, 4);
+            memcpy(&((char*)content)[write_pos + 4], &a_size, 4);
             
-            writePos += 8;
+            write_pos += 8;
             
             if (d->atoms[i].size > 0 || d->atoms[i].type == dmap_type_container) {
                 
                 if (d->atoms[i].type == dmap_type_container)
-                    writePos += dmap_get_content(d->atoms[i].container, &((char*)content)[writePos], size - writePos);
+                    write_pos += dmap_get_content(d->atoms[i].container, &((char*)content)[write_pos], size - write_pos);
                 else {
-                    memcpy(&((char*)content)[writePos], d->atoms[i].buffer, d->atoms[i].size);
-                    writePos += d->atoms[i].size;
+                    memcpy(&((char*)content)[write_pos], d->atoms[i].buffer, d->atoms[i].size);
+                    write_pos += d->atoms[i].size;
                 }
                 
             }
@@ -427,7 +427,7 @@ size_t dmap_get_content(struct dmap_t* d, void* content, size_t size) {
         
     }
     
-    return writePos;
+    return write_pos;
     
 }
 

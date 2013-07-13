@@ -1,6 +1,6 @@
 //
-//  Base64.cpp
-//  AirFloatCF
+//  base64.c
+//  AirFloat
 //
 //  Copyright (c) 2013, Kristian Trenskow All rights reserved.
 //
