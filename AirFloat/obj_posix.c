@@ -1,5 +1,5 @@
 //
-//  mutex_posix.c
+//  obj_posix.c
 //  AirFloat
 //
 //  Copyright (c) 2013, Kristian Trenskow All rights reserved.
@@ -28,94 +28,60 @@
 //  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#if (__APPLE__)
-
 #include <stdlib.h>
-#include <pthread.h>
-#include <sys/time.h>
 #include <string.h>
+#include <pthread.h>
 
 #include "log.h"
-
 #include "obj.h"
 
-#include "mutex.h"
-
-#define MAX_NAME_LENGTH 250
-
-struct mutex_t {
+struct obj_t {
+    uint32_t retain_count;
     pthread_mutex_t mutex;
-    bool locked;
-    char name[MAX_NAME_LENGTH];
 };
 
-void _mutex_destroy(void* o) {
+void* obj_create(size_t size) {
     
-    struct mutex_t* m = (struct mutex_t*)o;
+    struct obj_t* obj = malloc(sizeof(struct obj_t) + size);
+    bzero(obj, sizeof(struct obj_t) + size);
     
-    pthread_mutex_destroy(&m->mutex);
+    obj->retain_count = 1;
+    pthread_mutex_init(&obj->mutex, NULL);
     
-}
-
-struct mutex_t* mutex_create() {
-    
-    struct mutex_t* m = (struct mutex_t*)obj_create(sizeof(struct mutex_t));
-    
-    pthread_mutex_init(&m->mutex, NULL);
-    
-    return m;
+    return obj + sizeof(struct obj_t);
     
 }
 
-struct mutex_t* mutex_retain(struct mutex_t* m) {
+void* obj_retain(void* o) {
     
-    return obj_retain(m);
+    struct obj_t* obj = o - sizeof(struct obj_t);
     
-}
-
-void mutex_release(struct mutex_t* m) {
+    pthread_mutex_lock(&obj->mutex);
     
-    if (m != NULL)
-        obj_release(m, _mutex_destroy);
+    obj->retain_count++;
     
-}
-
-bool mutex_trylock(struct mutex_t* m) {
+    pthread_mutex_unlock(&obj->mutex);
     
-    return (pthread_mutex_trylock(&m->mutex) == 0);
+    return o;
     
 }
 
-void mutex_lock(struct mutex_t* m) {
+void obj_release(void* o, destroy_callback destroy) {
     
-    if (m != NULL) {
-        mutex_retain(m); /* Self retain while locked. */
-        pthread_mutex_lock(&m->mutex);
-#ifdef DEBUG
-        pthread_getname_np(pthread_self(), m->name, MAX_NAME_LENGTH);
-        m->locked = true;
-#endif
-    }
+    struct obj_t* obj = o - sizeof(struct obj_t);
     
-}
-
-void mutex_unlock(struct mutex_t* m) {
+    pthread_mutex_lock(&obj->mutex);
     
-    if (m != NULL) {
-#ifdef DEBUG
-        m->locked = false;
-        m->name[0] = '\0';
-#endif
-        pthread_mutex_unlock(&m->mutex);
-        mutex_release(m); /* Release self */
-    }
+    if (!--obj->retain_count) {
+        
+        destroy(o);
+        
+        pthread_mutex_unlock(&obj->mutex);
+        pthread_mutex_destroy(&obj->mutex);
+        
+        free(obj);
+        
+    } else
+        pthread_mutex_unlock(&obj->mutex);
     
 }
-
-pthread_mutex_t* mutex_pthread(struct mutex_t* m) {
-    
-    return &m->mutex;
-    
-}
-
-#endif

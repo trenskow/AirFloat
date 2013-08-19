@@ -668,7 +668,7 @@ void raop_session_destroy(struct raop_session_t* rs) {
     
     mutex_unlock(rs->mutex);
     
-    mutex_destroy(rs->mutex);
+    mutex_release(rs->mutex);
     rs->mutex = NULL;
     
     free(rs);

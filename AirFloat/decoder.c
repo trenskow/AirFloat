@@ -72,7 +72,7 @@ void decoder_destroy(struct decoder_t* d) {
     if (d->type == decoder_type_alac)
         decoder_alac_destroy(d->data);
     
-    mutex_destroy(d->mutex);
+    mutex_release(d->mutex);
     
     free(d);
     

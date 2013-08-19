@@ -157,7 +157,7 @@ void web_client_connection_destroy(struct web_client_connection_t* wc) {
         wc->socket = NULL;
     }
     
-    mutex_destroy(wc->mutex);
+    mutex_release(wc->mutex);
     
     free(wc);
     
