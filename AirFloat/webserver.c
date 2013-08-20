@@ -155,11 +155,7 @@ bool _web_server_socket_accept_callback(socket_p socket, socket_p new_socket, vo
         
         web_server_connection_p new_web_connection = web_server_connection_create(new_socket, ws);
         
-        bool should_live = false;
-        if (ws->callbacks.accept)
-            should_live = ws->callbacks.accept(ws, new_web_connection, ws->callbacks.ctx.accept);
-        
-        if (!should_live)
+        if (ws->callbacks.accept == NULL || !ws->callbacks.accept(ws, new_web_connection, ws->callbacks.ctx.accept))
             web_server_connection_release(new_web_connection);
         else {
             

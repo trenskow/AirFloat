@@ -73,12 +73,8 @@ ssize_t _web_server_connection_socket_recieve_callback(socket_p socket, const vo
     
     web_request_p request = web_request_create();
     
-    if ((ret = web_request_parse(request, data, data_size)) > 0) {
-        
-        if (wc->callbacks.request != NULL)
-            wc->callbacks.request(wc, request, wc->callbacks.ctx.request);
-        
-    }
+    if ((ret = web_request_parse(request, data, data_size)) > 0 && wc->callbacks.request != NULL)
+        wc->callbacks.request(wc, request, wc->callbacks.ctx.request);
     
     web_request_release(request);
     
