@@ -39,10 +39,9 @@
 #include "log.h"
 #include "mutex.h"
 #include "thread.h"
+#include "sockaddr.h"
 
 #include "obj.h"
-
-#include "sockaddr.h"
 
 #include "socket.h"
 
@@ -172,7 +171,7 @@ void _socket_receive_loop(void* ctx) {
             read = recvfrom(s->socket, buffer + write_pos, buffer_size - write_pos, 0, (struct sockaddr*) &remote_addr, &remote_addr_len);
             mutex_lock(s->mutex);
             
-            s->remote_end_point = sockaddr_release(s->remote_end_point);
+            sockaddr_release(s->remote_end_point);
             s->remote_end_point = sockaddr_copy((struct sockaddr*) &remote_addr);
             
         } else {
@@ -333,7 +332,7 @@ void socket_connect(struct socket_t* s, struct sockaddr* end_point) {
         if (s->socket <= 0)
             log_message(LOG_ERROR, "Socket creation error: %s", strerror(errno));
         
-        s->remote_end_point = sockaddr_release(s->remote_end_point);
+        sockaddr_release(s->remote_end_point);
         s->remote_end_point = sockaddr_copy(end_point);
         
         s->receive_thread = thread_create(_socket_connect, s);
@@ -470,13 +469,12 @@ struct sockaddr* socket_get_local_end_point(struct socket_t* s) {
     
     if (s->local_end_point == NULL && s->socket >= 0) {
         
-        struct sockaddr_storage* addr = (struct sockaddr_storage*)malloc(sizeof(struct sockaddr_storage));
+        struct sockaddr_storage* addr = (struct sockaddr_storage*)obj_create(sizeof(struct sockaddr_storage));
         socklen_t len = sizeof(struct sockaddr_storage);
-        bzero(addr, len);
         if (getsockname(s->socket, (struct sockaddr*)addr, &len) == 0)
             s->local_end_point = (struct sockaddr*)addr;
         else
-            free(addr);
+            sockaddr_release((struct sockaddr*)addr);
         
     }
     
@@ -494,12 +492,12 @@ struct sockaddr* socket_get_remote_end_point(struct socket_t* s) {
     
     if (s->remote_end_point == NULL && s->socket >= 0) {
         
-        struct sockaddr_storage* addr = (struct sockaddr_storage*)malloc(sizeof(struct sockaddr_storage));
+        struct sockaddr_storage* addr = (struct sockaddr_storage*)obj_create(sizeof(struct sockaddr_storage));
         socklen_t len = sizeof(struct sockaddr_storage);
         if (getpeername(s->socket, (struct sockaddr*)addr, &len) == 0)
             s->remote_end_point = (struct sockaddr*)addr;
         else
-            free(addr);
+            sockaddr_release((struct sockaddr*)addr);
         
     }
     

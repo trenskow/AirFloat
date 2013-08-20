@@ -55,7 +55,6 @@ struct rtp_socket_t {
 struct rtp_socket_t* rtp_socket_create(const char* name, struct sockaddr* allowed_remote_end_point) {
     
     struct rtp_socket_t* rs = (struct rtp_socket_t*)obj_create(sizeof(struct rtp_socket_t));
-    bzero(rs, sizeof(struct rtp_socket_t));
     
     if (allowed_remote_end_point != NULL)
         rs->allowed_remote_end_point = sockaddr_copy(allowed_remote_end_point);

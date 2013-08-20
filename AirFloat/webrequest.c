@@ -57,7 +57,6 @@ struct web_request_t {
 struct web_request_t* web_request_create() {
     
     struct web_request_t* wr = (struct web_request_t*)obj_create(sizeof(struct web_request_t));
-    bzero(wr, sizeof(struct web_request_t));
     
     wr->headers = web_headers_create();
         
@@ -180,7 +179,6 @@ ssize_t web_request_parse(struct web_request_t* wr, const void* data, size_t dat
 struct web_request_t* web_request_copy(struct web_request_t* wr) {
     
     struct web_request_t* request = (struct web_request_t*)obj_create(sizeof(struct web_request_t));
-    bzero(request, sizeof(struct web_request_t));
     
     if (wr->command != NULL) {
         request->command = malloc(strlen(wr->command) + 1);

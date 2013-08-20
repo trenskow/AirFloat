@@ -384,7 +384,6 @@ rtp_socket_p _rtp_recorder_create_socket(struct rtp_recorder_t* rr, const char* 
 struct rtp_recorder_t* rtp_recorder_create(crypt_aes_p crypt, audio_queue_p audio_queue, struct sockaddr* local_end_point, struct sockaddr* remote_end_point, uint16_t remote_control_port, uint16_t remote_timing_port) {
     
     struct rtp_recorder_t* rr = (struct rtp_recorder_t*)obj_create(sizeof(struct rtp_recorder_t));
-    bzero(rr, sizeof(struct rtp_recorder_t));
     
     rr->crypt = crypt;
     rr->audio_queue = audio_queue;

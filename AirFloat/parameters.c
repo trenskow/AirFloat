@@ -174,8 +174,6 @@ size_t _parameters_write_http_header(struct parameters_t* p, void* buffer, size_
 struct parameters_t* parameters_create(const void* buffer, size_t size, enum parameters_type type) {
     
     struct parameters_t* p = (struct parameters_t*)obj_create(sizeof(struct parameters_t));
-    bzero(p, sizeof(struct parameters_t));
-    memset(p, 0, sizeof(struct parameters_t));
     
     switch (type) {
         case parameters_type_text:

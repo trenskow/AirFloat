@@ -144,7 +144,6 @@ void _web_connection_socket_closed_callback(socket_p socket, void* ctx) {
 struct web_client_connection_t* web_client_connection_create() {
     
     struct web_client_connection_t* wc = (struct web_client_connection_t*)obj_create(sizeof(struct web_client_connection_t));
-    bzero(wc, sizeof(struct web_client_connection_t));
     
     wc->mutex = mutex_create();
     
@@ -156,6 +155,7 @@ void _web_client_connection_destroy(void* obj) {
     
     struct web_client_connection_t* wc = (struct web_client_connection_t*)obj;
     
+    socket_close(wc->socket);
     wc->socket = socket_release(wc->socket);
     
     mutex_lock(wc->mutex);

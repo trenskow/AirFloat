@@ -88,7 +88,6 @@ ssize_t _web_server_connection_socket_recieve_callback(socket_p socket, const vo
 struct web_server_connection_t* web_server_connection_create(socket_p socket, web_server_p server) {
     
     struct web_server_connection_t* wc = (struct web_server_connection_t*)obj_create(sizeof(struct web_server_connection_t));
-    bzero(wc, sizeof(struct web_server_connection_t));
     
     wc->socket = socket;
     wc->server = server;

@@ -189,7 +189,6 @@ void _dacp_client_send_request(struct dacp_client_t* dc, const char* request_nam
 struct dacp_client_t* dacp_client_create(struct sockaddr* end_point, const char* identifier, const char* active_remote) {
     
     struct dacp_client_t* dc = (struct dacp_client_t*)obj_create(sizeof(struct dacp_client_t));
-    bzero(dc, sizeof(struct dacp_client_t));
     
     dc->end_point = sockaddr_copy(end_point);
     sockaddr_set_port(dc->end_point, 3689);
@@ -215,8 +214,8 @@ void _dacp_client_destroy(void* obj) {
     sockaddr_release(dc->end_point);
     
     dc->is_destroyed = true;
-    dc->dacp_discover = zeroconf_dacp_discover_release(dc->dacp_discover);
     
+    dc->dacp_discover = zeroconf_dacp_discover_release(dc->dacp_discover);
     dc->web_connection = web_client_connection_release(dc->web_connection);
     
     free(dc->identifier);

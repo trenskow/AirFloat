@@ -52,34 +52,30 @@ struct web_headers_t {
 
 struct web_headers_t* web_headers_create() {
     
-    struct web_headers_t* wh = (struct web_headers_t*)obj_create(sizeof(struct web_headers_t));
-    bzero(wh, sizeof(struct web_headers_t));
-    
-    return wh;
+    return obj_create(sizeof(struct web_headers_t));
     
 }
 
 struct web_headers_t* web_headers_copy(struct web_headers_t* wh) {
     
-    struct web_headers_t* headers = (struct web_headers_t*)obj_create(sizeof(struct web_headers_t));
-    bzero(headers, sizeof(struct web_headers_t));
+    struct web_headers_t* copy = (struct web_headers_t*)obj_create(sizeof(struct web_headers_t));
     
-    headers->count = wh->count;
-    headers->headers = (struct web_header_t*)malloc(sizeof(struct web_header_t) * wh->count);
+    copy->count = wh->count;
+    copy->headers = (struct web_header_t*)malloc(sizeof(struct web_header_t) * wh->count);
     for (uint32_t i = 0 ; i < wh->count ; i++) {
         
         size_t name_len = strlen(wh->headers[i].name);
         size_t value_len = strlen(wh->headers[i].value);
         
-        headers->headers[i].name = malloc(name_len + value_len + 2);
-        headers->headers[i].value = headers->headers[i].name + name_len + 1;
+        copy->headers[i].name = malloc(name_len + value_len + 2);
+        copy->headers[i].value = copy->headers[i].name + name_len + 1;
         
-        strcpy(headers->headers[i].name, wh->headers[i].name);
-        strcpy(headers->headers[i].value, wh->headers[i].value);
+        strcpy(copy->headers[i].name, wh->headers[i].name);
+        strcpy(copy->headers[i].value, wh->headers[i].value);
         
     }
     
-    return headers;
+    return copy;
     
 }
 

@@ -87,7 +87,6 @@ void _web_server_socket_closed(socket_p socket, void* ctx) {
 struct web_server_t* web_server_create(sockaddr_type socket_types) {
     
     struct web_server_t* ws = (struct web_server_t*)obj_create(sizeof(struct web_server_t));
-    bzero(ws, sizeof(struct web_server_t));
     
     ws->socket_types = socket_types;
     ws->mutex = mutex_create();

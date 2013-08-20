@@ -43,7 +43,6 @@ struct sockaddr* sockaddr_create(const char* host, uint16_t port, sockaddr_type 
     if (version == sockaddr_type_inet_4) {
         
         struct sockaddr_in* ret = (struct sockaddr_in*)obj_create(sizeof(struct sockaddr_storage));
-        bzero(ret, sizeof(struct sockaddr_storage));
         ret->sin_len = sizeof(struct sockaddr_in);
         ret->sin_family = AF_INET;
         ret->sin_addr.s_addr = INADDR_ANY;
@@ -56,8 +55,7 @@ struct sockaddr* sockaddr_create(const char* host, uint16_t port, sockaddr_type 
         
     } else if (version == sockaddr_type_inet_6) {
         
-        struct sockaddr_in6* ret = (struct sockaddr_in6*)malloc(sizeof(struct sockaddr_in6));
-        bzero(ret, sizeof(struct sockaddr_in6));
+        struct sockaddr_in6* ret = (struct sockaddr_in6*)obj_create(sizeof(struct sockaddr_in6));
         ret->sin6_len = sizeof(struct sockaddr_in6);
         ret->sin6_family = AF_INET6;
         ret->sin6_addr = in6addr_any;

@@ -56,7 +56,6 @@ struct web_response_t {
 struct web_response_t* web_response_create() {
     
     struct web_response_t* wr = (struct web_response_t*)obj_create(sizeof(struct web_response_t));
-    bzero(wr, sizeof(struct web_response_t));
     
     wr->headers = web_headers_create();
     web_response_set_status(wr, 500, "Internal Server Error");

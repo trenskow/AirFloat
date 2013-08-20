@@ -282,7 +282,6 @@ void _zeroconf_dacp_discover_run_loop_thread(void* ctx) {
 struct zeroconf_dacp_discover_t* zeroconf_dacp_discover_create() {
     
     struct zeroconf_dacp_discover_t* zd = (struct zeroconf_dacp_discover_t*)obj_create(sizeof(struct zeroconf_dacp_discover_t));
-    bzero(zd, sizeof(struct zeroconf_dacp_discover_t));
     
     CFNetServiceClientContext context = { 0, zd, NULL, NULL, NULL };
     
@@ -332,7 +331,7 @@ struct zeroconf_dacp_discover_t* zeroconf_dacp_discover_retain(struct zeroconf_d
 
 struct zeroconf_dacp_discover_t* zeroconf_dacp_discover_release(struct zeroconf_dacp_discover_t* zd) {
     
-    return obj_release(zd, _zeroconf_raop_ad_destroy);
+    return obj_release(zd, _zeroconf_dacp_discover_destroy);
     
 }
 

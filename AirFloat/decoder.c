@@ -55,7 +55,6 @@ struct decoder_t* decoder_create(const char* type, const char* rtp_fmtp) {
     assert(type);
 
     struct decoder_t* d = (struct decoder_t*)obj_create(sizeof(struct decoder_t));
-    bzero(d, sizeof(struct decoder_t));
     
     d->mutex = mutex_create();
     

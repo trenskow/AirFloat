@@ -439,9 +439,6 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
                         
                         web_headers_set_value(response_headers, "Transport", transport_reply);
                         
-                        if (parameters != NULL)
-                            parameters_release(parameters);
-                        
                         parameters_release(transport_params);
                         
                         mutex_unlock(rs->mutex);
@@ -610,8 +607,7 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
         
         web_headers_set_value(response_headers, "Audio-Jack-Status", "connected; type=digital");
         
-        if (parameters != NULL)
-            parameters_release(parameters);
+        parameters_release(parameters);
         
     } else
         web_response_set_status(response, 400, "Bad Request");
@@ -633,7 +629,6 @@ void _raop_session_raop_closed_callback(web_server_connection_p connection, void
 struct raop_session_t* raop_session_create(raop_server_p server, web_server_connection_p connection, settings_p settings) {
     
     struct raop_session_t* rs = (struct raop_session_t*)obj_create(sizeof(struct raop_session_t));
-    bzero(rs, sizeof(struct raop_session_t));
     
     rs->server = server;
     rs->raop_connection = connection;

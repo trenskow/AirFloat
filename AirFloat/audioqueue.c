@@ -74,7 +74,6 @@ struct audio_packet_t {
 struct audio_packet_t* audio_packet_create(enum audio_packet_state state) {
     
     struct audio_packet_t* ap = (struct audio_packet_t*)obj_create(sizeof(struct audio_packet_t));
-    bzero(ap, sizeof(struct audio_packet_t));
     
     ap->state = state;
     
@@ -506,7 +505,6 @@ void _audio_queue_output_render(audio_output_p ao, void* buffer, size_t size, do
 struct audio_queue_t* audio_queue_create(decoder_p decoder) {
     
     struct audio_queue_t* aq = (struct audio_queue_t*)obj_create(sizeof(struct audio_queue_t));
-    bzero(aq, sizeof(struct audio_queue_t));
     
     aq->decoder = decoder;
     aq->output_format = decoder_get_output_format(decoder);

@@ -89,7 +89,6 @@ bool _raop_server_web_connection_accept_callback(web_server_p server, web_server
 struct raop_server_t* raop_server_create(struct raop_server_settings_t settings) {
     
     struct raop_server_t* rs = (struct raop_server_t*)obj_create(sizeof(struct raop_server_t));
-    bzero(rs, sizeof(struct raop_server_t));
     
     rs->settings = settings_create(settings.name, settings.password);
     

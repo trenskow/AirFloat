@@ -124,7 +124,6 @@ OSStatus _audio_unit_render_callback(void *inRefCon, AudioUnitRenderActionFlags 
 struct audio_output_t* audio_output_create(struct decoder_output_format_t decoder_output_format) {
     
     struct audio_output_t* ao = (struct audio_output_t*)obj_create(sizeof(struct audio_output_t));
-    bzero(ao, sizeof(struct audio_output_t));
     
     ca_assert(NewAUGraph(&ao->graph));
     ca_assert(AUGraphOpen(ao->graph));

@@ -222,36 +222,33 @@ const uint32_t _atom_type_count = sizeof(_atom_types) / sizeof(struct dmap_atom_
 
 struct dmap_t* dmap_create() {
     
-    struct dmap_t* t = (struct dmap_t*)obj_create(sizeof(struct dmap_t));
-    bzero(t, sizeof(struct dmap_t));
-    
-    return t;
+    return obj_create(sizeof(struct dmap_t));
     
 }
 
 struct dmap_t* dmap_copy(struct dmap_t* d) {
     
-    struct dmap_t* ret = dmap_create();
+    struct dmap_t* copy = dmap_create();
     
-    ret->count = d->count;
-    ret->atoms = (struct dmap_atom*)obj_create(sizeof(struct dmap_atom) * d->count);
+    copy->count = d->count;
+    copy->atoms = (struct dmap_atom*)malloc(sizeof(struct dmap_atom) * d->count);
     
     for (uint32_t i = 0 ; i < d->count ; i++) {
         
-        ret->atoms[i].tag = d->atoms[i].tag;
-        ret->atoms[i].type = d->atoms[i].type;
-        ret->atoms[i].buffer = NULL;
-        ret->atoms[i].size = d->atoms[i].size;
+        copy->atoms[i].tag = d->atoms[i].tag;
+        copy->atoms[i].type = d->atoms[i].type;
+        copy->atoms[i].buffer = NULL;
+        copy->atoms[i].size = d->atoms[i].size;
         if (d->atoms[i].buffer != NULL) {
-            ret->atoms[i].buffer = malloc(d->atoms[i].size);
-            memcpy(ret->atoms[i].buffer, d->atoms[i].buffer, d->atoms[i].size);
+            copy->atoms[i].buffer = malloc(d->atoms[i].size);
+            memcpy(copy->atoms[i].buffer, d->atoms[i].buffer, d->atoms[i].size);
         }
         if (d->atoms[i].container != NULL)
-            ret->atoms[i].container = dmap_copy(d->atoms[i].container);
+            copy->atoms[i].container = dmap_copy(d->atoms[i].container);
         
     }
     
-    return ret;
+    return copy;
     
 }
 
