@@ -93,7 +93,7 @@ struct web_server_t* web_server_create(sockaddr_type socket_types) {
     struct web_server_t* ws = (struct web_server_t*)obj_create(sizeof(struct web_server_t));
     
     ws->socket_types = socket_types;
-    ws->mutex = mutex_create();
+    ws->mutex = mutex_create_recursive();
     
     return ws;
     
@@ -147,6 +147,8 @@ bool _web_server_socket_accept_callback(socket_p socket, socket_p new_socket, vo
     
     struct web_server_t* ws = (struct web_server_t*)ctx;
     
+    bool ret = false;
+    
     if (new_socket != NULL) {
         
         mutex_lock(ws->mutex);
@@ -154,11 +156,8 @@ bool _web_server_socket_accept_callback(socket_p socket, socket_p new_socket, vo
         web_server_connection_p new_web_connection = web_server_connection_create(new_socket, ws);
         
         bool should_live = false;
-        if (ws->callbacks.accept) {
-            mutex_unlock(ws->mutex);
+        if (ws->callbacks.accept)
             should_live = ws->callbacks.accept(ws, new_web_connection, ws->callbacks.ctx.accept);
-            mutex_lock(ws->mutex);
-        }
         
         if (!should_live)
             web_server_connection_release(new_web_connection);
@@ -174,15 +173,15 @@ bool _web_server_socket_accept_callback(socket_p socket, socket_p new_socket, vo
             
             web_server_connection_take_off(new_web_connection);
             
+            ret = true;
+            
         }
         
         mutex_unlock(ws->mutex);
         
-        return should_live;
-        
     }
     
-    return false;
+    return ret;
     
 }
 
@@ -206,23 +205,25 @@ bool web_server_start(struct web_server_t* ws, uint16_t port) {
             
             ws->is_running = true;
             
-            mutex_unlock(ws->mutex);
+            log_message(LOG_INFO, "Server started.");
             
-            return true;
+        } else {
+            
+            ws->socket_ipv4 = socket_release(ws->socket_ipv4);
+            ws->socket_ipv6 = socket_release(ws->socket_ipv6);
+            
+            log_message(LOG_ERROR, "Cannot start: Cannot bind to port %d", port);
             
         }
-        
-        socket_release(ws->socket_ipv4);
-        socket_release(ws->socket_ipv6);
-        
-        log_message(LOG_INFO, "Server started.");
         
     } else
         log_message(LOG_ERROR, "Cannot start: Server is already running");
     
+    bool ret = ws->is_running;
+    
     mutex_unlock(ws->mutex);
     
-    return false;
+    return ret;
     
 }
 
@@ -244,15 +245,18 @@ void web_server_stop(struct web_server_t* ws) {
         
         ws->is_running = false;
         
+        socket_close(ws->socket_ipv4);
+        socket_close(ws->socket_ipv6);
+        
         ws->socket_ipv4 = socket_release(ws->socket_ipv4);
         ws->socket_ipv6 = socket_release(ws->socket_ipv6);
         
-        while (ws->connection_count > 0) {
-            mutex_unlock(ws->mutex);
-            socket_release(ws->connections[0].socket);
-            web_server_connection_release(ws->connections[0].web_connection);
-            mutex_lock(ws->mutex);
+        for (uint32_t i = 0 ; i < ws->connection_count ; i++) {
+            socket_close(ws->connections[i].socket);
+            socket_release(ws->connections[i].socket);
+            web_server_connection_release(ws->connections[i].web_connection);
         }
+        ws->connection_count = 0;
         
         log_message(LOG_INFO, "Server stopped");
         

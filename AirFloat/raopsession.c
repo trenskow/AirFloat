@@ -642,7 +642,7 @@ struct raop_session_t* raop_session_create(raop_server_p server, web_server_conn
     web_server_connection_set_request_callback(rs->raop_connection, _raop_session_raop_connection_request_callback, rs);
     web_server_connection_set_closed_callback(rs->raop_connection, _raop_session_raop_closed_callback, rs);
     
-    rs->mutex = mutex_create();
+    rs->mutex = mutex_create_recursive();
     
     return rs;
     
@@ -654,11 +654,8 @@ void _raop_session_destroy(void* obj) {
     
     mutex_lock(rs->mutex);
     
-    if (rs->is_running) {
-        mutex_unlock(rs->mutex);
+    if (rs->is_running)
         raop_session_stop(rs);
-        mutex_lock(rs->mutex);
-    }
     
     if (rs->password != NULL) {
         free(rs->password);
@@ -706,11 +703,8 @@ void raop_session_stop(struct raop_session_t* rs) {
         rs->is_running = false;
         stopped = true;
         
-        if (rs->callbacks.ended != NULL) {
-            mutex_unlock(rs->mutex);
+        if (rs->callbacks.ended != NULL)
             rs->callbacks.ended(rs, rs->callbacks.ctx.ended);
-            mutex_lock(rs->mutex);
-        }
         
     }
     

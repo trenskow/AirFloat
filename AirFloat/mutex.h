@@ -36,6 +36,7 @@
 typedef struct mutex_t *mutex_p;
 
 mutex_p mutex_create();
+mutex_p mutex_create_recursive();
 mutex_p mutex_retain(mutex_p m);
 mutex_p mutex_release(mutex_p m);
 

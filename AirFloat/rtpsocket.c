@@ -68,7 +68,7 @@ struct rtp_socket_t* rtp_socket_create(const char* name, struct sockaddr* allowe
         strcpy(rs->name, name);
     }
     
-    rs->mutex = mutex_create();
+    rs->mutex = mutex_create_recursive();
     
     return rs;
     
@@ -81,21 +81,18 @@ void _rtp_socket_destroy(void* obj) {
     mutex_lock(rs->mutex);
     
     for (uint32_t i = 0 ; i < rs->sockets_count ; i++) {
-        mutex_unlock(rs->mutex);
         socket_close(rs->sockets[i]->socket);
         socket_release(rs->sockets[i]->socket);
-        mutex_lock(rs->mutex);
     }
     
     free(rs->sockets);
-    
-    mutex_unlock(rs->mutex);
     
     rs->allowed_remote_end_point = sockaddr_release(rs->allowed_remote_end_point);
     
     if (rs->name)
         free(rs->name);
     
+    mutex_unlock(rs->mutex);
     mutex_release(rs->mutex);
     
 }

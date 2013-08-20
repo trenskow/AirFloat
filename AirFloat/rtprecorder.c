@@ -388,7 +388,7 @@ struct rtp_recorder_t* rtp_recorder_create(crypt_aes_p crypt, audio_queue_p audi
     rr->crypt = crypt;
     rr->audio_queue = audio_queue;
     
-    rr->timer_mutex = mutex_create();
+    rr->timer_mutex = mutex_create_recursive();
     rr->timer_cond = condition_create();
     
     rr->remote_control_end_point = sockaddr_copy(remote_end_point);
@@ -413,14 +413,9 @@ void _rtp_recorder_destroy(void* obj) {
     
     if (rr->synchronization_thread != NULL) {
         condition_signal(rr->timer_cond);
-        mutex_unlock(rr->timer_mutex);
-        thread_join(rr->synchronization_thread);
-        mutex_lock(rr->timer_mutex);
         thread_release(rr->synchronization_thread);
         rr->synchronization_thread = NULL;
     }
-    
-    mutex_unlock(rr->timer_mutex);
     
     rtp_socket_release(rr->streaming_socket);
     rtp_socket_release(rr->control_socket);
@@ -429,8 +424,10 @@ void _rtp_recorder_destroy(void* obj) {
     sockaddr_release(rr->remote_control_end_point);
     sockaddr_release(rr->remote_timing_end_point);
     
-    mutex_release(rr->timer_mutex);
     condition_release(rr->timer_cond);
+    
+    mutex_unlock(rr->timer_mutex);
+    mutex_release(rr->timer_mutex);
     
 }
 
