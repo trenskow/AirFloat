@@ -35,6 +35,11 @@
 
 #include "decoder.h"
 
+/*
+ Decoder implementations does not retain/release, as it is only being used by the decoder.h/c front-end,
+ which handles the memory management for it. Therefore these are just destroyed when done.
+ */
+
 void* decoder_alac_create(const char* rtp_fmtp);
 void decoder_alac_destroy(void* data);
 struct decoder_output_format_t decoder_alac_get_output_format(void* data);

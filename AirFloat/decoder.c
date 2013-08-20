@@ -34,6 +34,9 @@
 #include <assert.h>
 
 #include "mutex.h"
+
+#include "obj.h"
+
 #include "decoder_alac.h"
 
 enum decoder_type {
@@ -51,7 +54,7 @@ struct decoder_t* decoder_create(const char* type, const char* rtp_fmtp) {
     
     assert(type);
 
-    struct decoder_t* d = (struct decoder_t*)malloc(sizeof(struct decoder_t));
+    struct decoder_t* d = (struct decoder_t*)obj_create(sizeof(struct decoder_t));
     bzero(d, sizeof(struct decoder_t));
     
     d->mutex = mutex_create();
@@ -67,14 +70,26 @@ struct decoder_t* decoder_create(const char* type, const char* rtp_fmtp) {
     
 }
 
-void decoder_destroy(struct decoder_t* d) {
+void _decoder_destroy(void* obj) {
+    
+    struct decoder_t* d = (struct decoder_t*)obj;
     
     if (d->type == decoder_type_alac)
         decoder_alac_destroy(d->data);
     
     mutex_release(d->mutex);
     
-    free(d);
+}
+
+struct decoder_t* decoder_retain(struct decoder_t* d) {
+    
+    return obj_retain(d);
+    
+}
+
+struct decoder_t* decoder_release(struct decoder_t* d) {
+    
+    return obj_release(d, _decoder_destroy);
     
 }
 

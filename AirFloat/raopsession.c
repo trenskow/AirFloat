@@ -726,11 +726,7 @@ void raop_session_stop(struct raop_session_t* rs) {
         rs->rtp_session = NULL;
     }
     
-    if (rs->decoder != NULL) {
-        decoder_destroy(rs->decoder);
-        rs->decoder = NULL;
-    }
-    
+    rs->decoder = decoder_release(rs->decoder);
     rs->crypt_aes = crypt_aes_release(rs->crypt_aes);
     rs->dacp_client = dacp_client_release(rs->dacp_client);
     
