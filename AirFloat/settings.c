@@ -31,6 +31,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "obj.h"
+
 #include "settings.h"
 
 struct settings_t {
@@ -40,8 +42,7 @@ struct settings_t {
 
 struct settings_t* settings_create(const char* name, const char* password) {
     
-    struct settings_t* s = (struct settings_t*)malloc(sizeof(struct settings_t));
-    bzero(s, sizeof(struct settings_t));
+    struct settings_t* s = (struct settings_t*)obj_create(sizeof(struct settings_t));
     
     settings_set_name(s, name);
     settings_set_password(s, password);
@@ -50,13 +51,25 @@ struct settings_t* settings_create(const char* name, const char* password) {
     
 }
 
-void settings_destroy(struct settings_t* s) {
+void _settings_destroy(void* obj) {
+    
+    struct settings_t* s = (struct settings_t*)obj;
     
     free(s->name);
     if (s->password != NULL)
         free(s->password);
     
-    return free(s);
+}
+
+struct settings_t* settings_retain(struct settings_t* s) {
+    
+    return obj_retain(s);
+    
+}
+
+struct settings_t* settings_release(struct settings_t* s) {
+    
+    return obj_release(s, _settings_destroy);
     
 }
 

@@ -110,6 +110,8 @@ void _raop_server_destroy(void* obj) {
     
     mutex_release(rs->mutex);
     
+    settings_release(rs->settings);
+    
 }
 
 struct raop_server_t* raop_server_retain(struct raop_server_t* rs) {
