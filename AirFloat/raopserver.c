@@ -52,8 +52,12 @@ struct raop_server_t {
     bool is_running;
     raop_session_p* sessions;
     uint32_t sessions_count;
-    raop_server_new_session_callback new_session_callback;
-    void* new_session_ctx;
+    struct {
+        raop_server_new_session_callback new_session;
+        struct {
+            void* new_session;
+        } ctx;
+    } callbacks;
 };
 
 bool _raop_server_web_connection_accept_callback(web_server_p server, web_server_connection_p connection, void* ctx) {
@@ -75,8 +79,8 @@ bool _raop_server_web_connection_accept_callback(web_server_p server, web_server
                 
         raop_session_start(new_session);
         
-        if (rs->new_session_callback != NULL)
-            rs->new_session_callback(rs, new_session, rs->new_session_ctx);
+        if (rs->callbacks.new_session != NULL)
+            rs->callbacks.new_session(rs, new_session, rs->callbacks.ctx.new_session);
         
         return true;
 #if (!defined(ALLOW_LOCALHOST))
@@ -231,8 +235,8 @@ void raop_server_stop(struct raop_server_t* rs) {
 
 void raop_server_set_new_session_callback(struct raop_server_t* rs, raop_server_new_session_callback new_session_callback, void* ctx) {
     
-    rs->new_session_callback = new_session_callback;
-    rs->new_session_ctx = ctx;
+    rs->callbacks.new_session = new_session_callback;
+    rs->callbacks.ctx.new_session = ctx;
     
 }
 

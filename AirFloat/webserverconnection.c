@@ -53,10 +53,14 @@ struct web_server_connection_t {
     bool has_taken_off;
     socket_p socket;
     web_server_p server;
-    web_server_connection_request_callback request_callback;
-    void* request_callback_ctx;
-    web_server_connection_closed_callback closed_callback;
-    void* closed_callback_ctx;
+    struct {
+        web_server_connection_request_callback request;
+        web_server_connection_closed_callback closed;
+        struct {
+            void* request;
+            void* closed;
+        } ctx;
+    } callbacks;
 };
 
 ssize_t _web_server_connection_socket_recieve_callback(socket_p socket, const void* data, size_t data_size, struct sockaddr* remote_end_point, void* ctx) {
@@ -73,8 +77,8 @@ ssize_t _web_server_connection_socket_recieve_callback(socket_p socket, const vo
         
         mutex_unlock(wc->mutex);
         
-        if (wc->request_callback != NULL)
-            wc->request_callback(wc, request, wc->request_callback_ctx);
+        if (wc->callbacks.request != NULL)
+            wc->callbacks.request(wc, request, wc->callbacks.ctx.request);
         
     } else
         mutex_unlock(wc->mutex);
@@ -91,12 +95,6 @@ struct web_server_connection_t* web_server_connection_create(socket_p socket, we
     
     wc->socket = socket;
     wc->server = server;
-    
-    wc->is_connected = false;
-    
-    wc->request_callback = NULL;
-    wc->closed_callback = NULL;
-    wc->closed_callback_ctx = wc->request_callback_ctx = NULL;
     
     wc->mutex = mutex_create();
     
@@ -129,8 +127,8 @@ struct web_server_connection_t* web_server_connection_release(struct web_server_
 void web_server_connection_set_request_callback(struct web_server_connection_t* wc, web_server_connection_request_callback request_callback, void* ctx) {
     
     mutex_lock(wc->mutex);
-    wc->request_callback = request_callback;
-    wc->request_callback_ctx = ctx;
+    wc->callbacks.request = request_callback;
+    wc->callbacks.ctx.request = ctx;
     mutex_unlock(wc->mutex);
     
 }
@@ -138,8 +136,8 @@ void web_server_connection_set_request_callback(struct web_server_connection_t* 
 void web_server_connection_set_closed_callback(struct web_server_connection_t* wc, web_server_connection_closed_callback closed_callback, void* ctx) {
     
     mutex_lock(wc->mutex);
-    wc->closed_callback = closed_callback;
-    wc->closed_callback_ctx = ctx;
+    wc->callbacks.closed = closed_callback;
+    wc->callbacks.ctx.closed = ctx;
     mutex_unlock(wc->mutex);
     
 }
@@ -207,8 +205,8 @@ void web_server_connection_close(struct web_server_connection_t* wc) {
         
         mutex_unlock(wc->mutex);
         
-        if (wc->closed_callback != NULL)
-            wc->closed_callback(wc, wc->closed_callback_ctx);
+        if (wc->callbacks.closed != NULL)
+            wc->callbacks.closed(wc, wc->callbacks.ctx.closed);
         
         mutex_lock(wc->mutex);
         

@@ -47,9 +47,13 @@ struct rtp_socket_t {
     struct sockaddr* allowed_remote_end_point;
     struct rtp_socket_info_t** sockets;
     uint32_t sockets_count;
-    rtp_socket_data_received_callback received_callback;
-    void* received_callback_ctx;
     mutex_p mutex;
+    struct {
+        rtp_socket_data_received_callback data_received;
+        struct {
+            void* data_received;
+        } ctx;
+    } callbacks;
 };
 
 struct rtp_socket_t* rtp_socket_create(const char* name, struct sockaddr* allowed_remote_end_point) {
@@ -140,8 +144,8 @@ ssize_t _rtp_socket_socket_receive_callback(socket_p socket, const void* data, s
     
     size_t used = data_size;
     
-    if (sockaddr_equals_host(remote_end_point, rs->allowed_remote_end_point) && rs->received_callback != NULL)
-        used = rs->received_callback(rs, socket, (const char*)data, data_size, rs->received_callback_ctx);
+    if (sockaddr_equals_host(remote_end_point, rs->allowed_remote_end_point) && rs->callbacks.data_received != NULL)
+        used = rs->callbacks.data_received(rs, socket, (const char*)data, data_size, rs->callbacks.ctx.data_received);
     
     return used;
     
@@ -214,8 +218,8 @@ bool rtp_socket_setup(struct rtp_socket_t* rs, struct sockaddr* local_end_point)
 
 void rtp_socket_set_data_received_callback(struct rtp_socket_t* rs, rtp_socket_data_received_callback callback, void* ctx) {
     
-    rs->received_callback = callback;
-    rs->received_callback_ctx = ctx;
+    rs->callbacks.data_received = callback;
+    rs->callbacks.ctx.data_received = ctx;
     
 }
 

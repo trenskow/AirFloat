@@ -184,8 +184,12 @@ struct zeroconf_dacp_discover_t {
     CFRunLoopRef run_loop;
     thread_p thread;
     mutex_p mutex;
-    zeroconf_dacp_discover_service_found_callback service_found_callback;
-    void* service_found_callback_ctx;
+    struct {
+        zeroconf_dacp_discover_service_found_callback service_found;
+        struct {
+            void* service_found;
+        } ctx;
+    } callbacks;
 };
 
 void _zeroconf_dacp_discover_resolve_callback(CFNetServiceRef service, CFStreamError* error, void* info) {
@@ -194,7 +198,7 @@ void _zeroconf_dacp_discover_resolve_callback(CFNetServiceRef service, CFStreamE
     
     CFArrayRef addresses = CFNetServiceGetAddressing(service);
     
-    if (addresses != NULL && zd->service_found_callback != NULL) {
+    if (addresses != NULL && zd->callbacks.service_found != NULL) {
         
         uint32_t addresses_count = CFArrayGetCount(addresses);
         struct sockaddr* end_points[addresses_count];
@@ -205,7 +209,7 @@ void _zeroconf_dacp_discover_resolve_callback(CFNetServiceRef service, CFStreamE
             end_points[i] = sockaddr_copy(end_point);
         }
         
-        zd->service_found_callback(zd, CFStringGetCStringPtr(CFNetServiceGetName(service), kCFStringEncodingMacRoman), end_points, addresses_count, zd->service_found_callback_ctx);
+        zd->callbacks.service_found(zd, CFStringGetCStringPtr(CFNetServiceGetName(service), kCFStringEncodingMacRoman), end_points, addresses_count, zd->callbacks.ctx.service_found);
         
         for (uint32_t i = 0 ; i < addresses_count ; i++)
             sockaddr_release(end_points[i]);
@@ -337,8 +341,8 @@ struct zeroconf_dacp_discover_t* zeroconf_dacp_discover_release(struct zeroconf_
 
 void zeroconf_dacp_discover_set_callback(struct zeroconf_dacp_discover_t* zd, zeroconf_dacp_discover_service_found_callback callback, void* ctx) {
     
-    zd->service_found_callback = callback;
-    zd->service_found_callback_ctx = ctx;
+    zd->callbacks.service_found = callback;
+    zd->callbacks.ctx.service_found = ctx;
     
 }
 

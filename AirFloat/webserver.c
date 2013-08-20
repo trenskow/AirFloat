@@ -52,11 +52,15 @@ struct web_server_t {
     socket_p socket_ipv6;
     sockaddr_type socket_types;
     bool is_running;
-    web_server_accept_callback accept_callback;
-    void* accept_callback_ctx;
     struct web_server_connection_t* connections;
     uint32_t connection_count;
     mutex_p mutex;
+    struct {
+        web_server_accept_callback accept;
+        struct {
+            void* accept;
+        } ctx;
+    } callbacks;
 };
 
 void _web_server_socket_closed(socket_p socket, void* ctx) {
@@ -150,9 +154,9 @@ bool _web_server_socket_accept_callback(socket_p socket, socket_p new_socket, vo
         web_server_connection_p new_web_connection = web_server_connection_create(new_socket, ws);
         
         bool should_live = false;
-        if (ws->accept_callback) {
+        if (ws->callbacks.accept) {
             mutex_unlock(ws->mutex);
-            should_live = ws->accept_callback(ws, new_web_connection, ws->accept_callback_ctx);
+            should_live = ws->callbacks.accept(ws, new_web_connection, ws->callbacks.ctx.accept);
             mutex_lock(ws->mutex);
         }
         
@@ -280,8 +284,8 @@ struct sockaddr* web_server_get_local_end_point(struct web_server_t* ws, sockadd
 void web_server_set_accept_callback(struct web_server_t* ws, web_server_accept_callback accept_callback, void* ctx) {
     
     mutex_lock(ws->mutex);
-    ws->accept_callback = accept_callback;
-    ws->accept_callback_ctx = ctx;
+    ws->callbacks.accept = accept_callback;
+    ws->callbacks.ctx.accept = ctx;
     mutex_unlock(ws->mutex);
     
 }

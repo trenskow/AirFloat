@@ -169,8 +169,6 @@ struct audio_queue_t {
 #if DEBUG
     uint32_t non_garbage;
 #endif
-    audio_queue_received_audio_callback audio_received_callback;
-    void* audio_received_callback_ctx;
     audio_output_p output;
     struct audio_packet_t* queue_head;
     struct audio_packet_t* queue_tail;
@@ -192,6 +190,12 @@ struct audio_queue_t {
     mutex_p mutex;
     condition_p condition;
     bool destroyed;
+    struct {
+        audio_queue_received_audio_callback audio_received;
+        struct {
+            void* audio_received;
+        } ctx;
+    } callbacks;
 };
 
 void _audio_queue_add_packet_to_tail(struct audio_queue_t* aq, struct audio_packet_t* packet);
@@ -564,8 +568,8 @@ void audio_queue_set_received_audio_callback(struct audio_queue_t* aq, audio_que
     
     mutex_lock(aq->mutex);
     
-    aq->audio_received_callback = callback;
-    aq->audio_received_callback_ctx = ctx;
+    aq->callbacks.audio_received = callback;
+    aq->callbacks.ctx.audio_received = ctx;
     
     mutex_unlock(aq->mutex);
     
@@ -691,8 +695,8 @@ uint32_t audio_queue_add_packet(struct audio_queue_t* aq, void* encoded_buffer, 
                 for (uint32_t i = 0 ; i < ret ; i++)
                     _audio_queue_add_empty_packet(aq);
                 
-            } else if (!package_resend && aq->audio_received_callback != NULL)
-                aq->audio_received_callback(aq, aq->audio_received_callback_ctx);
+            } else if (!package_resend && aq->callbacks.audio_received != NULL)
+                aq->callbacks.audio_received(aq, aq->callbacks.ctx.audio_received);
             
             struct audio_packet_t* new_packet = audio_packet_create(audio_packet_state_complete);
             

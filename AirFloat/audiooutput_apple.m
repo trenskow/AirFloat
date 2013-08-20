@@ -55,8 +55,12 @@ struct audio_output_t {
     bool has_speed_control;
     AudioUnit speed_unit;
     AudioUnit output_unit;
-    audio_output_callback callback;
-    void* callback_ctx;
+    struct {
+        audio_output_callback audio_output;
+        struct {
+            void* audio_output;
+        } ctx;
+    } callbacks;
 };
 
 void audio_output_stop(struct audio_output_t* ao);
@@ -114,8 +118,8 @@ OSStatus _audio_unit_render_callback(void *inRefCon, AudioUnitRenderActionFlags 
     
     ca_assert(AudioUnitSetParameter(ao->mixer_unit, kMultiChannelMixerParam_Enable, kAudioUnitScope_Output, 0, 1.0, 0));
     
-    if (ao->callback)
-        ao->callback(ao, ioData->mBuffers[0].mData, ioData->mBuffers[0].mDataByteSize, hardware_host_time_to_seconds(inTimeStamp->mHostTime), ao->callback_ctx);
+    if (ao->callbacks.audio_output)
+        ao->callbacks.audio_output(ao, ioData->mBuffers[0].mData, ioData->mBuffers[0].mDataByteSize, hardware_host_time_to_seconds(inTimeStamp->mHostTime), ao->callbacks.ctx.audio_output);
     
     return noErr;
     
@@ -230,8 +234,8 @@ struct audio_output_t* audio_output_release(struct audio_output_t* ao) {
 
 void audio_output_set_callback(struct audio_output_t* ao, audio_output_callback callback, void* ctx) {
     
-    ao->callback = callback;
-    ao->callback_ctx = ctx;
+    ao->callbacks.audio_output = callback;
+    ao->callbacks.ctx.audio_output = ctx;
     
 }
 
