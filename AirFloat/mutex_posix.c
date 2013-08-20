@@ -44,18 +44,34 @@
 #define MAX_NAME_LENGTH 250
 
 struct mutex_t {
+    pthread_mutexattr_t attr;
     pthread_mutex_t mutex;
     bool locked;
     char name[MAX_NAME_LENGTH];
 };
 
-struct mutex_t* mutex_create() {
+struct mutex_t* _mutex_create(int type) {
     
     struct mutex_t* m = (struct mutex_t*)obj_create(sizeof(struct mutex_t));
     
-    pthread_mutex_init(&m->mutex, NULL);
+    pthread_mutexattr_init(&m->attr);
+    pthread_mutexattr_settype(&m->attr, type);
+    
+    pthread_mutex_init(&m->mutex, &m->attr);
     
     return m;
+    
+}
+
+struct mutex_t* mutex_create() {
+    
+    return _mutex_create(PTHREAD_MUTEX_DEFAULT);
+    
+}
+
+struct mutex_t* mutex_create_recursive() {
+    
+    return _mutex_create(PTHREAD_MUTEX_RECURSIVE);
     
 }
 
@@ -64,6 +80,7 @@ void _mutex_destroy(void* o) {
     struct mutex_t* m = (struct mutex_t*)o;
     
     pthread_mutex_destroy(&m->mutex);
+    pthread_mutexattr_destroy(&m->attr);
     
 }
 

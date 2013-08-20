@@ -92,7 +92,7 @@ struct raop_server_t* raop_server_create(struct raop_server_settings_t settings)
     
     rs->settings = settings_create(settings.name, settings.password);
     
-    rs->mutex = mutex_create();
+    rs->mutex = mutex_create_recursive();
     
     rs->server = web_server_create((sockaddr_type)(sockaddr_type_inet_4 | sockaddr_type_inet_6));
     web_server_set_accept_callback(rs->server, _raop_server_web_connection_accept_callback, rs);
@@ -106,9 +106,7 @@ void _raop_server_destroy(void* obj) {
     struct raop_server_t* rs = (struct raop_server_t*)obj;
     
     web_server_release(rs->server);
-    
     mutex_release(rs->mutex);
-    
     settings_release(rs->settings);
     
 }
@@ -208,11 +206,8 @@ void raop_server_stop(struct raop_server_t* rs) {
         
         rs->is_running = false;
         
-        for (uint32_t i = 0 ; i < rs->sessions_count ; i++) {
-            mutex_unlock(rs->mutex);
-            raop_session_release(rs->sessions[0]);
-            mutex_lock(rs->mutex);
-        }
+        for (uint32_t i = 0 ; i < rs->sessions_count ; i++)
+            raop_session_release(rs->sessions[i]);
         
         free(rs->sessions);
         

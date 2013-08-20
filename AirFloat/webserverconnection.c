@@ -69,17 +69,12 @@ ssize_t _web_server_connection_socket_recieve_callback(socket_p socket, const vo
     
     web_request_p request = web_request_create();
     
-    if ((ret = web_request_parse(request, data, data_size)) > 0) {
-        
-        mutex_unlock(wc->mutex);
-        
-        if (wc->request_callback != NULL)
-            wc->request_callback(wc, request, wc->request_callback_ctx);
-        
-    } else
-        mutex_unlock(wc->mutex);
+    if ((ret = web_request_parse(request, data, data_size)) > 0 && wc->request_callback != NULL)
+        wc->request_callback(wc, request, wc->request_callback_ctx);
     
     web_request_release(request);
+    
+    mutex_unlock(wc->mutex);
     
     return ret;
         
@@ -98,7 +93,7 @@ struct web_server_connection_t* web_server_connection_create(socket_p socket, we
     wc->closed_callback = NULL;
     wc->closed_callback_ctx = wc->request_callback_ctx = NULL;
     
-    wc->mutex = mutex_create();
+    wc->mutex = mutex_create_recursive();
     
     return wc;
     
@@ -205,12 +200,8 @@ void web_server_connection_close(struct web_server_connection_t* wc) {
         
         socket_close(wc->socket);
         
-        mutex_unlock(wc->mutex);
-        
         if (wc->closed_callback != NULL)
             wc->closed_callback(wc, wc->closed_callback_ctx);
-        
-        mutex_lock(wc->mutex);
         
     }
     

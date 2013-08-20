@@ -107,11 +107,8 @@ ssize_t _web_client_connection_socket_receive_callback(socket_p socket, const vo
         
         mutex_lock(wc->mutex);
         
-        if (wc->callbacks.response_received != NULL) {
-            mutex_unlock(wc->mutex);
+        if (wc->callbacks.response_received != NULL)
             wc->callbacks.response_received(wc, wc->requests[0], response, wc->callbacks.ctx.response_received);
-            mutex_lock(wc->mutex);
-        }
         
         web_request_release(wc->requests[0]);
         
@@ -145,7 +142,7 @@ struct web_client_connection_t* web_client_connection_create() {
     
     struct web_client_connection_t* wc = (struct web_client_connection_t*)obj_create(sizeof(struct web_client_connection_t));
     
-    wc->mutex = mutex_create();
+    wc->mutex = mutex_create_recursive();
     
     return wc;
     
@@ -167,7 +164,6 @@ void _web_client_connection_destroy(void* obj) {
     }
     
     mutex_unlock(wc->mutex);
-    
     mutex_release(wc->mutex);
     
 }

@@ -205,11 +205,11 @@
 		A150074816E8E86C00B1A877 /* raopserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = raopserver.h; sourceTree = "<group>"; };
 		A150074916E8E87B00B1A877 /* raopserver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = raopserver.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A150075116E9359700B1A877 /* raopsession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = raopsession.h; sourceTree = "<group>"; };
-		A150075216E935A500B1A877 /* raopsession.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = raopsession.c; sourceTree = "<group>"; };
+		A150075216E935A500B1A877 /* raopsession.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = raopsession.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A150075516E9485500B1A877 /* dacpclient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dacpclient.h; sourceTree = "<group>"; };
 		A150075616E9486100B1A877 /* dacpclient.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dacpclient.c; sourceTree = "<group>"; };
 		A150075816E94BEF00B1A877 /* rtprecorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rtprecorder.h; sourceTree = "<group>"; };
-		A150075916E94BFA00B1A877 /* rtprecorder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rtprecorder.c; sourceTree = "<group>"; };
+		A150075916E94BFA00B1A877 /* rtprecorder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = rtprecorder.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A150075F16ED018E00B1A877 /* zeroconf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = zeroconf.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A150076016ED019900B1A877 /* zeroconf_apple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = zeroconf_apple.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A150B60C16E6A03100C369C5 /* hardware.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hardware.h; sourceTree = "<group>"; };
@@ -272,7 +272,7 @@
 		A19E4ACF16CA952700E5D60F /* dmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dmap.h; sourceTree = "<group>"; };
 		A19E4AD016CA952700E5D60F /* dmap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dmap.c; sourceTree = "<group>"; };
 		A19E4AD316CA953600E5D60F /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
-		A19E4AD416CA953600E5D60F /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = log.c; sourceTree = "<group>"; };
+		A19E4AD416CA953600E5D60F /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = log.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A19E4AD716CA954500E5D60F /* mutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mutex.h; sourceTree = "<group>"; };
 		A19E4AD816CA954500E5D60F /* mutex_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mutex_posix.c; sourceTree = "<group>"; };
 		A19E4AD916CA954500E5D60F /* condition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = condition.h; sourceTree = "<group>"; };
@@ -284,7 +284,7 @@
 		A19E4B0B16CA95AC00E5D60F /* alac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alac.h; sourceTree = "<group>"; };
 		A19E4B0C16CA95AC00E5D60F /* alac.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alac.c; sourceTree = "<group>"; };
 		A19E4B1016CA95C900E5D60F /* socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = socket.h; sourceTree = "<group>"; };
-		A19E4B1116CA95C900E5D60F /* socket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = socket.c; sourceTree = "<group>"; };
+		A19E4B1116CA95C900E5D60F /* socket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = socket.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A19E4B1216CA95C900E5D60F /* sockaddr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sockaddr.h; sourceTree = "<group>"; };
 		A19E4B1316CA95C900E5D60F /* sockaddr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sockaddr.c; sourceTree = "<group>"; };
 		A19E4B1C16CA95D300E5D60F /* webtools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webtools.h; sourceTree = "<group>"; };
@@ -296,9 +296,9 @@
 		A19E4B2216CA95D300E5D60F /* webrequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webrequest.h; sourceTree = "<group>"; };
 		A19E4B2316CA95D300E5D60F /* webrequest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webrequest.c; sourceTree = "<group>"; };
 		A19E4B2416CA95D300E5D60F /* webserverconnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webserverconnection.h; sourceTree = "<group>"; };
-		A19E4B2516CA95D300E5D60F /* webserverconnection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webserverconnection.c; sourceTree = "<group>"; };
+		A19E4B2516CA95D300E5D60F /* webserverconnection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = webserverconnection.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A19E4B2616CA95D300E5D60F /* webserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webserver.h; sourceTree = "<group>"; };
-		A19E4B2716CA95D300E5D60F /* webserver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webserver.c; sourceTree = "<group>"; };
+		A19E4B2716CA95D300E5D60F /* webserver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = webserver.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A19E4B2E16CA95E200E5D60F /* base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = base64.h; sourceTree = "<group>"; };
 		A19E4B2F16CA95E200E5D60F /* base64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = base64.c; sourceTree = "<group>"; };
 		A19E4B3216CA95E200E5D60F /* parameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parameters.h; sourceTree = "<group>"; };
@@ -311,14 +311,14 @@
 		A1C7F7991500D22100D7DE52 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "../Default@2x.png"; sourceTree = "<group>"; };
 		A1C7F79B1500D2B600D7DE52 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = ../Default.png; sourceTree = "<group>"; };
 		A1CD9F2817076E6A0015CBBA /* webclientconnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = webclientconnection.h; sourceTree = "<group>"; };
-		A1CD9F2917076E720015CBBA /* webclientconnection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webclientconnection.c; sourceTree = "<group>"; };
+		A1CD9F2917076E720015CBBA /* webclientconnection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = webclientconnection.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A1CF856416F3C02B009114B2 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
-		A1D490BF16D4EB000082AFDD /* rtpsocket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rtpsocket.c; sourceTree = "<group>"; };
+		A1D490BF16D4EB000082AFDD /* rtpsocket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = rtpsocket.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A1D490C016D4EB000082AFDD /* rtpsocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rtpsocket.h; sourceTree = "<group>"; };
 		A1DE598614CF163500A6767D /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		A1DF3AF414C4623700252C95 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		A1E9740716DBAD5F000AD9E4 /* decoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = decoder.h; sourceTree = "<group>"; };
-		A1E9740816DBAE79000AD9E4 /* decoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decoder.c; sourceTree = "<group>"; };
+		A1E9740816DBAE79000AD9E4 /* decoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = decoder.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A1E9740B16DBAE8F000AD9E4 /* decoder_alac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = decoder_alac.h; sourceTree = "<group>"; };
 		A1E9740C16DBAE9B000AD9E4 /* decoder_alac_apple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decoder_alac_apple.c; sourceTree = "<group>"; };
 		A1E9740E16DBAEAA000AD9E4 /* decoder_alac_other.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decoder_alac_other.c; sourceTree = "<group>"; };
@@ -428,6 +428,28 @@
 				A116EA8D16EE6297005530E9 /* AppViewController.m */,
 			);
 			name = "View Controllers";
+			sourceTree = "<group>";
+		};
+		A118381617C3A956007DBF41 /* RTP Recorder */ = {
+			isa = PBXGroup;
+			children = (
+				A1D490C016D4EB000082AFDD /* rtpsocket.h */,
+				A1D490BF16D4EB000082AFDD /* rtpsocket.c */,
+				A150075816E94BEF00B1A877 /* rtprecorder.h */,
+				A150075916E94BFA00B1A877 /* rtprecorder.c */,
+			);
+			name = "RTP Recorder";
+			sourceTree = "<group>";
+		};
+		A118381717C3A972007DBF41 /* RAOP Server */ = {
+			isa = PBXGroup;
+			children = (
+				A150075116E9359700B1A877 /* raopsession.h */,
+				A150075216E935A500B1A877 /* raopsession.c */,
+				A150074816E8E86C00B1A877 /* raopserver.h */,
+				A150074916E8E87B00B1A877 /* raopserver.c */,
+			);
+			name = "RAOP Server";
 			sourceTree = "<group>";
 		};
 		A12B7AF914FDCBCE0068538D /* Intro */ = {
@@ -778,14 +800,8 @@
 				A19E4B0E16CA95BB00E5D60F /* Web */,
 				A150074316E8DA2E00B1A877 /* Crypt */,
 				A150075D16ECA2A800B1A877 /* DACP Client */,
-				A1D490C016D4EB000082AFDD /* rtpsocket.h */,
-				A1D490BF16D4EB000082AFDD /* rtpsocket.c */,
-				A150075816E94BEF00B1A877 /* rtprecorder.h */,
-				A150075916E94BFA00B1A877 /* rtprecorder.c */,
-				A150075116E9359700B1A877 /* raopsession.h */,
-				A150075216E935A500B1A877 /* raopsession.c */,
-				A150074816E8E86C00B1A877 /* raopserver.h */,
-				A150074916E8E87B00B1A877 /* raopserver.c */,
+				A118381617C3A956007DBF41 /* RTP Recorder */,
+				A118381717C3A972007DBF41 /* RAOP Server */,
 			);
 			name = Server;
 			sourceTree = "<group>";

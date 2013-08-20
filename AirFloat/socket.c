@@ -109,32 +109,20 @@ void _socket_accept_loop(void* ctx) {
             struct socket_t* new_socket = (struct socket_t*)obj_create(sizeof(struct socket_t));
             
             new_socket->socket = new_socket_fd;
-            new_socket->mutex = mutex_create();
+            new_socket->mutex = mutex_create_recursive();
             new_socket->is_connected = true;
             
-            bool accept = false;
-            if (s->callbacks.accept != NULL) {
-                mutex_unlock(s->mutex);
-                accept = s->callbacks.accept(s, new_socket, s->callbacks.ctx.accept);
-                mutex_lock(s->mutex);
-            }
-            
-            /* Retain count is now one */
-            /* If socket was accepted, then keep it, and make the receive loop release it */
-            /* If socket was NOT accepted, release it, so it can close and destroy */
-            
-            if (!accept)
+            if (s->callbacks.accept == NULL || !s->callbacks.accept(s, new_socket, s->callbacks.ctx.accept))
                 socket_release(new_socket);
             
         }
         
     } while (new_socket_fd >= 0);
     
-    mutex_unlock(s->mutex);
-    
     socket_close(s);
-    
     socket_release(s);
+    
+    mutex_unlock(s->mutex);
     
 }
 
@@ -185,11 +173,8 @@ void _socket_receive_loop(void* ctx) {
             write_pos += read;
             processed = write_pos;
             
-            if (s->callbacks.receive != NULL) {
-                mutex_unlock(s->mutex);
+            if (s->callbacks.receive != NULL)
                 processed = s->callbacks.receive(s, buffer, write_pos, s->remote_end_point, s->callbacks.ctx.receive);
-                mutex_lock(s->mutex);
-            }
             
             if (processed > 0) {
                 memcpy(buffer, buffer + processed, write_pos - processed);
@@ -203,11 +188,10 @@ void _socket_receive_loop(void* ctx) {
     if (buffer != NULL)
         free(buffer);
     
-    mutex_unlock(s->mutex);
-    
     socket_close(s);
-    
     socket_release(s);
+    
+    mutex_unlock(s->mutex);
     
 }
 
@@ -244,7 +228,7 @@ struct socket_t* socket_create(const char* name, bool is_udp) {
     
     s->is_udp = is_udp;
     s->socket = -1;
-    s->mutex = mutex_create();
+    s->mutex = mutex_create_recursive();
     
     return s;
     
@@ -267,7 +251,6 @@ void _socket_destroy(void* obj) {
     }
     
     mutex_unlock(s->mutex);
-    
     mutex_release(s->mutex);
     
 }
@@ -346,12 +329,8 @@ void socket_set_accept_callback(struct socket_t* s, socket_accept_callback callb
     s->callbacks.accept = callback;
     s->callbacks.ctx.accept = ctx;
     
-    if (!s->is_udp && s->accept_thread == NULL) {
-        
-        if (listen(s->socket, 5) == 0)
-            s->accept_thread = thread_create(_socket_accept_loop, s);
-        
-    }
+    if (!s->is_udp && s->accept_thread == NULL && listen(s->socket, 5) == 0)
+        s->accept_thread = thread_create(_socket_accept_loop, s);
     
 }
 
@@ -409,17 +388,18 @@ ssize_t socket_send_to(struct socket_t* s, struct sockaddr* end_point, const voi
     
     mutex_lock(s->mutex);
     
-    if (!s->is_udp) {
-        mutex_unlock(s->mutex);
-        return socket_send(s, buffer, size);
+    if (!s->is_udp)
+        ret = socket_send(s, buffer, size);
+    else {
+        
+        socklen_t len = end_point->sa_len;
+        
+        assert(end_point->sa_family == s->local_end_point->sa_family);
+        
+        if (s->is_connected || (s->is_udp && s->socket > -1))
+            ret = sendto(s->socket, buffer, size, 0, (struct sockaddr*) end_point, len);
+        
     }
-    
-    socklen_t len = end_point->sa_len;
-    
-    assert(end_point->sa_family == s->local_end_point->sa_family);
-    
-    if (s->is_connected || (s->is_udp && s->socket > -1))
-        ret = sendto(s->socket, buffer, size, 0, (struct sockaddr*) end_point, len);
     
     mutex_unlock(s->mutex);
     
@@ -436,26 +416,12 @@ void socket_close(struct socket_t* s) {
         s->is_connected = false;
         close(s->socket);
         s->socket = -1;
-
-        if (s->accept_thread != NULL) {
-            mutex_unlock(s->mutex);
-            thread_release(s->accept_thread);
-            mutex_lock(s->mutex);
-            s->accept_thread = NULL;
-        }
         
-        if (s->receive_thread != NULL) {
-            mutex_unlock(s->mutex);
-            thread_release(s->receive_thread);
-            mutex_lock(s->mutex);
-            s->receive_thread = NULL;
-        }
+        s->accept_thread = thread_release(s->accept_thread);
+        s->receive_thread = thread_release(s->receive_thread);
         
-        if (s->callbacks.closed) {
-            mutex_unlock(s->mutex);
+        if (s->callbacks.closed)
             s->callbacks.closed(s, s->callbacks.ctx.closed);
-            mutex_lock(s->mutex);
-        }
         
     }
     
