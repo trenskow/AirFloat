@@ -43,7 +43,9 @@ typedef void(*web_client_connection_response_received_callback)(web_client_conne
 typedef void(*web_client_connection_disconnected_callback)(web_client_connection_p connection, void* ctx);
 
 web_client_connection_p web_client_connection_create();
-void web_client_connection_destroy(web_client_connection_p wc);
+web_client_connection_p web_client_connection_retain(web_client_connection_p wc);
+web_client_connection_p web_client_connection_release(web_client_connection_p wc);
+
 void web_client_connection_set_connected_callback(web_client_connection_p wc, web_client_connection_connected_callback callback, void* ctx);
 void web_client_connection_set_connect_failed_callback(web_client_connection_p wc, web_client_connection_connect_failed_callback callback, void* ctx);
 void web_client_connection_set_response_received_callback(web_client_connection_p wc, web_client_connection_response_received_callback callback, void* ctx);

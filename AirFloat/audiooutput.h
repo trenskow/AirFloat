@@ -37,6 +37,20 @@
 
 typedef struct audio_output_t *audio_output_p;
 
+typedef void (*audio_output_callback)(audio_output_p ao, void* buffer, size_t size, double host_time, void* ctx);
+
+double audio_output_get_host_time();
+
+audio_output_p audio_output_create(struct decoder_output_format_t decoder_output_format);
+audio_output_p audio_output_retain(audio_output_p ao);
+audio_output_p audio_output_release(audio_output_p ao);
+
+void audio_output_set_callback(audio_output_p ao, audio_output_callback callback, void* ctx);
+void audio_output_start(audio_output_p ao);
+void audio_output_stop(audio_output_p ao);
+void audio_output_flush(audio_output_p ao);
+double audio_output_get_playback_rate(audio_output_p ao);
+void audio_output_set_playback_rate(audio_output_p ao, double playback_rate);
 void audio_output_set_volume(audio_output_p ao, double volume);
 void audio_output_set_muted(audio_output_p ao, bool muted);
 

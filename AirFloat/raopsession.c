@@ -61,6 +61,8 @@
 #include "raopserver.h"
 #include "rtprecorder.h"
 
+#include "obj.h"
+
 #include "raopsession.h"
 
 #define MAX(x,y) (x > y ? x : y)
@@ -171,7 +173,7 @@ bool _raop_session_check_authentication(struct raop_session_t* rs, const char* m
                     
                 }
                 
-                parameters_destroy(parameters);
+                parameters_release(parameters);
                 
             }
             
@@ -438,9 +440,9 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
                         web_headers_set_value(response_headers, "Transport", transport_reply);
                         
                         if (parameters != NULL)
-                            parameters_destroy(parameters);
+                            parameters_release(parameters);
                         
-                        parameters_destroy(transport_params);
+                        parameters_release(transport_params);
                         
                         mutex_unlock(rs->mutex);
                         
@@ -528,7 +530,7 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
                             
                         }
                         
-                        dmap_destroy(tags);
+                        dmap_release(tags);
                         
                     } else if (rs->callbacks.updated_artwork != NULL)
                         rs->callbacks.updated_artwork(rs, data, data_size, mime_type, rs->callbacks.ctx.updated_artwork);
@@ -549,7 +551,7 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
                     if ((seq = parameters_value_for_key(rtp_params, "seq")) != NULL)
                         last_seq = atoi(seq);
                     
-                    parameters_destroy(rtp_params);
+                    parameters_release(rtp_params);
                     
                 }
                 
@@ -609,14 +611,14 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
         web_headers_set_value(response_headers, "Audio-Jack-Status", "connected; type=digital");
         
         if (parameters != NULL)
-            parameters_destroy(parameters);
+            parameters_release(parameters);
         
     } else
         web_response_set_status(response, 400, "Bad Request");
     
     web_server_connection_send_response(rs->raop_connection, response, "RTSP/1.0", !keep_alive);
     
-    web_response_destroy(response);
+    web_response_release(response);
     
 }
 
@@ -630,7 +632,7 @@ void _raop_session_raop_closed_callback(web_server_connection_p connection, void
 
 struct raop_session_t* raop_session_create(raop_server_p server, web_server_connection_p connection, settings_p settings) {
     
-    struct raop_session_t* rs = (struct raop_session_t*)malloc(sizeof(struct raop_session_t));
+    struct raop_session_t* rs = (struct raop_session_t*)obj_create(sizeof(struct raop_session_t));
     bzero(rs, sizeof(struct raop_session_t));
     
     rs->server = server;
@@ -651,7 +653,9 @@ struct raop_session_t* raop_session_create(raop_server_p server, web_server_conn
     
 }
 
-void raop_session_destroy(struct raop_session_t* rs) {
+void _raop_session_destroy(void* obj) {
+    
+    struct raop_session_t* rs = (struct raop_session_t*)obj;
     
     mutex_lock(rs->mutex);
     
@@ -668,10 +672,19 @@ void raop_session_destroy(struct raop_session_t* rs) {
     
     mutex_unlock(rs->mutex);
     
-    mutex_release(rs->mutex);
-    rs->mutex = NULL;
+    rs->mutex = mutex_release(rs->mutex);
     
-    free(rs);
+}
+
+struct raop_session_t* raop_session_retain(struct raop_session_t* rs) {
+    
+    return obj_retain(rs);
+    
+}
+
+struct raop_session_t* raop_session_release(struct raop_session_t* rs) {
+    
+    return obj_release(rs, _raop_session_destroy);
     
 }
 
@@ -707,8 +720,8 @@ void raop_session_stop(struct raop_session_t* rs) {
     }
     
     if (rs->rtp_session != NULL){
-        rtp_recorder_destroy(rs->rtp_session->recorder);
-        audio_queue_destroy(rs->rtp_session->queue);
+        rtp_recorder_release(rs->rtp_session->recorder);
+        audio_queue_release(rs->rtp_session->queue);
         free(rs->rtp_session);
         rs->rtp_session = NULL;
     }
@@ -718,15 +731,8 @@ void raop_session_stop(struct raop_session_t* rs) {
         rs->decoder = NULL;
     }
     
-    if (rs->crypt_aes != NULL) {
-        crypt_aes_destroy(rs->crypt_aes);
-        rs->crypt_aes = NULL;
-    }
-    
-    if (rs->dacp_client != NULL) {
-        dacp_client_destroy(rs->dacp_client);
-        rs->dacp_client = NULL;
-    }
+    rs->crypt_aes = crypt_aes_release(rs->crypt_aes);
+    rs->dacp_client = dacp_client_release(rs->dacp_client);
     
     if (rs->user_agent != NULL) {
         free(rs->user_agent);

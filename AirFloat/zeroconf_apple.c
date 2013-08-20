@@ -43,6 +43,8 @@
 #include "condition.h"
 #include "thread.h"
 
+#include "obj.h"
+
 #include "zeroconf.h"
 
 struct zeroconf_raop_ad_t {
@@ -105,7 +107,7 @@ void _zeroconf_raop_ad_run_loop_thread(void* ctx) {
 
 struct zeroconf_raop_ad_t* zeroconf_raop_ad_create(uint16_t port, const char *name) {
     
-    struct zeroconf_raop_ad_t* za = (struct zeroconf_raop_ad_t*)malloc(sizeof(struct zeroconf_raop_ad_t));
+    struct zeroconf_raop_ad_t* za = (struct zeroconf_raop_ad_t*)obj_create(sizeof(struct zeroconf_raop_ad_t));
         
     CFStringRef service_name = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
     uint64_t hardware_id = hardware_identifier();
@@ -147,19 +149,31 @@ struct zeroconf_raop_ad_t* zeroconf_raop_ad_create(uint16_t port, const char *na
     
 }
 
-void zeroconf_raop_ad_destroy(struct zeroconf_raop_ad_t* za) {
+void _zeroconf_raop_ad_destroy(void* obj) {
+    
+    struct zeroconf_raop_ad_t* za = (struct zeroconf_raop_ad_t*)obj;
     
     CFRunLoopStop(za->run_loop);
     
-    condition_destroy(za->condition);
+    condition_release(za->condition);
     mutex_release(za->mutex);
     thread_join(za->thread);
     
     CFRelease(za->service);
     
-    thread_destroy(za->thread);
+    thread_release(za->thread);
     
-    free(za);
+}
+
+struct zeroconf_raop_ad_t* zeroconf_raop_ad_retain(struct zeroconf_raop_ad_t* za) {
+    
+    return obj_retain(za);
+    
+}
+
+struct zeroconf_raop_ad_t* zeroconf_raop_ad_release(struct zeroconf_raop_ad_t* za) {
+    
+    return obj_release(za, _zeroconf_raop_ad_destroy);
     
 }
 
@@ -194,7 +208,7 @@ void _zeroconf_dacp_discover_resolve_callback(CFNetServiceRef service, CFStreamE
         zd->service_found_callback(zd, CFStringGetCStringPtr(CFNetServiceGetName(service), kCFStringEncodingMacRoman), end_points, addresses_count, zd->service_found_callback_ctx);
         
         for (uint32_t i = 0 ; i < addresses_count ; i++)
-            sockaddr_destroy(end_points[i]);
+            sockaddr_release(end_points[i]);
         
     }
     
@@ -267,7 +281,7 @@ void _zeroconf_dacp_discover_run_loop_thread(void* ctx) {
 
 struct zeroconf_dacp_discover_t* zeroconf_dacp_discover_create() {
     
-    struct zeroconf_dacp_discover_t* zd = (struct zeroconf_dacp_discover_t*)malloc(sizeof(struct zeroconf_dacp_discover_t));
+    struct zeroconf_dacp_discover_t* zd = (struct zeroconf_dacp_discover_t*)obj_create(sizeof(struct zeroconf_dacp_discover_t));
     bzero(zd, sizeof(struct zeroconf_dacp_discover_t));
     
     CFNetServiceClientContext context = { 0, zd, NULL, NULL, NULL };
@@ -280,7 +294,9 @@ struct zeroconf_dacp_discover_t* zeroconf_dacp_discover_create() {
     
 }
 
-void zeroconf_dacp_discover_destroy(struct zeroconf_dacp_discover_t* zd) {
+void _zeroconf_dacp_discover_destroy(void* obj) {
+    
+    struct zeroconf_dacp_discover_t* zd = (struct zeroconf_dacp_discover_t*)obj;
     
     mutex_lock(zd->mutex);
     
@@ -301,12 +317,22 @@ void zeroconf_dacp_discover_destroy(struct zeroconf_dacp_discover_t* zd) {
         thread_join(zd->thread);
     }
     
-    thread_destroy(zd->thread);
+    thread_release(zd->thread);
     mutex_release(zd->mutex);
     
     CFRelease(zd->domain_browser);
     
-    free(zd);
+}
+
+struct zeroconf_dacp_discover_t* zeroconf_dacp_discover_retain(struct zeroconf_dacp_discover_t* zd) {
+    
+    return obj_retain(zd);
+    
+}
+
+struct zeroconf_dacp_discover_t* zeroconf_dacp_discover_release(struct zeroconf_dacp_discover_t* zd) {
+    
+    return obj_release(zd, _zeroconf_raop_ad_destroy);
     
 }
 

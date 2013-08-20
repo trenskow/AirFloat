@@ -37,6 +37,8 @@
 
 #include "log.h"
 
+#include "obj.h"
+
 #include "parameters.h"
 
 struct parameter_t {
@@ -171,7 +173,7 @@ size_t _parameters_write_http_header(struct parameters_t* p, void* buffer, size_
 
 struct parameters_t* parameters_create(const void* buffer, size_t size, enum parameters_type type) {
     
-    struct parameters_t* p = (struct parameters_t*)malloc(sizeof(struct parameters_t));
+    struct parameters_t* p = (struct parameters_t*)obj_create(sizeof(struct parameters_t));
     bzero(p, sizeof(struct parameters_t));
     memset(p, 0, sizeof(struct parameters_t));
     
@@ -208,14 +210,26 @@ struct parameters_t* parameters_create(const void* buffer, size_t size, enum par
     
 }
 
-void parameters_destroy(struct parameters_t* p) {
+void _parameters_destroy(void* obj) {
+    
+    struct parameters_t* p = (struct parameters_t*)obj;
     
     for (uint32_t i = 0 ; i < p->parameters_count ; i++)
         free(p->parameters[i].key);
     
     free(p->parameters);
     
-    free(p);
+}
+
+struct parameters_t* parameters_retain(struct parameters_t* p) {
+    
+    return obj_retain(p);
+    
+}
+
+struct parameters_t* parameters_release(struct parameters_t* p) {
+    
+    return obj_release(p, _parameters_destroy);
     
 }
 

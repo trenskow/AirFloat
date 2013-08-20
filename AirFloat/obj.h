@@ -34,10 +34,19 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-typedef void(*destroy_callback)(void*);
+/*
+ Base methods for memory management. Modal follows the Apple Core Foundataion rules.
+ These methods are called by other object (eg. threads, recorders, sockets, etc.), and is therefore not
+    called directly unless implementing those.
+ */
 
+typedef void(*obj_destroy_callback)(void*);
+
+/* Allocates memory and returns a pointer to the new object. Used instead of malloc. */
 void* obj_create(size_t size);
+/* Retains an object and returns @o. */
 void* obj_retain(void* o);
-void obj_release(void* o, destroy_callback destroy);
+/* Releases an object, and calls @destroy when object is freed. Always returns NULL. */
+void* obj_release(void* o, obj_destroy_callback destroy);
 
 #endif

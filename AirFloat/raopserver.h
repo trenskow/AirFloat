@@ -49,7 +49,9 @@ typedef struct raop_session_t *raop_session_p;
 typedef void(*raop_server_new_session_callback)(raop_server_p server, raop_session_p new_session, void* ctx);
 
 raop_server_p raop_server_create(struct raop_server_settings_t settings);
-void raop_server_destroy(raop_server_p rs);
+raop_server_p raop_server_retain(raop_server_p rs);
+raop_server_p raop_server_release(raop_server_p rs);
+
 bool raop_server_start(raop_server_p rs, uint16_t port);
 bool raop_server_is_running(raop_server_p rs);
 bool raop_server_is_recording(raop_server_p rs);

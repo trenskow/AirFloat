@@ -40,6 +40,9 @@
 #include "webtools.h"
 #include "webheaders.h"
 #include "webrequest.h"
+
+#include "obj.h"
+
 #include "webserverconnection.h"
 
 #define MAX(x,y) (x > y ? x : y)
@@ -76,7 +79,7 @@ ssize_t _web_server_connection_socket_recieve_callback(socket_p socket, const vo
     } else
         mutex_unlock(wc->mutex);
     
-    web_request_destroy(request);
+    web_request_release(request);
     
     return ret;
         
@@ -84,7 +87,7 @@ ssize_t _web_server_connection_socket_recieve_callback(socket_p socket, const vo
 
 struct web_server_connection_t* web_server_connection_create(socket_p socket, web_server_p server) {
     
-    struct web_server_connection_t* wc = (struct web_server_connection_t*)malloc(sizeof(struct web_server_connection_t));
+    struct web_server_connection_t* wc = (struct web_server_connection_t*)obj_create(sizeof(struct web_server_connection_t));
     bzero(wc, sizeof(struct web_server_connection_t));
     
     wc->socket = socket;
@@ -102,13 +105,25 @@ struct web_server_connection_t* web_server_connection_create(socket_p socket, we
     
 }
 
-void web_server_connection_destroy(struct web_server_connection_t* wc) {
+void _web_server_connection_destroy(void* obj) {
+    
+    struct web_server_connection_t* wc = (struct web_server_connection_t*)obj;
     
     web_server_connection_close(wc);
     
     mutex_release(wc->mutex);
     
-    free(wc);
+}
+
+struct web_server_connection_t* web_server_connection_retain(struct web_server_connection_t* wc) {
+    
+    return obj_retain(wc);
+    
+}
+
+struct web_server_connection_t* web_server_connection_release(struct web_server_connection_t* wc) {
+    
+    return obj_release(wc, _web_server_connection_destroy);
     
 }
 

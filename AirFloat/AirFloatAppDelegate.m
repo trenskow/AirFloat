@@ -150,7 +150,7 @@
     
     if (self.server && !raop_server_is_recording(self.server)) {
         raop_server_stop(self.server);
-        raop_server_destroy(self.server);
+        raop_server_release(self.server);
         self.appViewController.server = self.server = NULL;
     }
     

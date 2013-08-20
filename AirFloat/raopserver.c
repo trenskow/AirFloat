@@ -39,6 +39,9 @@
 #include "settings.h"
 #include "webserver.h"
 #include "raopsession.h"
+
+#include "obj.h"
+
 #include "raopserver.h"
 
 struct raop_server_t {
@@ -85,7 +88,7 @@ bool _raop_server_web_connection_accept_callback(web_server_p server, web_server
 
 struct raop_server_t* raop_server_create(struct raop_server_settings_t settings) {
     
-    struct raop_server_t* rs = (struct raop_server_t*)malloc(sizeof(struct raop_server_t));
+    struct raop_server_t* rs = (struct raop_server_t*)obj_create(sizeof(struct raop_server_t));
     bzero(rs, sizeof(struct raop_server_t));
     
     rs->settings = settings_create(settings.name, settings.password);
@@ -99,13 +102,25 @@ struct raop_server_t* raop_server_create(struct raop_server_settings_t settings)
     
 }
 
-void raop_server_destroy(struct raop_server_t* rs) {
+void _raop_server_destroy(void* obj) {
     
-    web_server_destroy(rs->server);
+    struct raop_server_t* rs = (struct raop_server_t*)obj;
+    
+    web_server_release(rs->server);
     
     mutex_release(rs->mutex);
     
-    free(rs);
+}
+
+struct raop_server_t* raop_server_retain(struct raop_server_t* rs) {
+    
+    return obj_retain(rs);
+    
+}
+
+struct raop_server_t* raop_server_release(struct raop_server_t* rs) {
+    
+    return obj_release(rs, _raop_server_destroy);
     
 }
 
@@ -176,7 +191,7 @@ void raop_server_set_settings(struct raop_server_t* rs, struct raop_server_setti
     const char* new_name = settings_get_name(rs->settings);
     
     if (strcmp(old_name_c, new_name) != 0) {
-        zeroconf_raop_ad_destroy(rs->zeroconf_ad);
+        zeroconf_raop_ad_release(rs->zeroconf_ad);
         rs->zeroconf_ad = zeroconf_raop_ad_create(sockaddr_get_port(web_server_get_local_end_point(rs->server, sockaddr_type_inet_4)), new_name);
     }
     
@@ -192,9 +207,9 @@ void raop_server_stop(struct raop_server_t* rs) {
         
         rs->is_running = false;
         
-        while (rs->sessions_count > 0) {
+        for (uint32_t i = 0 ; i < rs->sessions_count ; i++) {
             mutex_unlock(rs->mutex);
-            raop_session_destroy(rs->sessions[0]);
+            raop_session_release(rs->sessions[0]);
             mutex_lock(rs->mutex);
         }
         
@@ -203,7 +218,7 @@ void raop_server_stop(struct raop_server_t* rs) {
         rs->sessions = NULL;
         rs->sessions_count = 0;
         
-        zeroconf_raop_ad_destroy(rs->zeroconf_ad);
+        rs->zeroconf_ad = zeroconf_raop_ad_release(rs->zeroconf_ad);
         
         web_server_stop(rs->server);
         
@@ -226,7 +241,7 @@ void raop_server_session_ended(struct raop_server_t* rs, raop_session_p session)
     
     for (uint32_t i = 0 ; i < rs->sessions_count ; i++)
         if (rs->sessions[i] == session) {
-            raop_session_destroy(rs->sessions[i]);
+            raop_session_release(rs->sessions[i]);
             for (uint32_t a = i + 1 ; a < rs->sessions_count ; a++)
                 rs->sessions[a - 1] = rs->sessions[a];
             rs->sessions_count--;
@@ -234,6 +249,5 @@ void raop_server_session_ended(struct raop_server_t* rs, raop_session_p session)
         }
     
     mutex_unlock(rs->mutex);
-    
     
 }

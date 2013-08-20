@@ -39,13 +39,14 @@
 #import <AudioToolbox/AudioToolbox.h>
 
 #import "log.h"
+
+#import "obj.h"
+
 #import "audiooutput.h"
 
 #define ca_assert(error) assert((error) == noErr)
 
 double hardware_host_time_to_seconds(double host_time);
-
-typedef void (*audio_output_callback)(audio_output_p ao, void* buffer, size_t size, double host_time, void* ctx);
 
 struct audio_output_t {
     AUGraph graph;
@@ -122,7 +123,7 @@ OSStatus _audio_unit_render_callback(void *inRefCon, AudioUnitRenderActionFlags 
 
 struct audio_output_t* audio_output_create(struct decoder_output_format_t decoder_output_format) {
     
-    struct audio_output_t* ao = (struct audio_output_t*)malloc(sizeof(struct audio_output_t));
+    struct audio_output_t* ao = (struct audio_output_t*)obj_create(sizeof(struct audio_output_t));
     bzero(ao, sizeof(struct audio_output_t));
     
     ca_assert(NewAUGraph(&ao->graph));
@@ -205,14 +206,26 @@ struct audio_output_t* audio_output_create(struct decoder_output_format_t decode
     
 }
 
-void audio_output_destroy(struct audio_output_t* ao) {
+void _audio_output_destroy(void* obj) {
+    
+    struct audio_output_t* ao = (struct audio_output_t*)obj;
     
     audio_output_stop(ao);
     
     ca_assert(AUGraphUninitialize(ao->graph));
     ca_assert(DisposeAUGraph(ao->graph));
     
-    free(ao);
+}
+
+struct audio_output_t* audio_output_retain(struct audio_output_t* ao) {
+    
+    return obj_retain(ao);
+    
+}
+
+struct audio_output_t* audio_output_release(struct audio_output_t* ao) {
+    
+    return obj_release(ao, _audio_output_destroy);
     
 }
 

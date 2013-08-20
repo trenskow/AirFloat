@@ -60,9 +60,11 @@ typedef struct {
 typedef struct dmap_t *dmap_p;
 
 dmap_p dmap_create();
-void dmap_destroy(dmap_p d);
-void dmap_parse(dmap_p d, const void* data, size_t data_size);
 dmap_p dmap_copy(dmap_p d);
+dmap_p dmap_retain(dmap_p d);
+dmap_p dmap_release(dmap_p d);
+
+void dmap_parse(dmap_p d, const void* data, size_t data_size);
 
 dmap_type dmap_type_for_tag(uint32_t tag);
 uint32_t dmap_tag_for_identifier(const char* identifier);

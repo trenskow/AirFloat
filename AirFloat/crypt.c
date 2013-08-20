@@ -37,6 +37,10 @@
 #include <openssl/aes.h>
 #include <openssl/md5.h>
 
+#include "obj.h"
+
+#include "crypt.h"
+
 #define AIRPORT_PRIVATE_KEY \
 "-----BEGIN RSA PRIVATE KEY-----\n" \
 "MIIEpQIBAAKCAQEA59dE8qLieItsH1WgjrcFRKj6eUWqi+bGLOX1HL3U3GhC/j0Qg90u3sG/1CUt\n" \
@@ -106,7 +110,7 @@ struct crypt_aes_t* crypt_aes_create(void* key, void* iv, size_t size) {
     
     assert(size == 16);
     
-    struct crypt_aes_t* d = (struct crypt_aes_t*)malloc(sizeof(struct crypt_aes_t));
+    struct crypt_aes_t* d = (struct crypt_aes_t*)obj_create(sizeof(struct crypt_aes_t));
     AES_set_decrypt_key(key, 128, &d->key);
     memcpy(d->iv, iv, 16);
     
@@ -114,9 +118,15 @@ struct crypt_aes_t* crypt_aes_create(void* key, void* iv, size_t size) {
     
 }
 
-void crypt_aes_destroy(struct crypt_aes_t* d) {
+struct crypt_aes_t* crypt_aes_retain(struct crypt_aes_t* d) {
     
-    free(d);
+    return obj_retain(d);
+    
+}
+
+struct crypt_aes_t* crypt_aes_release(struct crypt_aes_t* d) {
+    
+    return obj_release(d, NULL);
     
 }
 

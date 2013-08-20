@@ -40,6 +40,9 @@
 #include "decoder.h"
 #include "hardware.h"
 #include "audiooutput.h"
+
+#include "obj.h"
+
 #include "audioqueue.h"
 
 #define MAX_QUEUE_COUNT 500
@@ -49,19 +52,6 @@
 #define IS_LOWER(x) (((x % 0xFFFF) & 0xC000) == 0)
 #define MIN(x,y) (x < y ? x : y)
 #define MAX(x,y) (x > y ? x : y)
-
-typedef void (*audio_output_callback)(audio_output_p ao, void* buffer, size_t size, double host_time, void* ctx);
-
-double audio_output_get_host_time();
-
-audio_output_p audio_output_create(struct decoder_output_format_t decoder_output_format);
-void audio_output_destroy(audio_output_p ao);
-void audio_output_set_callback(audio_output_p ao, audio_output_callback callback, void* ctx);
-void audio_output_start(audio_output_p ao);
-void audio_output_stop(audio_output_p ao);
-void audio_output_flush(audio_output_p ao);
-double audio_output_get_playback_rate(audio_output_p ao);
-void audio_output_set_playback_rate(audio_output_p ao, double playback_rate);
 
 enum audio_packet_state {
     audio_packet_state_complete = 0,
@@ -83,7 +73,7 @@ struct audio_packet_t {
 
 struct audio_packet_t* audio_packet_create(enum audio_packet_state state) {
     
-    struct audio_packet_t* ap = (struct audio_packet_t*)malloc(sizeof(struct audio_packet_t));
+    struct audio_packet_t* ap = (struct audio_packet_t*)obj_create(sizeof(struct audio_packet_t));
     bzero(ap, sizeof(struct audio_packet_t));
     
     ap->state = state;
@@ -154,13 +144,25 @@ void audio_packet_shift_buffer(struct audio_packet_t* ap, size_t size) {
     
 }
 
-void audio_packet_destroy(struct audio_packet_t* ap) {
+void _audio_packet_destroy(void* obj) {
+    
+    struct audio_packet_t* ap = (struct audio_packet_t*)obj;
     
     audio_packet_set_buffer(ap, NULL, 0, 0);
     
     mutex_release(ap->mutex);
+        
+}
+
+struct audio_packet_t* audio_packet_retain(struct audio_packet_t* ap) {
     
-    free(ap);
+    return obj_retain(ap);
+    
+}
+
+struct audio_packet_t* audio_packet_release(struct audio_packet_t* ap) {
+    
+    return obj_release(ap, _audio_packet_destroy);
     
 }
 
@@ -273,7 +275,7 @@ void _audio_queue_add_packet_to_tail(struct audio_queue_t* aq, struct audio_pack
         log_message(LOG_INFO, "Added package %d to queue", packet->seq_no);
     
     while (aq->queue_count > MAX_QUEUE_COUNT)
-        audio_packet_destroy(_audio_queue_pop_packet_from_head(aq, false));
+        audio_packet_release(_audio_queue_pop_packet_from_head(aq, false));
     
 }
 
@@ -399,7 +401,7 @@ void _audio_queue_get_audio_buffer(struct audio_queue_t* aq, void* buffer, size_
                 out_size += written;
                 
                 if (audio_packet_buffer_size == 0)
-                    audio_packet_destroy(_audio_queue_pop_packet_from_head(aq, false));
+                    audio_packet_release(_audio_queue_pop_packet_from_head(aq, false));
                 
             } else
                 break;
@@ -433,7 +435,7 @@ void _audio_queue_output_render(audio_output_p ao, void* buffer, size_t size, do
             if (aq->synchronization_enabled) {
                 
                 while (queue_time < render_start_time && _audio_queue_has_available_packet(aq)) {
-                    audio_packet_destroy(_audio_queue_pop_packet_from_head(aq, false));
+                    audio_packet_release(_audio_queue_pop_packet_from_head(aq, false));
                     if (_audio_queue_has_available_packet(aq))
                         queue_time = _audio_queue_convert_time(aq, aq->last_known_sample, aq->last_known_sample_time, aq->queue_head->sample_time) + aq->client_server_difference;
                 }
@@ -503,7 +505,7 @@ void _audio_queue_output_render(audio_output_p ao, void* buffer, size_t size, do
 
 struct audio_queue_t* audio_queue_create(decoder_p decoder) {
     
-    struct audio_queue_t* aq = (struct audio_queue_t*)malloc(sizeof(struct audio_queue_t));
+    struct audio_queue_t* aq = (struct audio_queue_t*)obj_create(sizeof(struct audio_queue_t));
     bzero(aq, sizeof(struct audio_queue_t));
     
     aq->decoder = decoder;
@@ -521,14 +523,16 @@ struct audio_queue_t* audio_queue_create(decoder_p decoder) {
     
 }
 
-void audio_queue_destroy(struct audio_queue_t* aq) {
+void _audio_queue_destroy(void* obj) {
+    
+    struct audio_queue_t* aq = (struct audio_queue_t*)obj;
     
     mutex_lock(aq->mutex);
     
     while (aq->queue_head != NULL) {
         struct audio_packet_t* packet = aq->queue_head;
         aq->queue_head = aq->queue_head->next;
-        audio_packet_destroy(packet);
+        audio_packet_release(packet);
     }
     
     aq->queue_count = aq->missing_count = aq->frame_count = 0;
@@ -539,12 +543,22 @@ void audio_queue_destroy(struct audio_queue_t* aq) {
     
     mutex_unlock(aq->mutex);
     
-    audio_output_destroy(aq->output);
+    audio_output_release(aq->output);
     
     mutex_release(aq->mutex);
-    condition_destroy(aq->condition);
+    condition_release(aq->condition);
     
-    free(aq);
+}
+
+struct audio_queue_t* audio_queue_retain(struct audio_queue_t* aq) {
+    
+    return obj_retain(aq);
+    
+}
+
+struct audio_queue_t* audio_queue_release(struct audio_queue_t* aq) {
+    
+    return obj_release(aq, _audio_queue_destroy);
     
 }
 
@@ -579,7 +593,7 @@ void audio_queue_synchronize(struct audio_queue_t* aq, uint32_t current_sample_t
     if (aq->last_known_sample == 0 && aq->last_known_sample_time == 0) {
         
         while (aq->queue_head && aq->queue_head->sample_time < current_sample_time)
-            audio_packet_destroy(_audio_queue_pop_packet_from_head(aq, true));
+            audio_packet_release(_audio_queue_pop_packet_from_head(aq, true));
         
         audio_output_start(aq->output);
         
@@ -794,7 +808,7 @@ void audio_queue_flush(struct audio_queue_t* aq, uint16_t last_seq_no) {
     mutex_lock(aq->mutex);
     
     while (aq->queue_head != NULL)
-        audio_packet_destroy(_audio_queue_pop_packet_from_head(aq, false));
+        audio_packet_release(_audio_queue_pop_packet_from_head(aq, false));
     
     aq->flushed = true;
     aq->flush_last_seq_no = last_seq_no;

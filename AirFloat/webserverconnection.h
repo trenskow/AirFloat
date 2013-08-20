@@ -52,7 +52,9 @@ typedef void(*web_server_connection_request_callback)(web_server_connection_p co
 typedef void(*web_server_connection_closed_callback)(web_server_connection_p connection, void* ctx);
 
 web_server_connection_p web_server_connection_create(socket_p socket, web_server_p server);
-void web_server_connection_destroy(web_server_connection_p connection);
+web_server_connection_p web_server_connection_retain(web_server_connection_p wc);
+web_server_connection_p web_server_connection_release(web_server_connection_p wc);
+
 void web_server_connection_set_request_callback(web_server_connection_p wc, web_server_connection_request_callback request_callback, void* ctx);
 void web_server_connection_set_closed_callback(web_server_connection_p wc, web_server_connection_closed_callback closed_callback, void* ctx);
 void web_server_connection_send_response(web_server_connection_p wc, web_response_p response, const char* protocol, bool close_after_send);

@@ -35,6 +35,8 @@
 #include "mutex.h"
 #include "socket.h"
 
+#include "obj.h"
+
 #include "webclientconnection.h"
 
 struct web_client_connection_t {
@@ -111,7 +113,7 @@ ssize_t _web_client_connection_socket_receive_callback(socket_p socket, const vo
             mutex_lock(wc->mutex);
         }
         
-        web_request_destroy(wc->requests[0]);
+        web_request_release(wc->requests[0]);
         
         for (uint32_t i = 0 ; i < wc->requests_count - 1 ; i++)
             wc->requests[i] = wc->requests[i + 1];
@@ -124,7 +126,7 @@ ssize_t _web_client_connection_socket_receive_callback(socket_p socket, const vo
         
     }
     
-    web_response_destroy(response);
+    web_response_release(response);
     
     return ret;
     
@@ -141,7 +143,7 @@ void _web_connection_socket_closed_callback(socket_p socket, void* ctx) {
 
 struct web_client_connection_t* web_client_connection_create() {
     
-    struct web_client_connection_t* wc = (struct web_client_connection_t*)malloc(sizeof(struct web_client_connection_t));
+    struct web_client_connection_t* wc = (struct web_client_connection_t*)obj_create(sizeof(struct web_client_connection_t));
     bzero(wc, sizeof(struct web_client_connection_t));
     
     wc->mutex = mutex_create();
@@ -150,16 +152,35 @@ struct web_client_connection_t* web_client_connection_create() {
     
 }
 
-void web_client_connection_destroy(struct web_client_connection_t* wc) {
+void _web_client_connection_destroy(void* obj) {
     
-    if (wc->socket != NULL) {
-        socket_destroy(wc->socket);
-        wc->socket = NULL;
+    struct web_client_connection_t* wc = (struct web_client_connection_t*)obj;
+    
+    wc->socket = socket_release(wc->socket);
+    
+    mutex_lock(wc->mutex);
+    
+    if (wc->requests != NULL) {
+        for (uint32_t i = 0 ; i < wc->requests_count ; i++)
+            web_request_release(wc->requests[i]);
+        free(wc->requests);
     }
+    
+    mutex_unlock(wc->mutex);
     
     mutex_release(wc->mutex);
     
-    free(wc);
+}
+
+struct web_client_connection_t* web_client_connection_retain(struct web_client_connection_t* wc) {
+    
+    return obj_retain(wc);
+    
+}
+
+struct web_client_connection_t* web_client_connection_release(struct web_client_connection_t* wc) {
+    
+    return obj_release(wc, _web_client_connection_destroy);
     
 }
 

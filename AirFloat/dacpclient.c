@@ -40,6 +40,8 @@
 #include "webresponse.h"
 #include "webclientconnection.h"
 
+#include "obj.h"
+
 #include "dacpclient.h"
 
 struct dacp_client_t {
@@ -77,7 +79,7 @@ void _dacp_client_web_connection_connect_failed_callback(web_client_connection_p
     
     struct dacp_client_t* dc = (struct dacp_client_t*)ctx;
     
-    web_client_connection_destroy(dc->web_connection);
+    web_client_connection_release(dc->web_connection);
     dc->web_connection = NULL;
     
 }
@@ -91,10 +93,8 @@ void _dacp_client_web_connection_disconnected_callback(web_client_connection_p c
         if (dc->callbacks.controls_became_unavailable != NULL)
             dc->callbacks.controls_became_unavailable(dc, dc->callbacks.ctx.controls_became_unavailable);
         
-        if (!dc->is_destroyed) {
-            web_client_connection_destroy(dc->web_connection);
-            dc->web_connection = NULL;
-        }
+        if (!dc->is_destroyed)
+            dc->web_connection = web_client_connection_release(dc->web_connection);
         
     }
     
@@ -130,7 +130,7 @@ void _dacp_client_web_connection_response_received_callback(web_client_connectio
                 
             }
             
-            dmap_destroy(dmap);
+            dmap_release(dmap);
             
         }
         
@@ -180,7 +180,7 @@ void _dacp_client_send_request(struct dacp_client_t* dc, const char* request_nam
         
         web_client_connection_send_request(dc->web_connection, request);
         
-        web_request_destroy(request);
+        web_request_release(request);
         
     }
     
@@ -188,7 +188,7 @@ void _dacp_client_send_request(struct dacp_client_t* dc, const char* request_nam
 
 struct dacp_client_t* dacp_client_create(struct sockaddr* end_point, const char* identifier, const char* active_remote) {
     
-    struct dacp_client_t* dc = (struct dacp_client_t*)malloc(sizeof(struct dacp_client_t));
+    struct dacp_client_t* dc = (struct dacp_client_t*)obj_create(sizeof(struct dacp_client_t));
     bzero(dc, sizeof(struct dacp_client_t));
     
     dc->end_point = sockaddr_copy(end_point);
@@ -208,26 +208,31 @@ struct dacp_client_t* dacp_client_create(struct sockaddr* end_point, const char*
     
 }
 
-void dacp_client_destroy(struct dacp_client_t* dc) {
+void _dacp_client_destroy(void* obj) {
     
-    sockaddr_destroy(dc->end_point);
+    struct dacp_client_t* dc = (struct dacp_client_t*)obj;
+    
+    sockaddr_release(dc->end_point);
     
     dc->is_destroyed = true;
+    dc->dacp_discover = zeroconf_dacp_discover_release(dc->dacp_discover);
     
-    if (dc->dacp_discover != NULL) {
-        zeroconf_dacp_discover_destroy(dc->dacp_discover);
-        dc->dacp_discover = NULL;
-    }
-    
-    if (dc->web_connection != NULL) {
-        web_client_connection_destroy(dc->web_connection);
-        dc->web_connection = NULL;
-    }
+    dc->web_connection = web_client_connection_release(dc->web_connection);
     
     free(dc->identifier);
     free(dc->active_remove);
     
-    free(dc);
+}
+
+struct dacp_client_t* dacp_client_retain(struct dacp_client_t* dc) {
+    
+    return obj_retain(dc);
+    
+}
+
+struct dacp_client_t* dacp_client_release(struct dacp_client_t* dc) {
+    
+    return obj_release(dc, _dacp_client_destroy);
     
 }
 

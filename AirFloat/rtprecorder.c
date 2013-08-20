@@ -43,6 +43,8 @@
 #include "rtpsocket.h"
 #include "audioqueue.h"
 
+#include "obj.h"
+
 #include "rtprecorder.h"
 
 #define RTP_SOURCE                      0x0f
@@ -365,15 +367,15 @@ rtp_socket_p _rtp_recorder_create_socket(struct rtp_recorder_t* rr, const char* 
         if (rtp_socket_setup(ret, ep)) {
             rtp_socket_set_data_received_callback(ret, _rtp_recorder_socket_data_received_callback, rr);
             log_message(LOG_INFO, "Setup socket on port %u", p);
-            sockaddr_destroy(ep);
+            sockaddr_release(ep);
             return ret;
         }
-        sockaddr_destroy(ep);
+        sockaddr_release(ep);
     }
     
     log_message(LOG_ERROR, "Unable to bind socket.");
     
-    rtp_socket_destroy(ret);
+    rtp_socket_release(ret);
     
     return NULL;
     
@@ -381,7 +383,7 @@ rtp_socket_p _rtp_recorder_create_socket(struct rtp_recorder_t* rr, const char* 
 
 struct rtp_recorder_t* rtp_recorder_create(crypt_aes_p crypt, audio_queue_p audio_queue, struct sockaddr* local_end_point, struct sockaddr* remote_end_point, uint16_t remote_control_port, uint16_t remote_timing_port) {
     
-    struct rtp_recorder_t* rr = (struct rtp_recorder_t*)malloc(sizeof(struct rtp_recorder_t));
+    struct rtp_recorder_t* rr = (struct rtp_recorder_t*)obj_create(sizeof(struct rtp_recorder_t));
     bzero(rr, sizeof(struct rtp_recorder_t));
     
     rr->crypt = crypt;
@@ -404,7 +406,9 @@ struct rtp_recorder_t* rtp_recorder_create(crypt_aes_p crypt, audio_queue_p audi
     
 }
 
-void rtp_recorder_destroy(struct rtp_recorder_t* rr) {
+void _rtp_recorder_destroy(void* obj) {
+    
+    struct rtp_recorder_t* rr = (struct rtp_recorder_t*)obj;
     
     mutex_lock(rr->timer_mutex);
     
@@ -413,23 +417,33 @@ void rtp_recorder_destroy(struct rtp_recorder_t* rr) {
         mutex_unlock(rr->timer_mutex);
         thread_join(rr->synchronization_thread);
         mutex_lock(rr->timer_mutex);
-        thread_destroy(rr->synchronization_thread);
+        thread_release(rr->synchronization_thread);
         rr->synchronization_thread = NULL;
     }
     
     mutex_unlock(rr->timer_mutex);
     
-    rtp_socket_destroy(rr->streaming_socket);
-    rtp_socket_destroy(rr->control_socket);
-    rtp_socket_destroy(rr->timing_socket);
+    rtp_socket_release(rr->streaming_socket);
+    rtp_socket_release(rr->control_socket);
+    rtp_socket_release(rr->timing_socket);
     
-    sockaddr_destroy(rr->remote_control_end_point);
-    sockaddr_destroy(rr->remote_timing_end_point);
+    sockaddr_release(rr->remote_control_end_point);
+    sockaddr_release(rr->remote_timing_end_point);
     
     mutex_release(rr->timer_mutex);
-    condition_destroy(rr->timer_cond);
+    condition_release(rr->timer_cond);
     
-    free(rr);
+}
+
+struct rtp_recorder_t* rtp_recorder_retain(struct rtp_recorder_t* rr) {
+    
+    return obj_retain(rr);
+    
+}
+
+struct rtp_recorder_t* rtp_recorder_release(struct rtp_recorder_t* rr) {
+    
+    return obj_release(rr, _rtp_recorder_destroy);
     
 }
 

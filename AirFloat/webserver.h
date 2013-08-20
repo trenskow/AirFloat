@@ -46,7 +46,9 @@ typedef struct web_server_t *web_server_p;
 typedef bool(*web_server_accept_callback)(web_server_p server, web_server_connection_p connection, void* ctx);
 
 web_server_p web_server_create(sockaddr_type socket_types);
-void web_server_destroy(web_server_p ws);
+web_server_p web_server_retain(web_server_p ws);
+web_server_p web_server_release(web_server_p ws);
+
 bool web_server_start(web_server_p ws, uint16_t port);
 bool web_server_is_running(web_server_p ws);
 void web_server_stop(web_server_p ws);

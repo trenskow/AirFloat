@@ -46,7 +46,9 @@ typedef void(*dacp_client_controls_became_unavailable_callback)(dacp_client_p cl
 typedef void(*dacp_client_playback_state_changed_callback)(dacp_client_p client, enum dacp_client_playback_state state, void* ctx);
 
 dacp_client_p dacp_client_create(struct sockaddr* end_point, const char* identifier, const char* active_remote);
-void dacp_client_destroy(dacp_client_p dc);
+dacp_client_p dacp_client_retain(dacp_client_p dc);
+dacp_client_p dacp_client_release(dacp_client_p dc);
+
 void dacp_client_set_controls_became_available_callback(dacp_client_p dc, dacp_client_controls_became_available_callback callback, void* ctx);
 void dacp_client_set_controls_became_unavailable_callback(dacp_client_p dc, dacp_client_controls_became_unavailable_callback callback, void* ctx);
 void dacp_client_set_playback_state_changed_callback(dacp_client_p dc, dacp_client_playback_state_changed_callback callback, void* ctx);

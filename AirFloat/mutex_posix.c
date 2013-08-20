@@ -49,14 +49,6 @@ struct mutex_t {
     char name[MAX_NAME_LENGTH];
 };
 
-void _mutex_destroy(void* o) {
-    
-    struct mutex_t* m = (struct mutex_t*)o;
-    
-    pthread_mutex_destroy(&m->mutex);
-    
-}
-
 struct mutex_t* mutex_create() {
     
     struct mutex_t* m = (struct mutex_t*)obj_create(sizeof(struct mutex_t));
@@ -67,16 +59,23 @@ struct mutex_t* mutex_create() {
     
 }
 
+void _mutex_destroy(void* o) {
+    
+    struct mutex_t* m = (struct mutex_t*)o;
+    
+    pthread_mutex_destroy(&m->mutex);
+    
+}
+
 struct mutex_t* mutex_retain(struct mutex_t* m) {
     
     return obj_retain(m);
     
 }
 
-void mutex_release(struct mutex_t* m) {
+struct mutex_t* mutex_release(struct mutex_t* m) {
     
-    if (m != NULL)
-        obj_release(m, _mutex_destroy);
+    return obj_release(m, _mutex_destroy);
     
 }
 

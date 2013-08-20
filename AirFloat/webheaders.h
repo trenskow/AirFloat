@@ -36,8 +36,10 @@
 typedef struct web_headers_t *web_headers_p;
 
 web_headers_p web_headers_create();
-void web_headers_destroy(web_headers_p wh);
 web_headers_p web_headers_copy(web_headers_p wh);
+web_headers_p web_headers_retain(web_headers_p wh);
+web_headers_p web_headers_release(web_headers_p wh);
+
 const char* web_headers_value(web_headers_p wh, const char* name);
 const char* web_headers_name(web_headers_p wh, uint32_t index);
 uint32_t web_headers_count(web_headers_p wh);

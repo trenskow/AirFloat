@@ -37,6 +37,9 @@
 #include "sockaddr.h"
 #include "socket.h"
 #include "webserverconnection.h"
+
+#include "obj.h"
+
 #include "webserver.h"
 
 struct web_server_connection_t {
@@ -65,8 +68,8 @@ void _web_server_socket_closed(socket_p socket, void* ctx) {
     for (uint32_t i = 0 ; i < ws->connection_count ; i++)
         if (ws->connections[i].socket == socket) {
             
-            web_server_connection_destroy(ws->connections[i].web_connection);
-            socket_destroy(ws->connections[i].socket);
+            web_server_connection_release(ws->connections[i].web_connection);
+            socket_release(ws->connections[i].socket);
             
             for (uint32_t x = i ; x < ws->connection_count - 1 ; x++)
                 ws->connections[x] = ws->connections[x + 1];
@@ -83,7 +86,7 @@ void _web_server_socket_closed(socket_p socket, void* ctx) {
 
 struct web_server_t* web_server_create(sockaddr_type socket_types) {
     
-    struct web_server_t* ws = (struct web_server_t*)malloc(sizeof(struct web_server_t));
+    struct web_server_t* ws = (struct web_server_t*)obj_create(sizeof(struct web_server_t));
     bzero(ws, sizeof(struct web_server_t));
     
     ws->socket_types = socket_types;
@@ -93,13 +96,25 @@ struct web_server_t* web_server_create(sockaddr_type socket_types) {
     
 }
 
-void web_server_destroy(struct web_server_t* ws) {
+void _web_server_destroy(void* obj) {
+    
+    struct web_server_t* ws = (struct web_server_t*)obj;
     
     web_server_stop(ws);
     
     mutex_release(ws->mutex);
     
-    free(ws);
+}
+
+struct web_server_t* web_server_retain(struct web_server_t* ws) {
+    
+    return obj_retain(ws);
+    
+}
+
+struct web_server_t* web_server_release(struct web_server_t* ws) {
+    
+    return obj_release(ws, _web_server_destroy);
     
 }
 
@@ -114,12 +129,10 @@ socket_p _web_server_bind(struct web_server_t* ws, uint16_t port, sockaddr_type 
         
         bool ret = socket_bind(socket, end_point);
         
-        sockaddr_destroy(end_point);
+        sockaddr_release(end_point);
         
-        if (!ret) {
-            socket_destroy(socket);
-            socket = NULL;
-        }
+        if (!ret)
+            socket = socket_release(socket);
         
     }
     
@@ -145,7 +158,7 @@ bool _web_server_socket_accept_callback(socket_p socket, socket_p new_socket, vo
         }
         
         if (!should_live)
-            web_server_connection_destroy(new_web_connection);
+            web_server_connection_release(new_web_connection);
         else {
             
             socket_set_closed_callback(new_socket, _web_server_socket_closed, ws);
@@ -196,10 +209,8 @@ bool web_server_start(struct web_server_t* ws, uint16_t port) {
             
         }
         
-        if (ws->socket_ipv4 != NULL)
-            socket_destroy(ws->socket_ipv4);
-        if (ws->socket_ipv6 != NULL)
-            socket_destroy(ws->socket_ipv6);
+        socket_release(ws->socket_ipv4);
+        socket_release(ws->socket_ipv6);
         
         log_message(LOG_INFO, "Server started.");
         
@@ -230,19 +241,13 @@ void web_server_stop(struct web_server_t* ws) {
         
         ws->is_running = false;
         
-        if (ws->socket_ipv4 != NULL) {
-            socket_destroy(ws->socket_ipv4);
-            ws->socket_ipv4 = NULL;
-        }
-        if (ws->socket_ipv6 != NULL) {
-            socket_destroy(ws->socket_ipv6);
-            ws->socket_ipv6 = NULL;
-        }
+        ws->socket_ipv4 = socket_release(ws->socket_ipv4);
+        ws->socket_ipv6 = socket_release(ws->socket_ipv6);
         
         while (ws->connection_count > 0) {
             mutex_unlock(ws->mutex);
-            socket_destroy(ws->connections[0].socket);
-            web_server_connection_destroy(ws->connections[0].web_connection);
+            socket_release(ws->connections[0].socket);
+            web_server_connection_release(ws->connections[0].web_connection);
             mutex_lock(ws->mutex);
         }
         

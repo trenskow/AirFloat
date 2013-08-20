@@ -38,6 +38,9 @@
 #include "webtools.h"
 #include "webheaders.h"
 #include "webresponse.h"
+
+#include "obj.h"
+
 #include "webrequest.h"
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
@@ -53,7 +56,7 @@ struct web_request_t {
 
 struct web_request_t* web_request_create() {
     
-    struct web_request_t* wr = (struct web_request_t*)malloc(sizeof(struct web_request_t));
+    struct web_request_t* wr = (struct web_request_t*)obj_create(sizeof(struct web_request_t));
     bzero(wr, sizeof(struct web_request_t));
     
     wr->headers = web_headers_create();
@@ -62,7 +65,9 @@ struct web_request_t* web_request_create() {
     
 }
 
-void web_request_destroy(struct web_request_t* wr) {
+void _web_request_destroy(void* obj) {
+    
+    struct web_request_t* wr = (struct web_request_t*)obj;
     
     free(wr->command);
     free(wr->path);
@@ -71,9 +76,19 @@ void web_request_destroy(struct web_request_t* wr) {
     if (wr->content != NULL)
         free(wr->content);
     
-    web_headers_destroy(wr->headers);
+    web_headers_release(wr->headers);
+        
+}
+
+struct web_request_t* web_request_retain(struct web_request_t* wr) {
     
-    free(wr);
+    return obj_retain(wr);
+    
+}
+
+struct web_request_t* web_request_release(struct web_request_t* wr) {
+    
+    return obj_release(wr, _web_request_destroy);
     
 }
 
@@ -140,7 +155,7 @@ ssize_t web_request_parse(struct web_request_t* wr, const void* data, size_t dat
             wr->protocol = (char*)malloc(strlen(path) + 1);
             strcpy(wr->protocol, protocol);
             
-            web_headers_destroy(wr->headers);
+            web_headers_release(wr->headers);
             wr->headers = headers;
             
             log_message(LOG_INFO, "(Complete) - %d bytes", content_length);
@@ -151,7 +166,7 @@ ssize_t web_request_parse(struct web_request_t* wr, const void* data, size_t dat
             
         } else {
             log_message(LOG_INFO, "(Incomplete)");
-            web_headers_destroy(headers);
+            web_headers_release(headers);
         }
         
     }
@@ -164,7 +179,7 @@ ssize_t web_request_parse(struct web_request_t* wr, const void* data, size_t dat
 
 struct web_request_t* web_request_copy(struct web_request_t* wr) {
     
-    struct web_request_t* request = (struct web_request_t*)malloc(sizeof(struct web_request_t));
+    struct web_request_t* request = (struct web_request_t*)obj_create(sizeof(struct web_request_t));
     bzero(request, sizeof(struct web_request_t));
     
     if (wr->command != NULL) {

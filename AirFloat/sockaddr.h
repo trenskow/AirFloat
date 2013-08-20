@@ -43,8 +43,10 @@ typedef enum {
 } sockaddr_type;
 
 struct sockaddr* sockaddr_create(const char* host, uint16_t port, sockaddr_type version, uint32_t scope_id);
-void sockaddr_destroy(struct sockaddr* addr);
 struct sockaddr* sockaddr_copy(struct sockaddr* addr);
+struct sockaddr* sockaddr_retain(struct sockaddr* addr);
+struct sockaddr* sockaddr_release(struct sockaddr* addr);
+
 bool sockaddr_equals(struct sockaddr* addr1, struct sockaddr* addr2);
 bool sockaddr_equals_host(struct sockaddr* addr1, struct sockaddr* addr2);
 const char* sockaddr_get_host(struct sockaddr* addr);

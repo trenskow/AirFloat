@@ -32,6 +32,8 @@
 #include <string.h>
 #include <arpa/inet.h>
 
+#include "obj.h"
+
 #include "sockaddr.h"
 
 struct sockaddr* sockaddr_create(const char* host, uint16_t port, sockaddr_type version, uint32_t scope_id) {
@@ -40,7 +42,7 @@ struct sockaddr* sockaddr_create(const char* host, uint16_t port, sockaddr_type 
     
     if (version == sockaddr_type_inet_4) {
         
-        struct sockaddr_in* ret = (struct sockaddr_in*)malloc(sizeof(struct sockaddr_storage));
+        struct sockaddr_in* ret = (struct sockaddr_in*)obj_create(sizeof(struct sockaddr_storage));
         bzero(ret, sizeof(struct sockaddr_storage));
         ret->sin_len = sizeof(struct sockaddr_in);
         ret->sin_family = AF_INET;
@@ -73,19 +75,25 @@ struct sockaddr* sockaddr_create(const char* host, uint16_t port, sockaddr_type 
     
 }
 
-void sockaddr_destroy(struct sockaddr* addr) {
-    
-    free(addr);
-    
-}
-
 struct sockaddr* sockaddr_copy(struct sockaddr* addr) {
     
-    struct sockaddr* ret = (struct sockaddr*)malloc(addr->sa_len);
+    struct sockaddr* ret = (struct sockaddr*)obj_create(addr->sa_len);
     
     memcpy(ret, addr, addr->sa_len);
     
     return ret;
+    
+}
+
+struct sockaddr* sockaddr_retain(struct sockaddr* addr) {
+    
+    return obj_retain(addr);
+    
+}
+
+struct sockaddr* sockaddr_release(struct sockaddr* addr) {
+    
+    return obj_release(addr, NULL);
     
 }
 

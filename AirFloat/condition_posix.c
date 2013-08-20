@@ -35,6 +35,8 @@
 #include <sys/time.h>
 #include <errno.h>
 
+#include "obj.h"
+
 #include "condition.h"
 
 pthread_mutex_t* mutex_pthread(struct mutex_t* m);
@@ -45,7 +47,7 @@ struct condition_t {
 
 struct condition_t* condition_create() {
     
-    struct condition_t* c = (struct condition_t*)malloc(sizeof(struct condition_t));
+    struct condition_t* c = (struct condition_t*)obj_create(sizeof(struct condition_t));
     
     pthread_cond_init(&c->cond, NULL);
     
@@ -53,10 +55,21 @@ struct condition_t* condition_create() {
     
 }
 
-void condition_destroy(struct condition_t* c) {
+void _condition_destroy(void* c) {
     
-    pthread_cond_destroy(&c->cond);
-    free(c);
+    pthread_cond_destroy(&((struct condition_t*)c)->cond);
+    
+}
+
+struct condition_t* condition_retain(struct condition_t* c) {
+    
+    return obj_retain(c);
+    
+}
+
+struct condition_t* condition_release(struct condition_t* c) {
+    
+    return obj_release(c, _condition_destroy);
     
 }
 

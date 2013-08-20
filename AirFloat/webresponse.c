@@ -37,6 +37,9 @@
 #include "log.h"
 #include "webtools.h"
 #include "webheaders.h"
+
+#include "obj.h"
+
 #include "webresponse.h"
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
@@ -52,7 +55,7 @@ struct web_response_t {
 
 struct web_response_t* web_response_create() {
     
-    struct web_response_t* wr = (struct web_response_t*)malloc(sizeof(struct web_response_t));
+    struct web_response_t* wr = (struct web_response_t*)obj_create(sizeof(struct web_response_t));
     bzero(wr, sizeof(struct web_response_t));
     
     wr->headers = web_headers_create();
@@ -62,7 +65,9 @@ struct web_response_t* web_response_create() {
     
 }
 
-void web_response_destroy(struct web_response_t* wr) {
+void _web_response_destroy(void* obj) {
+    
+    struct web_response_t* wr = (struct web_response_t*)obj;
     
     if (wr->status_message != NULL)
         free(wr->status_message);
@@ -70,9 +75,19 @@ void web_response_destroy(struct web_response_t* wr) {
     if (wr->content != NULL)
         free(wr->content);
     
-    web_headers_destroy(wr->headers);
+    web_headers_release(wr->headers);
     
-    free(wr);
+}
+
+struct web_response_t* web_response_retain(struct web_response_t* wr) {
+    
+    return obj_retain(wr);
+    
+}
+
+struct web_response_t* web_response_release(struct web_response_t* wr) {
+    
+    return obj_release(wr, _web_response_destroy);
     
 }
 
@@ -131,11 +146,14 @@ ssize_t web_response_parse(web_response_p wr, const void* data, size_t data_size
         size_t actual_content_length = data_size - (content_start - buffer);
         if (content_length <= actual_content_length) {
             
+            if (wr->status_message != NULL)
+                free(wr->status_message);
+            
             wr->status_code = atoi(s_status_code);
             wr->status_message = (char*)malloc(strlen(status_message) + 1);
             strcpy(wr->status_message, status_message);
             
-            web_headers_destroy(wr->headers);
+            web_headers_release(wr->headers);
             wr->headers = headers;
             
             log_message(LOG_INFO, "(Complete) - %d bytes", content_length);
@@ -146,7 +164,7 @@ ssize_t web_response_parse(web_response_p wr, const void* data, size_t data_size
             
         } else {
             log_message(LOG_INFO, "(Incomplete)");
-            web_headers_destroy(headers);
+            web_headers_release(headers);
         }
         
     }
@@ -165,20 +183,14 @@ web_headers_p web_response_get_headers(struct web_response_t* wr) {
 
 void web_response_set_status(struct web_response_t* wr, uint16_t code, const char* message) {
     
-    assert(code < 1000);
+    assert(code > 0 && code < 1000 && message != NULL);
     
-    if (wr->status_message != NULL) {
+    if (wr->status_message != NULL)
         free(wr->status_message);
-        wr->status_message = NULL;
-    }
     
     wr->status_code = code;
-    
-    if (message != NULL) {
-        wr->status_message = (char*)malloc(strlen(message) + 1);
-        strcpy(wr->status_message, message);
-    } else
-        web_response_set_status(wr, 500, "Internal Server Error");
+    wr->status_message = (char*)malloc(strlen(message) + 1);
+    strcpy(wr->status_message, message);
     
 }
 

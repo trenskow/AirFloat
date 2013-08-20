@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <assert.h>
 
 #include "log.h"
 #include "obj.h"
@@ -40,48 +41,64 @@ struct obj_t {
     pthread_mutex_t mutex;
 };
 
+const size_t _obj_header_size = sizeof(struct obj_t);
+
 void* obj_create(size_t size) {
     
-    struct obj_t* obj = malloc(sizeof(struct obj_t) + size);
-    bzero(obj, sizeof(struct obj_t) + size);
+    struct obj_t* obj = malloc(_obj_header_size + size);
+    
+    void* o = &((void*)obj)[_obj_header_size];
+    
+    bzero(obj, _obj_header_size + size);
     
     obj->retain_count = 1;
     pthread_mutex_init(&obj->mutex, NULL);
-    
-    return obj + sizeof(struct obj_t);
-    
-}
-
-void* obj_retain(void* o) {
-    
-    struct obj_t* obj = o - sizeof(struct obj_t);
-    
-    pthread_mutex_lock(&obj->mutex);
-    
-    obj->retain_count++;
-    
-    pthread_mutex_unlock(&obj->mutex);
     
     return o;
     
 }
 
-void obj_release(void* o, destroy_callback destroy) {
+void* obj_retain(void* o) {
     
-    struct obj_t* obj = o - sizeof(struct obj_t);
-    
-    pthread_mutex_lock(&obj->mutex);
-    
-    if (!--obj->retain_count) {
+    if (o != NULL) {
         
-        destroy(o);
+        struct obj_t* obj = o - sizeof(struct obj_t);
+        
+        pthread_mutex_lock(&obj->mutex);
+        
+        obj->retain_count++;
         
         pthread_mutex_unlock(&obj->mutex);
-        pthread_mutex_destroy(&obj->mutex);
         
-        free(obj);
+    }
+    
+    return o;
+    
+}
+
+void* obj_release(void* o, obj_destroy_callback destroy) {
+    
+    if (o != NULL) {
         
-    } else
-        pthread_mutex_unlock(&obj->mutex);
+        struct obj_t* obj = o - sizeof(struct obj_t);
+        
+        pthread_mutex_lock(&obj->mutex);
+        
+        if (!--obj->retain_count) {
+            
+            if (destroy != NULL)
+                destroy(o);
+            
+            pthread_mutex_unlock(&obj->mutex);
+            pthread_mutex_destroy(&obj->mutex);
+            
+            free(obj);
+            
+        } else
+            pthread_mutex_unlock(&obj->mutex);
+        
+    }
+    
+    return NULL;
     
 }

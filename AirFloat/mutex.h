@@ -37,7 +37,8 @@ typedef struct mutex_t *mutex_p;
 
 mutex_p mutex_create();
 mutex_p mutex_retain(mutex_p m);
-void mutex_release(mutex_p m);
+mutex_p mutex_release(mutex_p m);
+
 void mutex_lock(mutex_p m);
 bool mutex_trylock(mutex_p m);
 void mutex_unlock(mutex_p m);

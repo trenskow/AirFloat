@@ -38,7 +38,9 @@
 typedef struct web_request_t *web_request_p;
 
 web_request_p web_request_create();
-void web_request_destroy(web_request_p wr);
+web_request_p web_request_retain(web_request_p wr);
+web_request_p web_request_release(web_request_p wr);
+
 ssize_t web_request_parse(web_request_p wr, const void* data, size_t data_size);
 web_request_p web_request_copy(web_request_p wr);
 void web_request_set_command(web_request_p wr, const char* command);

@@ -33,6 +33,8 @@
 #include <string.h>
 #include <assert.h>
 
+#include "obj.h"
+
 #include "rtpsocket.h"
 
 struct rtp_socket_info_t {
@@ -52,7 +54,7 @@ struct rtp_socket_t {
 
 struct rtp_socket_t* rtp_socket_create(const char* name, struct sockaddr* allowed_remote_end_point) {
     
-    struct rtp_socket_t* rs = (struct rtp_socket_t*)malloc(sizeof(struct rtp_socket_t));
+    struct rtp_socket_t* rs = (struct rtp_socket_t*)obj_create(sizeof(struct rtp_socket_t));
     bzero(rs, sizeof(struct rtp_socket_t));
     
     if (allowed_remote_end_point != NULL)
@@ -69,13 +71,16 @@ struct rtp_socket_t* rtp_socket_create(const char* name, struct sockaddr* allowe
     
 }
 
-void rtp_socket_destroy(struct rtp_socket_t* rs) {
+void _rtp_socket_destroy(void* obj) {
+    
+    struct rtp_socket_t* rs = (struct rtp_socket_t*)obj;
     
     mutex_lock(rs->mutex);
     
-    while (rs->sockets_count > 0) {
+    for (uint32_t i = 0 ; i < rs->sockets_count ; i++) {
         mutex_unlock(rs->mutex);
-        socket_close(rs->sockets[0]->socket);
+        socket_close(rs->sockets[i]->socket);
+        socket_release(rs->sockets[i]->socket);
         mutex_lock(rs->mutex);
     }
     
@@ -83,15 +88,24 @@ void rtp_socket_destroy(struct rtp_socket_t* rs) {
     
     mutex_unlock(rs->mutex);
     
-    if (rs->allowed_remote_end_point)
-        sockaddr_destroy(rs->allowed_remote_end_point);
+    rs->allowed_remote_end_point = sockaddr_release(rs->allowed_remote_end_point);
     
     if (rs->name)
         free(rs->name);
     
     mutex_release(rs->mutex);
     
-    free(rs);
+}
+
+struct rtp_socket_t* rtp_socket_retain(struct rtp_socket_t* rs) {
+    
+    return obj_retain(rs);
+    
+}
+
+struct rtp_socket_t* rtp_socket_release(struct rtp_socket_t* rs) {
+    
+    return obj_release(rs, _rtp_socket_destroy);
     
 }
 
@@ -104,7 +118,7 @@ void _rtp_socket_socket_closed_callback(socket_p socket, void* ctx) {
     for (uint32_t i = 0 ; i < rs->sockets_count ; i++)
         if (rs->sockets[i]->socket == socket) {
             
-            socket_destroy(rs->sockets[i]->socket);
+            socket_release(rs->sockets[i]->socket);
             
             free(rs->sockets[i]);
             
@@ -138,7 +152,7 @@ struct rtp_socket_info_t* _rtp_socket_add_socket(struct rtp_socket_t* rs, socket
     
     struct rtp_socket_info_t* info = (struct rtp_socket_info_t*)malloc(sizeof(struct rtp_socket_info_t));
     bzero(info, sizeof(struct rtp_socket_info_t));
-    info->socket = socket;
+    info->socket = socket_retain(socket);
     info->is_data_socket = is_data_socket;
         
     if (is_data_socket)
@@ -169,7 +183,7 @@ bool _rtp_socket_accept_callback(socket_p socket, socket_p new_socket, void* ctx
             return true;
         } else {
             socket_close(new_socket);
-            socket_destroy(new_socket);
+            socket_release(new_socket);
         }
         
     }
@@ -192,8 +206,8 @@ bool rtp_socket_setup(struct rtp_socket_t* rs, struct sockaddr* local_end_point)
         return true;
     }
     
-    socket_destroy(udp_socket);
-    socket_destroy(tcp_socket);
+    socket_release(udp_socket);
+    socket_release(tcp_socket);
     
     return false;
     

@@ -693,11 +693,11 @@
 		A19E4AC716CA94FA00E5D60F /* Server */ = {
 			isa = PBXGroup;
 			children = (
+				A187697F17C237FF002222FD /* obj.h */,
+				A187698017C23805002222FD /* obj_posix.c */,
 				A19E4AC916CA950C00E5D60F /* Tools */,
 				A19E4ADE16CA955C00E5D60F /* Audio */,
 				A19E4ADF16CA956400E5D60F /* Server */,
-				A187697F17C237FF002222FD /* obj.h */,
-				A187698017C23805002222FD /* obj_posix.c */,
 			);
 			name = Server;
 			sourceTree = "<group>";
@@ -1139,7 +1139,6 @@
 				OTHER_CFLAGS = (
 					"-DDEBUG",
 					"-DALLOW_LOCALHOST",
-					"-DUSE_BSD_SOCKETS",
 				);
 				SDKROOT = iphoneos;
 			};
@@ -1162,7 +1161,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				OTHER_CFLAGS = "-DUSE_BSD_SOCKETS";
+				OTHER_CFLAGS = "";
 				SDKROOT = iphoneos;
 			};
 			name = Release;
@@ -1244,7 +1243,6 @@
 				OTHER_CFLAGS = (
 					"-DLOG_SERVER",
 					"-DALLOW_LOCALHOST",
-					"-DUSE_BSD_SOCKETS",
 				);
 				SDKROOT = iphoneos;
 			};
@@ -1301,7 +1299,6 @@
 					"-DDEBUG",
 					"-DLOG_SERVER",
 					"-DALLOW_LOCALHOST",
-					"-DUSE_BSD_SOCKETS",
 				);
 				SDKROOT = iphoneos;
 			};
@@ -1335,6 +1332,56 @@
 				WRAPPER_EXTENSION = app;
 			};
 			name = "Debug (Server Logs)";
+		};
+		A187698217C29780002222FD /* Release (Allow Local Host) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					armv6,
+					armv7,
+				);
+				CODE_SIGN_IDENTITY = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_CFLAGS = "-DALLOW_LOCALHOST";
+				SDKROOT = iphoneos;
+			};
+			name = "Release (Allow Local Host)";
+		};
+		A187698317C29780002222FD /* Release (Allow Local Host) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
+				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/..\"",
+					"\"$(SRCROOT)\"",
+				);
+				OTHER_LDFLAGS = (
+					"-all_load",
+					"-ObjC",
+				);
+				PRODUCT_NAME = AirFloat;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = app;
+			};
+			name = "Release (Allow Local Host)";
 		};
 		A1A76011151B56B800728C9C /* App Store Distribution */ = {
 			isa = XCBuildConfiguration;
@@ -1434,7 +1481,7 @@
 			};
 			name = "Ad Hoc Distribution";
 		};
-		A1ECED8F16E8CFA500F8E7E3 /* Debug (Server Logs - ALAC Software) */ = {
+		A1ECED8F16E8CFA500F8E7E3 /* Debug (Server Logs - ALAC Software Decoder) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -1457,13 +1504,12 @@
 					"-DDEBUG",
 					"-DLOG_SERVER",
 					"-DALAC_SOFTWARE",
-					"-DUSE_BSD_SOCKETS",
 				);
 				SDKROOT = iphoneos;
 			};
-			name = "Debug (Server Logs - ALAC Software)";
+			name = "Debug (Server Logs - ALAC Software Decoder)";
 		};
-		A1ECED9016E8CFA500F8E7E3 /* Debug (Server Logs - ALAC Software) */ = {
+		A1ECED9016E8CFA500F8E7E3 /* Debug (Server Logs - ALAC Software Decoder) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
@@ -1490,7 +1536,7 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
-			name = "Debug (Server Logs - ALAC Software)";
+			name = "Debug (Server Logs - ALAC Software Decoder)";
 		};
 /* End XCBuildConfiguration section */
 
@@ -1500,8 +1546,9 @@
 			buildConfigurations = (
 				4898FA0D13CDAAD1006EC97E /* Debug */,
 				A149209414E7323900849DC3 /* Debug (Server Logs) */,
-				A1ECED8F16E8CFA500F8E7E3 /* Debug (Server Logs - ALAC Software) */,
+				A1ECED8F16E8CFA500F8E7E3 /* Debug (Server Logs - ALAC Software Decoder) */,
 				4898FA0E13CDAAD1006EC97E /* Release */,
+				A187698217C29780002222FD /* Release (Allow Local Host) */,
 				A116EA6416EDFDC7005530E9 /* Release (Server Logs) */,
 				A1A76011151B56B800728C9C /* App Store Distribution */,
 				A1C7F7AA1501048400D7DE52 /* Ad Hoc Distribution */,
@@ -1514,8 +1561,9 @@
 			buildConfigurations = (
 				4898FA1013CDAAD1006EC97E /* Debug */,
 				A149209514E7323900849DC3 /* Debug (Server Logs) */,
-				A1ECED9016E8CFA500F8E7E3 /* Debug (Server Logs - ALAC Software) */,
+				A1ECED9016E8CFA500F8E7E3 /* Debug (Server Logs - ALAC Software Decoder) */,
 				4898FA1113CDAAD1006EC97E /* Release */,
+				A187698317C29780002222FD /* Release (Allow Local Host) */,
 				A116EA6516EDFDC7005530E9 /* Release (Server Logs) */,
 				A1A76012151B56B800728C9C /* App Store Distribution */,
 				A1C7F7AB1501048400D7DE52 /* Ad Hoc Distribution */,

@@ -36,6 +36,8 @@
 #include <stdint.h>
 #include <unistd.h>
 
+#include "obj.h"
+
 #include "webheaders.h"
 
 struct web_header_t {
@@ -50,27 +52,16 @@ struct web_headers_t {
 
 struct web_headers_t* web_headers_create() {
     
-    struct web_headers_t* wh = (struct web_headers_t*)malloc(sizeof(struct web_headers_t));
+    struct web_headers_t* wh = (struct web_headers_t*)obj_create(sizeof(struct web_headers_t));
     bzero(wh, sizeof(struct web_headers_t));
     
     return wh;
     
 }
 
-void web_headers_destroy(struct web_headers_t* wh) {
-    
-    for (uint32_t i = 0 ; i < wh->count ; i++)
-        free(wh->headers[i].name);
-    
-    free(wh->headers);
-    
-    free(wh);
-    
-}
-
 struct web_headers_t* web_headers_copy(struct web_headers_t* wh) {
     
-    struct web_headers_t* headers = (struct web_headers_t*)malloc(sizeof(struct web_headers_t));
+    struct web_headers_t* headers = (struct web_headers_t*)obj_create(sizeof(struct web_headers_t));
     bzero(headers, sizeof(struct web_headers_t));
     
     headers->count = wh->count;
@@ -89,6 +80,29 @@ struct web_headers_t* web_headers_copy(struct web_headers_t* wh) {
     }
     
     return headers;
+    
+}
+
+void _web_headers_destroy(void* obj) {
+    
+    struct web_headers_t* wh = (struct web_headers_t*)obj;
+    
+    for (uint32_t i = 0 ; i < wh->count ; i++)
+        free(wh->headers[i].name);
+    
+    free(wh->headers);
+    
+}
+
+struct web_headers_t* web_headers_retain(struct web_headers_t* wh) {
+    
+    return obj_retain(wh);
+    
+}
+
+struct web_headers_t* web_headers_release(struct web_headers_t* wh) {
+    
+    return obj_release(wh, _web_headers_destroy);
     
 }
 

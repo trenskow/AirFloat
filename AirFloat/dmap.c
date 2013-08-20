@@ -32,10 +32,12 @@
 #include <assert.h>
 #include <string.h>
 
-#include "Endian.h"
+#include "endian.h"
 #include "log.h"
 
-#include "DMAP.h"
+#include "obj.h"
+
+#include "dmap.h"
 
 struct dmap_atom_type {
     const uint32_t tag;
@@ -220,18 +222,46 @@ const uint32_t _atom_type_count = sizeof(_atom_types) / sizeof(struct dmap_atom_
 
 struct dmap_t* dmap_create() {
     
-    struct dmap_t* t = (struct dmap_t*)malloc(sizeof(struct dmap_t));
+    struct dmap_t* t = (struct dmap_t*)obj_create(sizeof(struct dmap_t));
     bzero(t, sizeof(struct dmap_t));
     
     return t;
     
 }
 
-void dmap_destroy(struct dmap_t* d) {
+struct dmap_t* dmap_copy(struct dmap_t* d) {
+    
+    struct dmap_t* ret = dmap_create();
+    
+    ret->count = d->count;
+    ret->atoms = (struct dmap_atom*)obj_create(sizeof(struct dmap_atom) * d->count);
+    
+    for (uint32_t i = 0 ; i < d->count ; i++) {
+        
+        ret->atoms[i].tag = d->atoms[i].tag;
+        ret->atoms[i].type = d->atoms[i].type;
+        ret->atoms[i].buffer = NULL;
+        ret->atoms[i].size = d->atoms[i].size;
+        if (d->atoms[i].buffer != NULL) {
+            ret->atoms[i].buffer = malloc(d->atoms[i].size);
+            memcpy(ret->atoms[i].buffer, d->atoms[i].buffer, d->atoms[i].size);
+        }
+        if (d->atoms[i].container != NULL)
+            ret->atoms[i].container = dmap_copy(d->atoms[i].container);
+        
+    }
+    
+    return ret;
+    
+}
+
+void _dmap_destroy(void* obj) {
+    
+    struct dmap_t* d = (struct dmap_t*)obj;
     
     for (uint32_t i = 0 ; i < d->count ; i++) {
         if (d->atoms[i].type == dmap_type_container)
-            dmap_destroy(d->atoms[i].container);
+            dmap_release(d->atoms[i].container);
         
         if (d->atoms[i].buffer != NULL)
             free(d->atoms[i].buffer);
@@ -240,8 +270,18 @@ void dmap_destroy(struct dmap_t* d) {
     
     if (d->count > 0)
         free(d->atoms);
+        
+}
+
+struct dmap_t* dmap_retain(struct dmap_t* d) {
     
-    free(d);
+    return obj_retain(d);
+    
+}
+
+struct dmap_t* dmap_release(struct dmap_t* d) {
+    
+    return obj_release(d, _dmap_destroy);
     
 }
 
@@ -287,32 +327,6 @@ void dmap_parse(struct dmap_t* d, const void* data, size_t data_size) {
         length -= frame_size;
         
     }
-    
-}
-
-struct dmap_t* dmap_copy(struct dmap_t* d) {
-    
-    struct dmap_t* ret = dmap_create();
-    
-    ret->count = d->count;
-    ret->atoms = (struct dmap_atom*)malloc(sizeof(struct dmap_atom) * d->count);
-    
-    for (uint32_t i = 0 ; i < d->count ; i++) {
-        
-        ret->atoms[i].tag = d->atoms[i].tag;
-        ret->atoms[i].type = d->atoms[i].type;
-        ret->atoms[i].buffer = NULL;
-        ret->atoms[i].size = d->atoms[i].size;
-        if (d->atoms[i].buffer != NULL) {
-            ret->atoms[i].buffer = malloc(d->atoms[i].size);
-            memcpy(ret->atoms[i].buffer, d->atoms[i].buffer, d->atoms[i].size);
-        }
-        if (d->atoms[i].container != NULL)
-            ret->atoms[i].container = dmap_copy(d->atoms[i].container);
-        
-    }
-    
-    return ret;
     
 }
 

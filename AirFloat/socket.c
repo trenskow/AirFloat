@@ -40,7 +40,10 @@
 #include "mutex.h"
 #include "thread.h"
 
+#include "obj.h"
+
 #include "sockaddr.h"
+
 #include "socket.h"
 
 struct socket_t {
@@ -86,6 +89,8 @@ void _socket_accept_loop(void* ctx) {
     
     struct socket_t* s = (struct socket_t*)ctx;
    
+    socket_retain(s);
+    
     mutex_lock(s->mutex);
     _socket_set_loop_name(s, "Accept Loop");
     
@@ -102,8 +107,7 @@ void _socket_accept_loop(void* ctx) {
         
         if (new_socket_fd >= 0) {
             
-            struct socket_t* new_socket = (struct socket_t*)malloc(sizeof(struct socket_t));
-            bzero(new_socket, sizeof(struct socket_t));
+            struct socket_t* new_socket = (struct socket_t*)obj_create(sizeof(struct socket_t));
             
             new_socket->socket = new_socket_fd;
             new_socket->mutex = mutex_create();
@@ -116,21 +120,30 @@ void _socket_accept_loop(void* ctx) {
                 mutex_lock(s->mutex);
             }
             
+            /* Retain count is now one */
+            /* If socket was accepted, then keep it, and make the receive loop release it */
+            /* If socket was NOT accepted, release it, so it can close and destroy */
+            
             if (!accept)
-                socket_destroy(new_socket);
+                socket_release(new_socket);
             
         }
         
     } while (new_socket_fd >= 0);
+    
     mutex_unlock(s->mutex);
     
     socket_close(s);
+    
+    socket_release(s);
     
 }
 
 void _socket_receive_loop(void* ctx) {
     
     struct socket_t* s = (struct socket_t*)ctx;
+    
+    socket_retain(s);
     
     mutex_lock(s->mutex);
     _socket_set_loop_name(s, "Receive Loop");
@@ -159,11 +172,7 @@ void _socket_receive_loop(void* ctx) {
             read = recvfrom(s->socket, buffer + write_pos, buffer_size - write_pos, 0, (struct sockaddr*) &remote_addr, &remote_addr_len);
             mutex_lock(s->mutex);
             
-            if (s->remote_end_point != NULL) {
-                sockaddr_destroy(s->remote_end_point);
-                s->remote_end_point = NULL;
-            }
-            
+            s->remote_end_point = sockaddr_release(s->remote_end_point);
             s->remote_end_point = sockaddr_copy((struct sockaddr*) &remote_addr);
             
         } else {
@@ -199,6 +208,8 @@ void _socket_receive_loop(void* ctx) {
     
     socket_close(s);
     
+    socket_release(s);
+    
 }
 
 void _socket_connect(void* ctx) {
@@ -225,8 +236,7 @@ void _socket_connect(void* ctx) {
 
 struct socket_t* socket_create(const char* name, bool is_udp) {
     
-    struct socket_t* s = (struct socket_t*)malloc(sizeof(struct socket_t));
-    bzero(s, sizeof(struct socket_t));
+    struct socket_t* s = (struct socket_t*)obj_create(sizeof(struct socket_t));
     
     if (name != NULL) {
         s->name = (char*)malloc(strlen(name) + 1);
@@ -241,21 +251,16 @@ struct socket_t* socket_create(const char* name, bool is_udp) {
     
 }
 
-void socket_destroy(struct socket_t* s) {
+void _socket_destroy(void* obj) {
+    
+    struct socket_t* s = (struct socket_t*)obj;
     
     socket_close(s);
     
     mutex_lock(s->mutex);
     
-    if (s->local_end_point != NULL) {
-        sockaddr_destroy(s->local_end_point);
-        s->local_end_point = NULL;
-    }
-    
-    if (s->remote_end_point != NULL) {
-        sockaddr_destroy(s->remote_end_point);
-        s->remote_end_point = NULL;
-    }
+    s->local_end_point = sockaddr_release(s->local_end_point);
+    s->remote_end_point = sockaddr_release(s->remote_end_point);
     
     if (s->name != NULL) {
         free(s->name);
@@ -266,7 +271,17 @@ void socket_destroy(struct socket_t* s) {
     
     mutex_release(s->mutex);
     
-    free(s);
+}
+
+struct socket_t* socket_retain(struct socket_t* s) {
+    
+    return obj_retain(s);
+    
+}
+
+struct socket_t* socket_release(struct socket_t* s) {
+    
+    return obj_release(s, _socket_destroy);
     
 }
 
@@ -274,10 +289,7 @@ bool socket_bind(struct socket_t* s, struct sockaddr* end_point) {
     
     assert(end_point != NULL);
     
-    if (s->local_end_point != NULL) {
-        sockaddr_destroy(s->local_end_point);
-        s->local_end_point = NULL;
-    }
+    s->local_end_point = sockaddr_release(s->local_end_point);
     
     struct sockaddr* ep = sockaddr_copy(end_point);
     s->local_end_point = ep;
@@ -321,9 +333,7 @@ void socket_connect(struct socket_t* s, struct sockaddr* end_point) {
         if (s->socket <= 0)
             log_message(LOG_ERROR, "Socket creation error: %s", strerror(errno));
         
-        if (s->remote_end_point != NULL)
-            sockaddr_destroy(s->remote_end_point);
-        
+        s->remote_end_point = sockaddr_release(s->remote_end_point);
         s->remote_end_point = sockaddr_copy(end_point);
         
         s->receive_thread = thread_create(_socket_connect, s);
@@ -430,14 +440,14 @@ void socket_close(struct socket_t* s) {
 
         if (s->accept_thread != NULL) {
             mutex_unlock(s->mutex);
-            thread_destroy(s->accept_thread);
+            thread_release(s->accept_thread);
             mutex_lock(s->mutex);
             s->accept_thread = NULL;
         }
         
         if (s->receive_thread != NULL) {
             mutex_unlock(s->mutex);
-            thread_destroy(s->receive_thread);
+            thread_release(s->receive_thread);
             mutex_lock(s->mutex);
             s->receive_thread = NULL;
         }

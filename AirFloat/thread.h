@@ -37,7 +37,9 @@ typedef void (*thread_start_fnc)(void* ctx);
 typedef struct thread_t *thread_p;
 
 thread_p thread_create(thread_start_fnc start_fnc, void* ctx);
-void thread_destroy(thread_p t);
+thread_p thread_retain(thread_p t);
+thread_p thread_release(thread_p t);
+
 void thread_set_name(const char* name);
 void thread_join(thread_p t);
 
