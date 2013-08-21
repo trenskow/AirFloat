@@ -34,6 +34,7 @@
 #include <pthread.h>
 #include <sys/time.h>
 #include <string.h>
+#include <assert.h>
 
 #include "log.h"
 
@@ -46,8 +47,10 @@
 struct mutex_t {
     pthread_mutexattr_t attr;
     pthread_mutex_t mutex;
-    bool locked;
+    uint32_t lock_count;
+#ifdef DEBUG
     char name[MAX_NAME_LENGTH];
+#endif
 };
 
 struct mutex_t* _mutex_create(int type) {
@@ -107,9 +110,9 @@ void mutex_lock(struct mutex_t* m) {
     if (m != NULL) {
         mutex_retain(m); /* Self retain while locked. */
         pthread_mutex_lock(&m->mutex);
+        m->lock_count++;
 #ifdef DEBUG
         pthread_getname_np(pthread_self(), m->name, MAX_NAME_LENGTH);
-        m->locked = true;
 #endif
     }
     
@@ -117,11 +120,13 @@ void mutex_lock(struct mutex_t* m) {
 
 void mutex_unlock(struct mutex_t* m) {
     
+    assert(m->lock_count > 0);
+    
     if (m != NULL) {
 #ifdef DEBUG
-        m->locked = false;
         m->name[0] = '\0';
 #endif
+        m->lock_count--;
         pthread_mutex_unlock(&m->mutex);
         mutex_release(m); /* Release self */
     }
