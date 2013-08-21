@@ -195,8 +195,11 @@ bool _rtp_socket_accept_callback(socket_p socket, socket_p new_socket, void* ctx
 
 bool rtp_socket_setup(struct rtp_socket_t* rs, struct sockaddr* local_end_point) {
     
-    socket_p udp_socket = socket_create("RTP UDP Socket", true);
-    socket_p tcp_socket = socket_create("RTP TCP Listen Socket", false);
+    socket_p udp_socket = socket_create(true);
+    socket_p tcp_socket = socket_create(false);
+    
+    socket_set_name(udp_socket, "RTP UDP Socket");
+    socket_set_name(tcp_socket, "RTP TCP Listen Socket");
     
     if (socket_bind(udp_socket, local_end_point) && socket_bind(tcp_socket, local_end_point)) {
         _rtp_socket_add_socket(rs, udp_socket, true);

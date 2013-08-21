@@ -127,7 +127,8 @@ socket_p _web_server_bind(struct web_server_t* ws, uint16_t port, sockaddr_type 
     
     if (ws->socket_types & socket_type) {
         
-        socket = socket_create("Web server", false);
+        socket = socket_create(false);
+        socket_set_name(socket, "Web server");
         struct sockaddr* end_point = sockaddr_create(NULL, port, socket_type, 0);
         
         bool ret = socket_bind(socket, end_point);

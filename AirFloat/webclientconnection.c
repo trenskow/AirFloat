@@ -212,7 +212,8 @@ void web_client_connection_connect(struct web_client_connection_t* wc, struct so
     
     if (wc->socket == NULL) {
         
-        wc->socket = socket_create("Web connection", false);
+        wc->socket = socket_create(false);
+        socket_set_name(wc->socket, "Web connection");
         
         socket_set_connected_callback(wc->socket, _web_client_connection_socket_connected_callback, wc);
         socket_set_connect_failed_callback(wc->socket, _web_client_connection_socket_connect_failed_callback, wc);

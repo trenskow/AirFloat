@@ -46,10 +46,11 @@
 #include "socket.h"
 
 struct socket_t {
+#ifdef DEBUG
     char* name;
+#endif
     bool is_udp;
     int socket;
-    bool is_connected;
     mutex_p mutex;
     thread_p accept_thread;
     thread_p receive_thread;
@@ -71,16 +72,18 @@ struct socket_t {
     struct sockaddr* remote_end_point;
 };
 
-void _socket_set_loop_name(struct socket_t* s, const char* name) {
+void _socket_set_loop_thread_name(struct socket_t* s, const char* name) {
     
+#ifdef DEBUG
     if (s->name != NULL) {
         
         size_t len = strlen(s->name) + strlen(name) + 4;
         char t_name[len];
-        sprintf(t_name, "%s - %s", s->name, name);
+        sprintf(t_name, "%s (%s)", s->name, name);
         thread_set_name(t_name);
         
     }
+#endif
     
 }
 
@@ -91,10 +94,9 @@ void _socket_accept_loop(void* ctx) {
     socket_retain(s);
     
     mutex_lock(s->mutex);
-    _socket_set_loop_name(s, "Accept Loop");
     
-    s->is_connected = true;
-    
+    _socket_set_loop_thread_name(s, "accept loop");
+        
     int new_socket_fd = 0;
     do {
         
@@ -110,7 +112,6 @@ void _socket_accept_loop(void* ctx) {
             
             new_socket->socket = new_socket_fd;
             new_socket->mutex = mutex_create_recursive();
-            new_socket->is_connected = true;
             
             if (s->callbacks.accept == NULL || !s->callbacks.accept(s, new_socket, s->callbacks.ctx.accept))
                 socket_release(new_socket);
@@ -119,10 +120,13 @@ void _socket_accept_loop(void* ctx) {
         
     } while (new_socket_fd >= 0);
     
-    socket_close(s);
-    socket_release(s);
+    if (s->callbacks.closed)
+        s->callbacks.closed(s, s->callbacks.ctx.closed);
     
     mutex_unlock(s->mutex);
+    
+    socket_close(s);
+    socket_release(s);
     
 }
 
@@ -133,10 +137,8 @@ void _socket_receive_loop(void* ctx) {
     socket_retain(s);
     
     mutex_lock(s->mutex);
-    _socket_set_loop_name(s, "Receive Loop");
-    
-    s->is_connected = true;
-    
+    _socket_set_loop_thread_name(s, "receive loop");
+        
     void* buffer = NULL;
     size_t buffer_size = 0;
     size_t write_pos = 0;
@@ -163,9 +165,11 @@ void _socket_receive_loop(void* ctx) {
             s->remote_end_point = sockaddr_copy((struct sockaddr*) &remote_addr);
             
         } else {
+            
             mutex_unlock(s->mutex);
             read = recv(s->socket, buffer + write_pos, buffer_size - write_pos, 0);
             mutex_lock(s->mutex);
+            
         }
         
         if (read > 0) {
@@ -188,10 +192,13 @@ void _socket_receive_loop(void* ctx) {
     if (buffer != NULL)
         free(buffer);
     
-    socket_close(s);
-    socket_release(s);
+    if (s->callbacks.closed)
+        s->callbacks.closed(s, s->callbacks.ctx.closed);
     
     mutex_unlock(s->mutex);
+    
+    socket_close(s);    
+    socket_release(s);
     
 }
 
@@ -217,14 +224,9 @@ void _socket_connect(void* ctx) {
     
 }
 
-struct socket_t* socket_create(const char* name, bool is_udp) {
+struct socket_t* socket_create(bool is_udp) {
     
     struct socket_t* s = (struct socket_t*)obj_create(sizeof(struct socket_t));
-    
-    if (name != NULL) {
-        s->name = (char*)malloc(strlen(name) + 1);
-        strcpy(s->name, name);
-    }
     
     s->is_udp = is_udp;
     s->socket = -1;
@@ -245,10 +247,7 @@ void _socket_destroy(void* obj) {
     s->local_end_point = sockaddr_release(s->local_end_point);
     s->remote_end_point = sockaddr_release(s->remote_end_point);
     
-    if (s->name != NULL) {
-        free(s->name);
-        s->name = NULL;
-    }
+    socket_set_name(s, NULL);
     
     mutex_unlock(s->mutex);
     mutex_release(s->mutex);
@@ -264,6 +263,20 @@ struct socket_t* socket_retain(struct socket_t* s) {
 struct socket_t* socket_release(struct socket_t* s) {
     
     return obj_release(s, _socket_destroy);
+    
+}
+
+void socket_set_name(struct socket_t* s, const char* name) {
+
+#ifdef DEBUG
+    if (s->name != NULL)
+        free(s->name);
+    
+    if (name != NULL) {
+        s->name = malloc(strlen(name) + 1);
+        strcpy(s->name, name);
+    }
+#endif
     
 }
 
@@ -307,7 +320,9 @@ bool socket_bind(struct socket_t* s, struct sockaddr* end_point) {
 
 void socket_connect(struct socket_t* s, struct sockaddr* end_point) {
     
-    if (!s->is_connected && !s->is_udp) {
+    assert(s->accept_thread == NULL);
+    
+    if (s->receive_thread == NULL && !s->is_udp) {
         
         if (s->socket <= 0)
             s->socket = socket(end_point->sa_family, SOCK_STREAM, IPPROTO_TCP);
@@ -349,11 +364,11 @@ void socket_set_connect_failed_callback(struct socket_t* s, socket_connect_faile
 }
 
 void socket_set_receive_callback(struct socket_t* s, socket_receive_callback callback, void* ctx) {
-    
+        
     s->callbacks.receive = callback;
     s->callbacks.ctx.receive = ctx;
     
-    if (s->receive_thread == NULL && (s->is_udp || s->is_connected))
+    if (s->receive_thread == NULL)
         s->receive_thread = thread_create(_socket_receive_loop, s);
     
 }
@@ -371,7 +386,7 @@ ssize_t socket_send(struct socket_t* s, const void* buffer, size_t size) {
     
     mutex_lock(s->mutex);
     
-    if (s->is_connected)
+    if (s->receive_thread != NULL)
         ret = send(s->socket, buffer, size, 0);
     
     mutex_unlock(s->mutex);
@@ -396,7 +411,7 @@ ssize_t socket_send_to(struct socket_t* s, struct sockaddr* end_point, const voi
         
         assert(end_point->sa_family == s->local_end_point->sa_family);
         
-        if (s->is_connected || (s->is_udp && s->socket > -1))
+        if (s->receive_thread != NULL || (s->is_udp && s->socket > -1))
             ret = sendto(s->socket, buffer, size, 0, (struct sockaddr*) end_point, len);
         
     }
@@ -411,19 +426,13 @@ void socket_close(struct socket_t* s) {
     
     mutex_lock(s->mutex);
     
-    if (s->is_connected) {
-        
-        s->is_connected = false;
+    if (s->socket > -1) {
         close(s->socket);
         s->socket = -1;
-        
-        s->accept_thread = thread_release(s->accept_thread);
-        s->receive_thread = thread_release(s->receive_thread);
-        
-        if (s->callbacks.closed)
-            s->callbacks.closed(s, s->callbacks.ctx.closed);
-        
     }
+    
+    s->accept_thread = thread_release(s->accept_thread);
+    s->receive_thread = thread_release(s->receive_thread);
     
     mutex_unlock(s->mutex);
     
@@ -483,6 +492,6 @@ bool socket_is_udp(struct socket_t* s) {
 
 bool socket_is_connected(struct socket_t* s) {
     
-    return s->is_connected;
+    return (s->accept_thread != NULL || s->receive_thread != NULL);
     
 }

@@ -43,10 +43,11 @@ typedef void(*socket_connect_failed_callback)(socket_p socket, void* ctx);
 typedef ssize_t(*socket_receive_callback)(socket_p socket, const void* data, size_t data_size, struct sockaddr* remote_end_point, void* ctx);
 typedef void(*socket_closed_callback)(socket_p socket, void* ctx);
 
-socket_p socket_create(const char* name, bool is_udp);
+socket_p socket_create(bool udp);
 socket_p socket_retain(socket_p socket);
 socket_p socket_release(socket_p s);
 
+void socket_set_name(socket_p s, const char* name);
 bool socket_bind(socket_p s, struct sockaddr* end_point);
 void socket_connect(socket_p s, struct sockaddr* end_point);
 void socket_set_accept_callback(socket_p s, socket_accept_callback callback, void* ctx);
