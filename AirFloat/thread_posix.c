@@ -107,7 +107,7 @@ thread_p thread_retain(thread_p t) {
 
 struct thread_t* thread_release(thread_p t) {
     
-    return obj_release(t, NULL);
+    return obj_release(t, _thread_destroy);
     
 }
 
@@ -120,7 +120,7 @@ void thread_set_name(const char* name) {
 void thread_join(struct thread_t* t) {
     
     pthread_mutex_lock(&t->mutex);
-    if (!t->finir)
+    if (!t->finir && !pthread_equal(pthread_self(), t->thread))
         pthread_cond_wait(&t->join_cond, &t->mutex);
     pthread_mutex_unlock(&t->mutex);
     
