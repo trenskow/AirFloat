@@ -36,7 +36,10 @@
 #define LOG_INFO  0
 #define LOG_ERROR 1
 
-void log_message(int level, const char* message, ...);
-void log_data(int level, const void* data, size_t data_size);
+#define debug_data(d,s) _debug_data(__FILE__,__LINE__,d,s);
+#define debug(l,m,...) _debug(__FILE__,__LINE__,l,m,##__VA_ARGS__)
+
+void _debug_data(const char* file, uint32_t line, const void* data, size_t data_size);
+void _debug(const char* file, uint32_t line, uint8_t level, const char* message, ...);
 
 #endif

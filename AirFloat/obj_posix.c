@@ -33,7 +33,7 @@
 #include <pthread.h>
 #include <assert.h>
 
-#include "log.h"
+#include "debug.h"
 #include "obj.h"
 
 struct obj_t {

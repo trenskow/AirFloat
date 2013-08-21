@@ -36,7 +36,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <CFNetwork/CFNetwork.h>
 
-#include "log.h"
+#include "debug.h"
 #include "hardware.h"
 #include "settings.h"
 #include "mutex.h"
@@ -63,9 +63,9 @@ void _zeroconf_raop_ad_callback(CFNetServiceRef theService, CFStreamError* error
     struct zeroconf_raop_ad_t* b = (struct zeroconf_raop_ad_t*)info;
     
     if (error->error == 0)
-        log_message(LOG_INFO, "Zeroconf advertising started on port %d", b->port);
+        debug(LOG_INFO, "Zeroconf advertising started on port %d", b->port);
     else
-        log_message(LOG_ERROR, "Could not start Zeroconf advertisement.");
+        debug(LOG_ERROR, "Could not start Zeroconf advertisement.");
     
 }
 
@@ -73,7 +73,7 @@ void _zeroconf_raop_ad_run_loop_ready(CFRunLoopTimerRef timer, void *info) {
     
     struct zeroconf_raop_ad_t* b = (struct zeroconf_raop_ad_t*)info;
     
-    log_message(LOG_INFO, "Run loop ready");
+    debug(LOG_INFO, "Run loop ready");
     condition_signal(b->condition);
     
 }
@@ -137,7 +137,7 @@ struct zeroconf_raop_ad_t* zeroconf_raop_ad_create(uint16_t port, const char *na
     condition_wait(za->condition, za->mutex);
     mutex_unlock(za->mutex);
     
-    log_message(LOG_INFO, "Zeroconf configured");
+    debug(LOG_INFO, "Zeroconf configured");
     
     CFRelease(txt_data);
     CFRelease(txt_dictionary);
@@ -216,7 +216,7 @@ void _zeroconf_dacp_discover_resolve_callback(CFNetServiceRef service, CFStreamE
         
     }
     
-    log_message(LOG_INFO, "Found DACP Service: %s", CFStringGetCStringPtr(CFNetServiceGetName(service), kCFStringEncodingMacRoman));
+    debug(LOG_INFO, "Found DACP Service: %s", CFStringGetCStringPtr(CFNetServiceGetName(service), kCFStringEncodingMacRoman));
     
 }
 
@@ -240,7 +240,7 @@ void _zeroconf_dacp_discover_browse_callback(CFNetServiceBrowserRef browser, CFO
         
         mutex_unlock(zd->mutex);
         
-        log_message(LOG_INFO, "Domain found: %s", CFStringGetCStringPtr(domainOrService, kCFStringEncodingMacRoman));
+        debug(LOG_INFO, "Domain found: %s", CFStringGetCStringPtr(domainOrService, kCFStringEncodingMacRoman));
         
     } else if (CFNetServiceGetTypeID() == CFGetTypeID(domainOrService)) {
         

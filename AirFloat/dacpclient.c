@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "log.h"
+#include "debug.h"
 #include "zeroconf.h"
 #include "dmap.h"
 #include "sockaddr.h"
@@ -68,7 +68,7 @@ void _dacp_client_web_connection_connected_callback(web_client_connection_p conn
     
     struct dacp_client_t* dc = (struct dacp_client_t*)ctx;
     
-    log_message(LOG_INFO, "Connected!");
+    debug(LOG_INFO, "Connected!");
     
     if (dc->callbacks.controls_became_available != NULL)
         dc->callbacks.controls_became_available(dc, dc->callbacks.ctx.controls_became_available);

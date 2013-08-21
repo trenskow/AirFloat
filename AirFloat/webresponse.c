@@ -34,7 +34,7 @@
 #include <stdint.h>
 #include <assert.h>
 
-#include "log.h"
+#include "debug.h"
 #include "webtools.h"
 #include "webheaders.h"
 
@@ -105,7 +105,7 @@ ssize_t web_response_parse(web_response_p wr, const void* data, size_t data_size
         char header[header_length];
         memcpy(header, buffer, content_start - buffer);
         
-        log_data(LOG_INFO, data, content_start - buffer);
+        debug_data(data, content_start - buffer);
         
         char* header_start = header;
         header_length = web_tools_convert_new_lines(header_start, header_length);
@@ -155,14 +155,14 @@ ssize_t web_response_parse(web_response_p wr, const void* data, size_t data_size
             web_headers_release(wr->headers);
             wr->headers = headers;
             
-            log_message(LOG_INFO, "(Complete) - %d bytes", content_length);
+            debug(LOG_INFO, "(Complete) - %d bytes", content_length);
             
             web_response_set_content(wr, (void*)content_start, content_length);
             
             ret = content_start + content_length - buffer;
             
         } else {
-            log_message(LOG_INFO, "(Incomplete)");
+            debug(LOG_INFO, "(Incomplete)");
             web_headers_release(headers);
         }
         

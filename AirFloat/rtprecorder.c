@@ -36,7 +36,7 @@
 
 #include "crypt.h"
 #include "mutex.h"
-#include "log.h"
+#include "debug.h"
 #include "condition.h"
 #include "thread.h"
 #include "hardware.h"
@@ -175,7 +175,7 @@ void _rtp_recorder_process_timing_packet(struct rtp_recorder_t* rr, struct rtp_p
     double delay = ((current_time - reference_time) - (send_time - received_time)) / 2;
     double client_time = received_time + (send_time - received_time) + delay;
     
-    log_message(LOG_INFO, "Client time is %1.6f (peer delay: %1.6f)", client_time, delay);
+    debug(LOG_INFO, "Client time is %1.6f (peer delay: %1.6f)", client_time, delay);
     
     audio_queue_set_remote_time(rr->audio_queue, client_time);
     
@@ -201,7 +201,7 @@ void _rtp_recorder_send_timing_request(struct rtp_recorder_t* rr) {
     
     rtp_socket_send_to(rr->timing_socket, rr->remote_timing_end_point, &pckt, RTP_TIMING_PACKET_SIZE);
     
-    log_message(LOG_INFO, "Timing synchronization request sent (@ %1.6f)", send_time);
+    debug(LOG_INFO, "Timing synchronization request sent (@ %1.6f)", send_time);
     
 }
 
@@ -228,7 +228,7 @@ void _rtp_recorder_process_sync_packet(struct rtp_recorder_t* rr, struct rtp_pac
     double current_time = _ntp_time_to_hardware_time(*(struct ntp_time*)(packet->packet_data + 4));
     uint32_t next_rtp_time = ntohl(*((uint32_t*)packet->packet_data + 12));
     
-    log_message(LOG_INFO, "Sync packet (Playhead frame: %u - current time: %1.6f - next frame: %u)", current_rtp_time, current_time, next_rtp_time);
+    debug(LOG_INFO, "Sync packet (Playhead frame: %u - current time: %1.6f - next frame: %u)", current_rtp_time, current_time, next_rtp_time);
     
     audio_queue_synchronize(rr->audio_queue, current_rtp_time, current_time, next_rtp_time);
     
@@ -249,7 +249,7 @@ void _rtp_recorder_send_resend_request(struct rtp_recorder_t* rr, uint16_t seq_n
     
     rtp_socket_send_to(rr->control_socket, rr->remote_control_end_point, &pckt, RTP_RESEND_PACKET_SIZE);
     
-    log_message(LOG_INFO, "Requested packet resend (seq: %d / count %d)", seq_num, count);
+    debug(LOG_INFO, "Requested packet resend (seq: %d / count %d)", seq_num, count);
     
 }
 
@@ -330,14 +330,14 @@ size_t _rtp_recorder_socket_data_received_airtunes_v2(struct rtp_recorder_t* rr,
             break;
         case RTP_AUDIO_RESEND_DATA:
             packet = _rtp_header_read(&((char*)buffer)[4], size - 4);
-            log_message(LOG_INFO, "Received missing packet %d", packet.seq_num);
+            debug(LOG_INFO, "Received missing packet %d", packet.seq_num);
             break;
         case RTP_AUDIO_DATA:
             if (packet.packet_data_size > 0)
                 _rtp_recorder_process_audio_packet(rr, &packet);
             break;
         default:
-            log_message(LOG_ERROR, "Received unknown packet");
+            debug(LOG_ERROR, "Received unknown packet");
             break;
     }
     
@@ -366,14 +366,14 @@ rtp_socket_p _rtp_recorder_create_socket(struct rtp_recorder_t* rr, const char* 
         sockaddr_set_port(ep, p);
         if (rtp_socket_setup(ret, ep)) {
             rtp_socket_set_data_received_callback(ret, _rtp_recorder_socket_data_received_callback, rr);
-            log_message(LOG_INFO, "Setup socket on port %u", p);
+            debug(LOG_INFO, "Setup socket on port %u", p);
             sockaddr_release(ep);
             return ret;
         }
         sockaddr_release(ep);
     }
     
-    log_message(LOG_ERROR, "Unable to bind socket.");
+    debug(LOG_ERROR, "Unable to bind socket.");
     
     rtp_socket_release(ret);
     
@@ -453,17 +453,17 @@ bool rtp_recorder_start(struct rtp_recorder_t* rr) {
         _rtp_recorder_send_timing_request(rr);
         _rtp_recorder_send_timing_request(rr);
         
-        log_message(LOG_INFO, "Waiting for synchronization");
+        debug(LOG_INFO, "Waiting for synchronization");
         
         mutex_lock(rr->timer_mutex);
         
         complete = !condition_times_wait(rr->timer_cond, rr->timer_mutex, 5000);
         
         if (!complete)
-            log_message(LOG_INFO, "Initial time synchronization incomplete");
+            debug(LOG_INFO, "Initial time synchronization incomplete");
         else {
             rr->synchronization_thread = thread_create(_rtp_recorder_synchronization_loop, rr);
-            log_message(LOG_INFO, "Initial time synchronization complete");
+            debug(LOG_INFO, "Initial time synchronization complete");
         }
         
         mutex_unlock(rr->timer_mutex);

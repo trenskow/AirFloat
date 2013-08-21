@@ -38,7 +38,7 @@
 #endif
 #import <AudioToolbox/AudioToolbox.h>
 
-#import "log.h"
+#import "debug.h"
 
 #import "obj.h"
 

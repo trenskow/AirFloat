@@ -33,7 +33,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "log.h"
+#include "debug.h"
 
 #include "webtools.h"
 #include "webheaders.h"
@@ -106,7 +106,7 @@ ssize_t web_request_parse(struct web_request_t* wr, const void* data, size_t dat
         char header[header_length];
         memcpy(header, buffer, content_start - buffer);
         
-        log_data(LOG_INFO, data, content_start - buffer);
+        debug_data(data, content_start - buffer);
         
         char* header_start = header;
         header_length = web_tools_convert_new_lines(header_start, header_length);
@@ -157,14 +157,14 @@ ssize_t web_request_parse(struct web_request_t* wr, const void* data, size_t dat
             web_headers_release(wr->headers);
             wr->headers = headers;
             
-            log_message(LOG_INFO, "(Complete) - %d bytes", content_length);
+            debug(LOG_INFO, "(Complete) - %d bytes", content_length);
             
             web_request_set_content(wr, (void*)content_start, content_length);
             
             ret = content_start + content_length - buffer;
             
         } else {
-            log_message(LOG_INFO, "(Incomplete)");
+            debug(LOG_INFO, "(Incomplete)");
             web_headers_release(headers);
         }
         

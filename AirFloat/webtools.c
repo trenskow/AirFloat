@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "log.h"
+#include "debug.h"
 #include "webheaders.h"
 #include "webtools.h"
 

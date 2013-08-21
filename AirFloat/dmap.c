@@ -33,7 +33,7 @@
 #include <string.h>
 
 #include "endian.h"
-#include "log.h"
+#include "debug.h"
 
 #include "obj.h"
 

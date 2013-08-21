@@ -33,56 +33,90 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "log.h"
+#include "debug.h"
 #include "mutex.h"
 
-#if defined (LOG_SERVER_FILE)
 mutex_p write_mutex = NULL;
-#endif
 
-void log_message(int level, const char* message, ...) {
+const char* _fn(const char* file) {
     
-#if defined(LOG_SERVER) || defined(LOG_SERVER_FILE)
-    assert((level == LOG_INFO || level == LOG_ERROR) && message != NULL);
+    const char* ret = file;
     
-    char msgnl[strlen(message) + 2];
-    sprintf(msgnl, "%s\n", message);
+    size_t len = strlen(file);
+    for (size_t i = 0 ; i < len ; i++)
+        if (file[i] == '/')
+            ret = &file[i+1];
     
-    va_list args;
-    va_start(args, message);
+    return ret;
+    
+}
+
+void _debug_data(const char* file, uint32_t line, const void* data, size_t data_size) {
     
 #if defined(LOG_SERVER)
-    vprintf(msgnl, args);
-#else
-#if defined(LOG_SERVER_FILE)
     
     if (write_mutex == NULL)
         write_mutex = mutex_create();
     
     mutex_lock(write_mutex);
+    
+#if defined(LOG_SERVER_FILE)
     FILE* log_file = fopen("/var/log/com.tren.AirFloat.log", "a");
-    vfprintf(log_file, msgnl, args);
+#else
+    FILE* log_file = stdout;
+#endif
+    
+    fprintf(log_file, "%25s %5d ", _fn(file), line);
+    
+    char data_nl[data_size + 1];
+    memcpy(data_nl, data, data_size);
+    data_nl[data_size] = '\0';
+    
+    char* t = strtok(data_nl, "\n");
+    if (t != NULL)
+        fprintf(log_file, "%s\n", t);
+    
+    while (1) {
+        t = strtok(NULL, "\n");
+        if (t != NULL)
+            fprintf(log_file, "%30s  %s", " ", t);
+        else
+            break;
+    }
+    
+#if defined(LOG_SERVER_FILE)
     fclose(log_file);
+#endif
+    
     mutex_unlock(write_mutex);
     
-#endif
-#endif
-    
-    va_end(args);
 #endif
     
 }
 
-void log_data(int level, const void* data, size_t data_size) {
+void _debug(const char* file, uint32_t line, uint8_t level, const char* message, ...) {
     
-#if defined (LOG_SERVER)
-    assert((level == LOG_INFO || level == LOG_ERROR) && data != NULL && data_size > 0);
+#if defined(LOG_SERVER) || defined(LOG_SERVER_FILE)
     
-    char msgnl[data_size + 3];
-    memcpy(msgnl, data, data_size);
-    memcpy(&msgnl[data_size], "\n", 2);
+    assert((level == LOG_INFO || level == LOG_ERROR) && message != NULL);
+        
+    size_t msg_len = strlen(message);
+    char msg_nl[msg_len + 9];
+    if (level == LOG_INFO)
+        snprintf(msg_nl, msg_len + 9, "%s\n", message);
+    else
+        snprintf(msg_nl, msg_len + 9, "ERROR: %s\n", message);
     
-    printf("%s", msgnl);
+    va_list args;
+    va_start(args, message);
+    
+    char data[1024];
+    vsnprintf(data, 1024, msg_nl, args);
+    
+    _debug_data(file, line, data, strlen(data));
+    
+    va_end(args);
+    
 #endif
     
 }

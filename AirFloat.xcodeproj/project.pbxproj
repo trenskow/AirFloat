@@ -109,7 +109,7 @@
 		A187698117C23805002222FD /* obj_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = A187698017C23805002222FD /* obj_posix.c */; };
 		A194311F14D46878009FC07B /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A194311E14D46878009FC07B /* CoreAudio.framework */; };
 		A19E4AD116CA952700E5D60F /* dmap.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AD016CA952700E5D60F /* dmap.c */; };
-		A19E4AD516CA953600E5D60F /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AD416CA953600E5D60F /* log.c */; };
+		A19E4AD516CA953600E5D60F /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AD416CA953600E5D60F /* debug.c */; };
 		A19E4ADB16CA954500E5D60F /* mutex_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AD816CA954500E5D60F /* mutex_posix.c */; };
 		A19E4ADC16CA954500E5D60F /* condition_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4ADA16CA954500E5D60F /* condition_posix.c */; };
 		A19E4AFC16CA959700E5D60F /* audioqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AF616CA959700E5D60F /* audioqueue.c */; };
@@ -207,7 +207,7 @@
 		A150075116E9359700B1A877 /* raopsession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = raopsession.h; sourceTree = "<group>"; };
 		A150075216E935A500B1A877 /* raopsession.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = raopsession.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A150075516E9485500B1A877 /* dacpclient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dacpclient.h; sourceTree = "<group>"; };
-		A150075616E9486100B1A877 /* dacpclient.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dacpclient.c; sourceTree = "<group>"; };
+		A150075616E9486100B1A877 /* dacpclient.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = dacpclient.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A150075816E94BEF00B1A877 /* rtprecorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rtprecorder.h; sourceTree = "<group>"; };
 		A150075916E94BFA00B1A877 /* rtprecorder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = rtprecorder.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A150075F16ED018E00B1A877 /* zeroconf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = zeroconf.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -271,8 +271,8 @@
 		A19E4ACE16CA952700E5D60F /* endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = endian.h; sourceTree = "<group>"; };
 		A19E4ACF16CA952700E5D60F /* dmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dmap.h; sourceTree = "<group>"; };
 		A19E4AD016CA952700E5D60F /* dmap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dmap.c; sourceTree = "<group>"; };
-		A19E4AD316CA953600E5D60F /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
-		A19E4AD416CA953600E5D60F /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = log.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
+		A19E4AD316CA953600E5D60F /* debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = debug.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		A19E4AD416CA953600E5D60F /* debug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = debug.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A19E4AD716CA954500E5D60F /* mutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mutex.h; sourceTree = "<group>"; };
 		A19E4AD816CA954500E5D60F /* mutex_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mutex_posix.c; sourceTree = "<group>"; };
 		A19E4AD916CA954500E5D60F /* condition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = condition.h; sourceTree = "<group>"; };
@@ -292,9 +292,9 @@
 		A19E4B1E16CA95D300E5D60F /* webheaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webheaders.h; sourceTree = "<group>"; };
 		A19E4B1F16CA95D300E5D60F /* webheaders.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webheaders.c; sourceTree = "<group>"; };
 		A19E4B2016CA95D300E5D60F /* webresponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webresponse.h; sourceTree = "<group>"; };
-		A19E4B2116CA95D300E5D60F /* webresponse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webresponse.c; sourceTree = "<group>"; };
+		A19E4B2116CA95D300E5D60F /* webresponse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = webresponse.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A19E4B2216CA95D300E5D60F /* webrequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webrequest.h; sourceTree = "<group>"; };
-		A19E4B2316CA95D300E5D60F /* webrequest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webrequest.c; sourceTree = "<group>"; };
+		A19E4B2316CA95D300E5D60F /* webrequest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = webrequest.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A19E4B2416CA95D300E5D60F /* webserverconnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webserverconnection.h; sourceTree = "<group>"; };
 		A19E4B2516CA95D300E5D60F /* webserverconnection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = webserverconnection.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A19E4B2616CA95D300E5D60F /* webserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webserver.h; sourceTree = "<group>"; };
@@ -736,12 +736,12 @@
 		A19E4AC916CA950C00E5D60F /* Tools */ = {
 			isa = PBXGroup;
 			children = (
+				A19E4AD216CA952C00E5D60F /* Debugging */,
 				A150B60B16E6A02900C369C5 /* Hardware */,
 				A1E9741316DC19E5000AD9E4 /* Endian */,
 				A1E9741416DC19F4000AD9E4 /* Base 64 */,
 				A19E4AC816CA950500E5D60F /* Settings */,
 				A19E4ACD16CA951A00E5D60F /* Name Values */,
-				A19E4AD216CA952C00E5D60F /* Logging */,
 				A19E4AD616CA953A00E5D60F /* Threading */,
 			);
 			name = Tools;
@@ -758,13 +758,13 @@
 			name = "Name Values";
 			sourceTree = "<group>";
 		};
-		A19E4AD216CA952C00E5D60F /* Logging */ = {
+		A19E4AD216CA952C00E5D60F /* Debugging */ = {
 			isa = PBXGroup;
 			children = (
-				A19E4AD316CA953600E5D60F /* log.h */,
-				A19E4AD416CA953600E5D60F /* log.c */,
+				A19E4AD316CA953600E5D60F /* debug.h */,
+				A19E4AD416CA953600E5D60F /* debug.c */,
 			);
-			name = Logging;
+			name = Debugging;
 			sourceTree = "<group>";
 		};
 		A19E4AD616CA953A00E5D60F /* Threading */ = {
@@ -1085,7 +1085,7 @@
 				A10392DA14E9B6C400DB356F /* AirFloatBarButton.m in Sources */,
 				A12B7AFF14FDCBE20068538D /* AirFloatAdView.m in Sources */,
 				A19E4AD116CA952700E5D60F /* dmap.c in Sources */,
-				A19E4AD516CA953600E5D60F /* log.c in Sources */,
+				A19E4AD516CA953600E5D60F /* debug.c in Sources */,
 				A19E4ADB16CA954500E5D60F /* mutex_posix.c in Sources */,
 				A19E4ADC16CA954500E5D60F /* condition_posix.c in Sources */,
 				A19E4AFC16CA959700E5D60F /* audioqueue.c in Sources */,

@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "log.h"
+#include "debug.h"
 #include "mutex.h"
 #include "sockaddr.h"
 #include "socket.h"
@@ -188,7 +188,7 @@ bool web_server_start(struct web_server_t* ws, uint16_t port) {
     
     if (!ws->is_running) {
         
-        log_message(LOG_INFO, "Trying port %d", port);
+        debug(LOG_INFO, "Trying port %d", port);
         
         ws->socket_ipv4 = _web_server_bind(ws, port, sockaddr_type_inet_4);
         ws->socket_ipv6 = _web_server_bind(ws, port, sockaddr_type_inet_6);
@@ -202,19 +202,19 @@ bool web_server_start(struct web_server_t* ws, uint16_t port) {
             
             ws->is_running = true;
             
-            log_message(LOG_INFO, "Server started.");
+            debug(LOG_INFO, "Server started.");
             
         } else {
             
             ws->socket_ipv4 = socket_release(ws->socket_ipv4);
             ws->socket_ipv6 = socket_release(ws->socket_ipv6);
             
-            log_message(LOG_ERROR, "Cannot start: Cannot bind to port %d", port);
+            debug("Cannot start: Cannot bind to port %d", port);
             
         }
         
     } else
-        log_message(LOG_ERROR, "Cannot start: Server is already running");
+        debug(LOG_ERROR, "Cannot start: Server is already running");
     
     bool ret = ws->is_running;
     
@@ -255,10 +255,10 @@ void web_server_stop(struct web_server_t* ws) {
         }
         ws->connection_count = 0;
         
-        log_message(LOG_INFO, "Server stopped");
+        debug(LOG_INFO, "Server stopped");
         
     } else
-        log_message(LOG_ERROR, "Cannot stop: Server is not running");
+        debug(LOG_ERROR, "Cannot stop: Server is not running");
     
     mutex_unlock(ws->mutex);
     

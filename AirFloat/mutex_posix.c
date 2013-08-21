@@ -36,7 +36,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "log.h"
+#include "debug.h"
 
 #include "obj.h"
 
@@ -120,10 +120,10 @@ void mutex_lock(struct mutex_t* m) {
 
 void mutex_unlock(struct mutex_t* m) {
     
-    assert(m->lock_count > 0);
-    
     if (m != NULL) {
 #ifdef DEBUG
+        assert(m->lock_count > 0);
+        
         m->name[0] = '\0';
 #endif
         m->lock_count--;

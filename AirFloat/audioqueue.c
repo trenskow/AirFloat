@@ -34,7 +34,7 @@
 #include <math.h>
 #include <assert.h>
 
-#include "log.h"
+#include "debug.h"
 #include "mutex.h"
 #include "condition.h"
 #include "decoder.h"
@@ -275,7 +275,7 @@ void _audio_queue_add_packet_to_tail(struct audio_queue_t* aq, struct audio_pack
     _audio_queue_debug_check_queue_consistancy(aq);
     
     if ((packet->seq_no & 0xFF) == 0xFF)
-        log_message(LOG_INFO, "Added package %d to queue", packet->seq_no);
+        debug(LOG_INFO, "Added package %d to queue", packet->seq_no);
     
     while (aq->queue_count > MAX_QUEUE_COUNT)
         audio_packet_release(_audio_queue_pop_packet_from_head(aq, false));
@@ -346,7 +346,7 @@ bool _audio_queue_has_available_packet(struct audio_queue_t* aq) {
     else {
         
         ret = ret && (aq->frame_count >= aq->output_format.sample_rate * 2);
-        log_message(LOG_INFO, "Queue was synced");
+        debug(LOG_INFO, "Queue was synced");
         
     }
     
@@ -376,7 +376,7 @@ void _audio_queue_get_audio_buffer(struct audio_queue_t* aq, void* buffer, size_
                 struct audio_packet_t* audio_packet = aq->queue_head;
                 
                 if (audio_packet->state == audio_packet_state_missing) {
-                    log_message(LOG_INFO, "Missing package %d made it to playhead", audio_packet->seq_no);
+                    debug(LOG_INFO, "Missing package %d made it to playhead", audio_packet->seq_no);
                     audio_output_set_muted(aq->output, true);
                     aq->output_homed_at_host_time = hardware_get_time() + 1.0;
                 }
@@ -455,7 +455,7 @@ void _audio_queue_output_render(audio_output_p ao, void* buffer, size_t size, do
                         aq->output_is_homed = true;
                         if (aq->output_homed_at_host_time < host_time)
                             aq->output_homed_at_host_time = host_time;
-                        log_message(LOG_INFO, "Output is homed @ %1.5f (%d/%d)", packet_pos, data_offset, size);
+                        debug(LOG_INFO, "Output is homed @ %1.5f (%d/%d)", packet_pos, data_offset, size);
                         
                     }
                     
@@ -486,12 +486,12 @@ void _audio_queue_output_render(audio_output_p ao, void* buffer, size_t size, do
                     aq->output_is_homed = false;
                     aq->output_homed_at_host_time = host_time + 1.0;
                     audio_output_set_muted(aq->output, true);
-                    log_message(LOG_INFO, "Resynchronizing output");
+                    debug(LOG_INFO, "Resynchronizing output");
                     
                 }
                 
                 if (aq->queue_head && aq->queue_head->seq_no % 100 == 0)
-                    log_message(LOG_INFO, "%d packages in queue (%d missing / seq %d / delay %1.3f / playback rate %1.3f)", aq->queue_count, aq->missing_count, aq->queue_head->seq_no, delay, audio_output_get_playback_rate(aq->output));
+                    debug(LOG_INFO, "%d packages in queue (%d missing / seq %d / delay %1.3f / playback rate %1.3f)", aq->queue_count, aq->missing_count, aq->queue_head->seq_no, delay, audio_output_get_playback_rate(aq->output));
                 
             }
             
@@ -499,7 +499,7 @@ void _audio_queue_output_render(audio_output_p ao, void* buffer, size_t size, do
         
     } else if (aq->output_is_homed) {
         aq->output_is_homed = false;
-        log_message(LOG_INFO, "Output lost synchronization");
+        debug(LOG_INFO, "Output lost synchronization");
     }
     
     mutex_unlock(aq->mutex);
@@ -579,7 +579,7 @@ void audio_queue_disable_synchronization(struct audio_queue_t* aq) {
     
     mutex_lock(aq->mutex);
     
-    log_message(LOG_INFO, "Synchronization is disabled");
+    debug(LOG_INFO, "Synchronization is disabled");
     aq->synchronization_enabled = false;
     
     mutex_unlock(aq->mutex);
@@ -599,7 +599,7 @@ void audio_queue_synchronize(struct audio_queue_t* aq, uint32_t current_sample_t
         
         audio_output_start(aq->output);
         
-        log_message(LOG_INFO, "Queue was synced");
+        debug(LOG_INFO, "Queue was synced");
         
     }
     
@@ -626,7 +626,7 @@ void audio_queue_set_remote_time(struct audio_queue_t* aq, double remote_time) {
     
     aq->client_server_difference /= (double)aq->client_server_difference_history_count;
     
-    log_message(LOG_INFO, "Time difference: %1.5f", aq->client_server_difference);
+    debug(LOG_INFO, "Time difference: %1.5f", aq->client_server_difference);
     
     mutex_unlock(aq->mutex);
 
@@ -731,7 +731,7 @@ uint32_t audio_queue_add_packet(struct audio_queue_t* aq, void* encoded_buffer, 
                         current_packet->state = audio_packet_state_complete;
                         
                     } else
-                        log_message(LOG_INFO, "Packet %d already in queue", seq_no);
+                        debug(LOG_INFO, "Packet %d already in queue", seq_no);
                     
                     found = true;
                     break;
@@ -740,7 +740,7 @@ uint32_t audio_queue_add_packet(struct audio_queue_t* aq, void* encoded_buffer, 
             }
             
             if (!found)
-                log_message(LOG_INFO, "Packet %d came too late", seq_no);
+                debug(LOG_INFO, "Packet %d came too late", seq_no);
             
         }
         
@@ -821,7 +821,7 @@ void audio_queue_flush(struct audio_queue_t* aq, uint16_t last_seq_no) {
     
     mutex_unlock(aq->mutex);
     
-    log_message(LOG_INFO, "Queue flushed");
+    debug(LOG_INFO, "Queue flushed");
         
 }
 

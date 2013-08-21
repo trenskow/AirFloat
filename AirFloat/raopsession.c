@@ -37,7 +37,7 @@
 
 #include <netinet/in.h>
 
-#include "log.h"
+#include "debug.h"
 #include "mutex.h"
 #include "base64.h"
 #include "settings.h"
@@ -169,7 +169,7 @@ bool _raop_session_check_authentication(struct raop_session_t* rs, const char* m
                     if (strcmp(hfinal, w_response) == 0)
                         ret = true;
                     else
-                        log_message(LOG_INFO, "Authentication failure");
+                        debug(LOG_INFO, "Authentication failure");
                     
                 }
                 
@@ -178,7 +178,7 @@ bool _raop_session_check_authentication(struct raop_session_t* rs, const char* m
             }
             
         } else
-            log_message(LOG_INFO, "Authentication header missing");
+            debug(LOG_INFO, "Authentication header missing");
         
     }
     
@@ -192,7 +192,7 @@ void _raop_session_get_apple_response(struct raop_session_t* rs, const char* cha
     size_t actual_length = base64_decode(challenge, decoded_challenge);
     
     if (actual_length != 16)
-        log_message(LOG_ERROR, "Apple-Challenge: Expected 16 bytes - got %d", actual_length);
+        debug(LOG_ERROR, "Apple-Challenge: Expected 16 bytes - got %d", actual_length);
     
     struct sockaddr* local_end_point = web_server_connection_get_local_end_point(rs->raop_connection);
     uint64_t hw_identifier = hardware_identifier();
@@ -241,7 +241,7 @@ void _raop_session_get_apple_response(struct raop_session_t* rs, const char* cha
         free(a_encrypted_response);
         
     } else {
-        log_message(LOG_ERROR, "Unable to encrypt Apple response");
+        debug(LOG_ERROR, "Unable to encrypt Apple response");
         if (response_length != NULL)
             *response_length = 0;
     }
@@ -370,7 +370,7 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
                             unsigned char aes_key[size + 1];
                             size = crypt_apple_private_decrypt(aes_key_encryptet, size, aes_key, size);
                             
-                            log_message(LOG_INFO, "AES key length: %d bits", size * 8);
+                            debug(LOG_INFO, "AES key length: %d bits", size * 8);
                             
                             const char* aes_initializer_base64 = parameters_value_for_key(parameters, "a-aesiv");
                             size_t aes_initializer_base64_encoded_padded_length = strlen(aes_initializer_base64) + 5;
@@ -479,7 +479,7 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
                         
                         float volume_p = MAX(pow(10.0, 0.05 * volume_db), 0.0);
                         
-                        log_message(LOG_INFO, "Client set volume: %f", volume_p);
+                        debug(LOG_INFO, "Client set volume: %f", volume_p);
                         
                         audio_output_set_volume(audio_queue_get_output(rtp_session->queue), volume_p);
                         

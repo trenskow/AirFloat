@@ -33,7 +33,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "log.h"
+#include "debug.h"
 #include "mutex.h"
 #include "zeroconf.h"
 #include "settings.h"
@@ -136,9 +136,9 @@ bool raop_server_start(struct raop_server_t* rs, uint16_t port) {
         if (ret) {
             rs->is_running = true;
             rs->zeroconf_ad = zeroconf_raop_ad_create(port, settings_get_name(rs->settings));
-            log_message(LOG_INFO, "Server started at port %d", port);
+            debug(LOG_INFO, "Server started at port %d", port);
         } else
-            log_message(LOG_INFO, "Unable to start server at port %d", port);
+            debug(LOG_INFO, "Unable to start server at port %d", port);
         
         return ret;
         

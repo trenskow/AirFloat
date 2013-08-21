@@ -34,7 +34,7 @@
 
 #include <AudioToolbox/AudioToolbox.h>
 
-#include "log.h"
+#include "debug.h"
 #include "endian.h"
 #include "decoder.h"
 #include "alac_format.h"

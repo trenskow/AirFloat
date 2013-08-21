@@ -33,7 +33,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "log.h"
+#include "debug.h"
 #include "mutex.h"
 #include "socket.h"
 #include "sockaddr.h"
@@ -153,7 +153,7 @@ void web_server_connection_send_response(web_server_connection_p wc, web_respons
     
     socket_send(wc->socket, buffer, content_length + response_length);
     
-    log_data(LOG_INFO, buffer, content_length + response_length);
+    debug_data(buffer, content_length + response_length);
     
     if (close_after_send)
         socket_close(wc->socket);
@@ -182,7 +182,7 @@ void web_server_connection_take_off(struct web_server_connection_t* wc) {
     
     const char *ip = sockaddr_get_host(socket_get_remote_end_point(wc->socket));
     
-    log_message(LOG_INFO, "RAOPConnection (%p) took over connection from %s:%d", wc, ip, sockaddr_get_port(socket_get_remote_end_point(wc->socket)));
+    debug(LOG_INFO, "Connection from %s:%d", ip, sockaddr_get_port(socket_get_remote_end_point(wc->socket)));
     
 }
 
@@ -192,7 +192,7 @@ void web_server_connection_close(struct web_server_connection_t* wc) {
     
     if (wc->is_connected) {
         
-        log_message(LOG_INFO, "Client disconnected");
+        debug(LOG_INFO, "Client disconnected");
         
         wc->is_connected = false;
         

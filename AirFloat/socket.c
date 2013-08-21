@@ -36,7 +36,7 @@
 #include <errno.h>
 #include <string.h>
 
-#include "log.h"
+#include "debug.h"
 #include "mutex.h"
 #include "thread.h"
 #include "sockaddr.h"
@@ -215,7 +215,7 @@ void _socket_connect(void* ctx) {
         
     } else {
         
-        log_message(LOG_ERROR, "Unable to connect (%s)", strerror(errno));
+        debug(LOG_ERROR, "Unable to connect (%s)", strerror(errno));
         
         if (s->callbacks.connect_failed != NULL)
             s->callbacks.connect_failed(s, s->callbacks.ctx.connect_failed);
@@ -294,7 +294,7 @@ bool socket_bind(struct socket_t* s, struct sockaddr* end_point) {
         s->socket = socket(ep->sa_family, (s->is_udp ? SOCK_DGRAM : SOCK_STREAM), (s->is_udp ? IPPROTO_UDP : IPPROTO_TCP));
         
         if (s->socket < 0) {
-            log_message(LOG_ERROR, "Socket creation error: %s", strerror(errno));
+            debug(LOG_ERROR, "Socket creation error: %s", strerror(errno));
             return false;
         }
         
@@ -328,7 +328,7 @@ void socket_connect(struct socket_t* s, struct sockaddr* end_point) {
             s->socket = socket(end_point->sa_family, SOCK_STREAM, IPPROTO_TCP);
         
         if (s->socket <= 0)
-            log_message(LOG_ERROR, "Socket creation error: %s", strerror(errno));
+            debug(LOG_ERROR, "Socket creation error: %s", strerror(errno));
         
         sockaddr_release(s->remote_end_point);
         s->remote_end_point = sockaddr_copy(end_point);

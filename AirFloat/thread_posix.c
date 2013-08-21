@@ -34,7 +34,7 @@
 #include <assert.h>
 #include <pthread.h>
 
-#include "log.h"
+#include "debug.h"
 #include "condition.h"
 
 #include "obj.h"
