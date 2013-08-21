@@ -46,6 +46,7 @@ typedef void(*socket_closed_callback)(socket_p socket, void* ctx);
 socket_p socket_create(const char* name, bool is_udp);
 socket_p socket_retain(socket_p socket);
 socket_p socket_release(socket_p s);
+
 bool socket_bind(socket_p s, struct sockaddr* end_point);
 void socket_connect(socket_p s, struct sockaddr* end_point);
 void socket_set_accept_callback(socket_p s, socket_accept_callback callback, void* ctx);
