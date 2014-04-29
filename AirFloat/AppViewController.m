@@ -571,13 +571,13 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
                           MAX(screenSize.width, screenSize.height));
         
     }
+    [self.artworkImageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:NO];
     
-    UIImage* actualImage = [image imageAspectedFilledWithSize:size];
-    UIImage* blurredImage = [actualImage imageGaussianBlurredWithRadius:10.0];
+    //UIImage* actualImage = [image imageAspectedFilledWithSize:size];
+    //UIImage* blurredImage = [actualImage imageGaussianBlurredWithRadius:10.0];
     
-    [self.artworkImageView performSelectorOnMainThread:@selector(setImage:) withObject:actualImage waitUntilDone:NO];
-    [self.blurredArtworkImageView performSelectorOnMainThread:@selector(setImage:) withObject:blurredImage waitUntilDone:NO];
-    
+    //[self.artworkImageView performSelectorOnMainThread:@selector(setImage:) withObject:actualImage waitUntilDone:NO];
+    //[self.blurredArtworkImageView performSelectorOnMainThread:@selector(setImage:) withObject:blurredImage waitUntilDone:NO];
 }
 
 - (void)clientUpdatedArtwork:(UIImage *)image {
