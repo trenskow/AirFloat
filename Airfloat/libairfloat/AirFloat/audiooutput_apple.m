@@ -33,10 +33,11 @@
 #import <stdint.h>
 #import <stdbool.h>
 
+#import <TargetConditionals.h>
 #if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
 #endif
-#import <AudioToolbox/AudioToolbox.h>
+#import <AVFoundation/AVFoundation.h>
 
 #import "log.h"
 #import "audiooutput.h"
@@ -181,9 +182,9 @@ struct audio_output_t* audio_output_create(struct decoder_output_format_t decode
     
     double use_speed = true;
 #if TARGET_OS_IPHONE
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    use_speed = [[UIDevice currentDevice].systemVersion floatValue] >= 6;
-    [pool release];
+    @autoreleasepool {
+        use_speed = [[UIDevice currentDevice].systemVersion floatValue] >= 6;
+    }
 #endif
     
     if (use_speed) { // Darwin 11 is iOS 5. Varispeed is only available in iOS 5+.
@@ -226,11 +227,14 @@ void audio_output_set_callback(struct audio_output_t* ao, audio_output_callback 
 void audio_output_start(struct audio_output_t* ao) {
     
 #if TARGET_OS_IPHONE
-    UInt32 category = kAudioSessionCategory_MediaPlayback;
-    AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(category), &category);
-    float bufferLength = 4096.0f / 44100.0f;
-    AudioSessionSetProperty(kAudioSessionProperty_PreferredHardwareIOBufferDuration, sizeof(bufferLength), &bufferLength);
-    AudioSessionSetActive(true);
+    @autoreleasepool {
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
+                                               error:nil];
+        [[AVAudioSession sharedInstance] setPreferredIOBufferDuration:4096.0f / 44100.0f
+                                                                error:nil];
+        [[AVAudioSession sharedInstance] setActive:YES error:nil];
+        
+    }
 #endif
     
     ca_assert(AUGraphStart(ao->graph));
@@ -242,7 +246,9 @@ void audio_output_stop(struct audio_output_t* ao) {
     ca_assert(AUGraphStop(ao->graph));
     
 #if TARGET_OS_IPHONE
-    AudioSessionSetActive(false);
+    @autoreleasepool {
+        [[AVAudioSession sharedInstance] setActive:NO error:nil];
+    }
 #endif
     
 }

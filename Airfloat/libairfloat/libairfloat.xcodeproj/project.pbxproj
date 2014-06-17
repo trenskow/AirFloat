@@ -39,6 +39,10 @@
 		A1D0DCA21950384F004717F5 /* raopserver.c in Sources */ = {isa = PBXBuildFile; fileRef = A150074916E8E87B00B1A877 /* raopserver.c */; };
 		A1D0DCA319503854004717F5 /* dacpclient.c in Sources */ = {isa = PBXBuildFile; fileRef = A150075616E9486100B1A877 /* dacpclient.c */; };
 		A1D0DCA419503B38004717F5 /* decoder_alac_other.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9740E16DBAEAA000AD9E4 /* decoder_alac_other.c */; };
+		A1D0DCA619503F85004717F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898F9F413CDAAD1006EC97E /* Foundation.framework */; };
+		A1D0DCA719503F89004717F5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898F9F213CDAAD1006EC97E /* UIKit.framework */; };
+		A1D0DCA819504037004717F5 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1CF856416F3C02B009114B2 /* libcrypto.a */; };
+		A1D0DCAC19504234004717F5 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1D0DCAB19504234004717F5 /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -56,11 +60,6 @@
 /* Begin PBXFileReference section */
 		4898F9F213CDAAD1006EC97E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		4898F9F413CDAAD1006EC97E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		4898F9F613CDAAD1006EC97E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		4898FA9413CF17BC006EC97E /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		4898FA9613CF2D6C006EC97E /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		A1389E1E14E43683004FE040 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		A13F21C616ED10A900365A6D /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		A14583A916DAE42900911FE6 /* thread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = thread.h; sourceTree = "<group>"; };
 		A14583AA16DAE43400911FE6 /* thread_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thread_posix.c; sourceTree = "<group>"; };
 		A150074816E8E86C00B1A877 /* raopserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = raopserver.h; sourceTree = "<group>"; };
@@ -77,8 +76,6 @@
 		A150B60D16E6A03800C369C5 /* hardware_apple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hardware_apple.c; sourceTree = "<group>"; };
 		A179A2FD16DC274D00A1E58F /* crypt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
 		A179A2FE16DC275F00A1E58F /* crypt_openssl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crypt_openssl.c; sourceTree = "<group>"; };
-		A17E9233152DA909000331D3 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		A194311E14D46878009FC07B /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		A19E4ACA16CA951500E5D60F /* settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
 		A19E4ACE16CA952700E5D60F /* endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = endian.h; sourceTree = "<group>"; };
 		A19E4ACF16CA952700E5D60F /* dmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dmap.h; sourceTree = "<group>"; };
@@ -115,17 +112,14 @@
 		A19E4B2F16CA95E200E5D60F /* base64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = base64.c; sourceTree = "<group>"; };
 		A19E4B3216CA95E200E5D60F /* parameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parameters.h; sourceTree = "<group>"; };
 		A19E4B3316CA95E200E5D60F /* parameters.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = parameters.c; sourceTree = "<group>"; };
-		A1ACB4ED16FA2264008E4C4F /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
-		A1ACB4F316FA286F008E4C4F /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		A1B5D8E016DABEDA00181FCE /* settings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = settings.c; sourceTree = "<group>"; };
 		A1CD9F2817076E6A0015CBBA /* webclientconnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = webclientconnection.h; sourceTree = "<group>"; };
 		A1CD9F2917076E720015CBBA /* webclientconnection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webclientconnection.c; sourceTree = "<group>"; };
 		A1CF856416F3C02B009114B2 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
 		A1D0DC501950378A004717F5 /* libairfloat.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libairfloat.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1D0DCAB19504234004717F5 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		A1D490BF16D4EB000082AFDD /* rtpsocket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rtpsocket.c; sourceTree = "<group>"; };
 		A1D490C016D4EB000082AFDD /* rtpsocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rtpsocket.h; sourceTree = "<group>"; };
-		A1DE598614CF163500A6767D /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
-		A1DF3AF414C4623700252C95 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		A1E9740716DBAD5F000AD9E4 /* decoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = decoder.h; sourceTree = "<group>"; };
 		A1E9740816DBAE79000AD9E4 /* decoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decoder.c; sourceTree = "<group>"; };
 		A1E9740B16DBAE8F000AD9E4 /* decoder_alac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = decoder_alac.h; sourceTree = "<group>"; };
@@ -140,6 +134,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1D0DCAC19504234004717F5 /* AVFoundation.framework in Frameworks */,
+				A1D0DCA719503F89004717F5 /* UIKit.framework in Frameworks */,
+				A1D0DCA619503F85004717F5 /* Foundation.framework in Frameworks */,
+				A1D0DCA819504037004717F5 /* libcrypto.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -166,20 +164,10 @@
 		4898F9F113CDAAD1006EC97E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A1D0DCAB19504234004717F5 /* AVFoundation.framework */,
 				A1CF856416F3C02B009114B2 /* libcrypto.a */,
-				A17E9233152DA909000331D3 /* libz.dylib */,
-				A1ACB4F316FA286F008E4C4F /* OpenGLES.framework */,
-				A1ACB4ED16FA2264008E4C4F /* CoreImage.framework */,
-				A1389E1E14E43683004FE040 /* SystemConfiguration.framework */,
-				A194311E14D46878009FC07B /* CoreAudio.framework */,
-				A1DE598614CF163500A6767D /* MediaPlayer.framework */,
-				A1DF3AF414C4623700252C95 /* AVFoundation.framework */,
-				4898FA9613CF2D6C006EC97E /* AudioToolbox.framework */,
-				4898FA9413CF17BC006EC97E /* QuartzCore.framework */,
 				4898F9F213CDAAD1006EC97E /* UIKit.framework */,
 				4898F9F413CDAAD1006EC97E /* Foundation.framework */,
-				4898F9F613CDAAD1006EC97E /* CoreGraphics.framework */,
-				A13F21C616ED10A900365A6D /* CFNetwork.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -655,10 +643,20 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 			};
 			name = Debug;
 		};
@@ -689,10 +687,20 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 			};
 			name = "Debug (Server Logs)";
 		};
@@ -723,10 +731,20 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 			};
 			name = "Debug (Server Logs - ALAC Software)";
 		};
@@ -753,10 +771,20 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -784,10 +812,20 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = "Release (Server Logs)";
@@ -815,10 +853,20 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = "App Store Distribution";
@@ -846,10 +894,20 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = "Ad Hoc Distribution";
