@@ -180,7 +180,7 @@
 				A19E4ADF16CA956400E5D60F /* Server */,
 			);
 			name = libairfloat;
-			path = AirFloat;
+			path = libairfloat;
 			sourceTree = "<group>";
 		};
 		A150074316E8DA2E00B1A877 /* Crypt */ = {
