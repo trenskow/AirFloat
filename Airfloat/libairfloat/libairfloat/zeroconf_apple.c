@@ -182,7 +182,7 @@ void _zeroconf_dacp_discover_resolve_callback(CFNetServiceRef service, CFStreamE
     
     if (addresses != NULL && zd->service_found_callback != NULL) {
         
-        uint32_t addresses_count = CFArrayGetCount(addresses);
+        uint32_t addresses_count = (uint32_t)CFArrayGetCount(addresses);
         struct sockaddr* end_points[addresses_count];
         
         for (uint32_t i = 0 ; i < addresses_count ; i++) {
