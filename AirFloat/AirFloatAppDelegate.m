@@ -28,8 +28,8 @@
 //  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "audioqueue.h"
-#import "raopserver.h"
+#import <libairfloat/audioqueue.h>
+#import <libairfloat/raopserver.h>
 
 #import "AppViewController.h"
 

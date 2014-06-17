@@ -30,9 +30,9 @@
 
 #import <MediaPlayer/MediaPlayer.h>
 
-#import "webserverconnection.h"
-#import "dacpclient.h"
-#import "raopsession.h"
+#import <libairfloat/webserverconnection.h>
+#import <libairfloat/dacpclient.h>
+#import <libairfloat/raopsession.h>
 
 #import "UIImage+AirFloatAdditions.h"
 

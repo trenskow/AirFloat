@@ -32,7 +32,7 @@
 
 #import "AppViewController.h"
 
-#import "raopserver.h"
+#import <libairfloat/raopserver.h>
 
 #define AirFloatSharedAppDelegate ((AirFloatAppDelegate*)[UIApplication sharedApplication].delegate)
 

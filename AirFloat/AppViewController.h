@@ -30,7 +30,7 @@
 
 #import <UIKit/UIKit.h>
 
-#import "raopserver.h"
+#import <libairfloat/raopserver.h>
 
 @interface AppViewController : UIViewController
 

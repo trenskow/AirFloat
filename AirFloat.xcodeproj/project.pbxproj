@@ -39,6 +39,7 @@
 		A129DD7D16F94D02004AA3BD /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A129DD7C16F94D02004AA3BD /* SettingsViewController.m */; };
 		A12B7AFF14FDCBE20068538D /* AirFloatAdView.m in Sources */ = {isa = PBXBuildFile; fileRef = A12B7AFC14FDCBE20068538D /* AirFloatAdView.m */; };
 		A12B7B0914FDCCB20068538D /* Images.plist in Resources */ = {isa = PBXBuildFile; fileRef = A12B7B0514FDCCB20068538D /* Images.plist */; };
+		A12CB48A195047C00093C7AE /* libairfloat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A12CB487195047B30093C7AE /* libairfloat.a */; };
 		A1389E0914E417E6004FE040 /* TopBar.png in Resources */ = {isa = PBXBuildFile; fileRef = A1389E0714E417E6004FE040 /* TopBar.png */; };
 		A1389E0A14E417E6004FE040 /* TopBar@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1389E0814E417E6004FE040 /* TopBar@2x.png */; };
 		A1389E0D14E41A87004FE040 /* NoArtwork~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = A1389E0B14E41A87004FE040 /* NoArtwork~iphone.png */; };
@@ -47,7 +48,6 @@
 		A1389E1F14E43684004FE040 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1389E1E14E43683004FE040 /* SystemConfiguration.framework */; };
 		A13F21C716ED10A900365A6D /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A13F21C616ED10A900365A6D /* CFNetwork.framework */; };
 		A14328CE16F8DFD0003AFC5D /* AppViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A14328CD16F8DFD0003AFC5D /* AppViewController.xib */; };
-		A14583AB16DAE43400911FE6 /* thread_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = A14583AA16DAE43400911FE6 /* thread_posix.c */; };
 		A146A93416FA5C1000698A49 /* Support.html in Resources */ = {isa = PBXBuildFile; fileRef = A146A93316FA5C1000698A49 /* Support.html */; };
 		A146A93816FA625600698A49 /* SupportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A146A93616FA625600698A49 /* SupportViewController.m */; };
 		A146A93916FA625600698A49 /* SupportViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A146A93716FA625600698A49 /* SupportViewController.xib */; };
@@ -55,12 +55,6 @@
 		A146A93D16FA6E1B00698A49 /* AirFloatLogo-Support@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A146A93B16FA6E1A00698A49 /* AirFloatLogo-Support@2x.png */; };
 		A146A94016FB059100698A49 /* PayPalDonate.png in Resources */ = {isa = PBXBuildFile; fileRef = A146A93E16FB059100698A49 /* PayPalDonate.png */; };
 		A146A94116FB059100698A49 /* PayPalDonate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A146A93F16FB059100698A49 /* PayPalDonate@2x.png */; };
-		A150074A16E8E87B00B1A877 /* raopserver.c in Sources */ = {isa = PBXBuildFile; fileRef = A150074916E8E87B00B1A877 /* raopserver.c */; };
-		A150075316E935AA00B1A877 /* raopsession.c in Sources */ = {isa = PBXBuildFile; fileRef = A150075216E935A500B1A877 /* raopsession.c */; };
-		A150075716E9486200B1A877 /* dacpclient.c in Sources */ = {isa = PBXBuildFile; fileRef = A150075616E9486100B1A877 /* dacpclient.c */; };
-		A150075A16E94BFC00B1A877 /* rtprecorder.c in Sources */ = {isa = PBXBuildFile; fileRef = A150075916E94BFA00B1A877 /* rtprecorder.c */; };
-		A150076116ED019900B1A877 /* zeroconf_apple.c in Sources */ = {isa = PBXBuildFile; fileRef = A150076016ED019900B1A877 /* zeroconf_apple.c */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		A150B60E16E6A03800C369C5 /* hardware_apple.c in Sources */ = {isa = PBXBuildFile; fileRef = A150B60D16E6A03800C369C5 /* hardware_apple.c */; };
 		A1594D9316FCA38C00D14269 /* SettingsInputBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A1594D9116FCA38C00D14269 /* SettingsInputBackground.png */; };
 		A1594D9416FCA38C00D14269 /* SettingsInputBackground@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1594D9216FCA38C00D14269 /* SettingsInputBackground@2x.png */; };
 		A1594D9716FCAB7A00D14269 /* SettingsInputClearButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A1594D9516FCAB7A00D14269 /* SettingsInputClearButton.png */; };
@@ -103,42 +97,33 @@
 		A176B70E1739013A00024A3D /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A176B70D1739013A00024A3D /* Default-Landscape@2x~ipad.png */; };
 		A176B7111739081700024A3D /* NoArtwork~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A176B70F1739081700024A3D /* NoArtwork~ipad.png */; };
 		A176B7121739081700024A3D /* NoArtwork@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A176B7101739081700024A3D /* NoArtwork@2x~ipad.png */; };
-		A179A2F816DC248400A1E58F /* audiooutput_apple.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AF216CA959700E5D60F /* audiooutput_apple.m */; };
-		A179A2FF16DC275F00A1E58F /* crypt.c in Sources */ = {isa = PBXBuildFile; fileRef = A179A2FE16DC275F00A1E58F /* crypt.c */; };
 		A17D49DB163E7A4C00A94C23 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A17D49DA163E7A4C00A94C23 /* Default-568h@2x.png */; };
 		A194311F14D46878009FC07B /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A194311E14D46878009FC07B /* CoreAudio.framework */; };
-		A19E4AD116CA952700E5D60F /* dmap.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AD016CA952700E5D60F /* dmap.c */; };
-		A19E4AD516CA953600E5D60F /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AD416CA953600E5D60F /* log.c */; };
-		A19E4ADB16CA954500E5D60F /* mutex_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AD816CA954500E5D60F /* mutex_posix.c */; };
-		A19E4ADC16CA954500E5D60F /* condition_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4ADA16CA954500E5D60F /* condition_posix.c */; };
-		A19E4AFC16CA959700E5D60F /* audioqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AF616CA959700E5D60F /* audioqueue.c */; };
-		A19E4B0D16CA95AC00E5D60F /* alac.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B0C16CA95AC00E5D60F /* alac.c */; };
-		A19E4B1816CA95C900E5D60F /* socket.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1116CA95C900E5D60F /* socket.c */; };
-		A19E4B1916CA95C900E5D60F /* sockaddr.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1316CA95C900E5D60F /* sockaddr.c */; };
-		A19E4B2816CA95D300E5D60F /* webtools.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1D16CA95D300E5D60F /* webtools.c */; };
-		A19E4B2916CA95D300E5D60F /* webheaders.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1F16CA95D300E5D60F /* webheaders.c */; };
-		A19E4B2A16CA95D300E5D60F /* webresponse.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2116CA95D300E5D60F /* webresponse.c */; };
-		A19E4B2B16CA95D300E5D60F /* webrequest.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2316CA95D300E5D60F /* webrequest.c */; };
-		A19E4B2C16CA95D300E5D60F /* webserverconnection.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2516CA95D300E5D60F /* webserverconnection.c */; };
-		A19E4B2D16CA95D300E5D60F /* webserver.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2716CA95D300E5D60F /* webserver.c */; };
-		A19E4B3816CA95E200E5D60F /* base64.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2F16CA95E200E5D60F /* base64.c */; };
-		A19E4B3A16CA95E200E5D60F /* parameters.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B3316CA95E200E5D60F /* parameters.c */; };
 		A1ACB4EE16FA2264008E4C4F /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1ACB4ED16FA2264008E4C4F /* CoreImage.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A1ACB4F216FA2350008E4C4F /* UIImage+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A1ACB4F116FA2350008E4C4F /* UIImage+AirFloatAdditions.m */; };
 		A1ACB4F416FA286F008E4C4F /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1ACB4F316FA286F008E4C4F /* OpenGLES.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		A1B5D8E116DABEDA00181FCE /* settings.c in Sources */ = {isa = PBXBuildFile; fileRef = A1B5D8E016DABEDA00181FCE /* settings.c */; };
 		A1C7F79A1500D22100D7DE52 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1C7F7991500D22100D7DE52 /* Default@2x.png */; };
 		A1C7F79C1500D2B600D7DE52 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = A1C7F79B1500D2B600D7DE52 /* Default.png */; };
-		A1CD9F2A17076E720015CBBA /* webclientconnection.c in Sources */ = {isa = PBXBuildFile; fileRef = A1CD9F2917076E720015CBBA /* webclientconnection.c */; };
-		A1CF856516F3C02B009114B2 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1CF856416F3C02B009114B2 /* libcrypto.a */; };
-		A1D490C116D4EB000082AFDD /* rtpsocket.c in Sources */ = {isa = PBXBuildFile; fileRef = A1D490BF16D4EB000082AFDD /* rtpsocket.c */; };
 		A1DE598714CF163500A6767D /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1DE598614CF163500A6767D /* MediaPlayer.framework */; };
 		A1DF3AF514C4623700252C95 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1DF3AF414C4623700252C95 /* AVFoundation.framework */; };
-		A1E9740916DBAE79000AD9E4 /* decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9740816DBAE79000AD9E4 /* decoder.c */; };
-		A1E9740D16DBAE9B000AD9E4 /* decoder_alac_apple.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9740C16DBAE9B000AD9E4 /* decoder_alac_apple.c */; };
-		A1E9740F16DBAEAA000AD9E4 /* decoder_alac_other.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9740E16DBAEAA000AD9E4 /* decoder_alac_other.c */; };
-		A1E9741216DBB24E000AD9E4 /* alac_format.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9741116DBB24D000AD9E4 /* alac_format.c */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A12CB486195047B30093C7AE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A12CB482195047B30093C7AE /* libairfloat.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A1D0DC501950378A004717F5;
+			remoteInfo = airfloat;
+		};
+		A12CB488195047BA0093C7AE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A12CB482195047B30093C7AE /* libairfloat.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = A1D0DC4F1950378A004717F5;
+			remoteInfo = airfloat;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		4898F9EE13CDAAD1006EC97E /* AirFloat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AirFloat.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -183,6 +168,7 @@
 		A12B7AFB14FDCBE20068538D /* AirFloatAdView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFloatAdView.h; sourceTree = "<group>"; };
 		A12B7AFC14FDCBE20068538D /* AirFloatAdView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFloatAdView.m; sourceTree = "<group>"; };
 		A12B7B0514FDCCB20068538D /* Images.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Images.plist; sourceTree = "<group>"; };
+		A12CB482195047B30093C7AE /* libairfloat.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libairfloat.xcodeproj; path = libairfloat/libairfloat.xcodeproj; sourceTree = "<group>"; };
 		A1389E0714E417E6004FE040 /* TopBar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = TopBar.png; sourceTree = "<group>"; };
 		A1389E0814E417E6004FE040 /* TopBar@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TopBar@2x.png"; sourceTree = "<group>"; };
 		A1389E0B14E41A87004FE040 /* NoArtwork~iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NoArtwork~iphone.png"; sourceTree = "<group>"; };
@@ -191,8 +177,6 @@
 		A1389E1E14E43683004FE040 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		A13F21C616ED10A900365A6D /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		A14328CD16F8DFD0003AFC5D /* AppViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AppViewController.xib; sourceTree = "<group>"; };
-		A14583A916DAE42900911FE6 /* thread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = thread.h; sourceTree = "<group>"; };
-		A14583AA16DAE43400911FE6 /* thread_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thread_posix.c; sourceTree = "<group>"; };
 		A146A93316FA5C1000698A49 /* Support.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Support.html; sourceTree = "<group>"; };
 		A146A93516FA625600698A49 /* SupportViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SupportViewController.h; sourceTree = "<group>"; };
 		A146A93616FA625600698A49 /* SupportViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SupportViewController.m; sourceTree = "<group>"; };
@@ -201,18 +185,6 @@
 		A146A93B16FA6E1A00698A49 /* AirFloatLogo-Support@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AirFloatLogo-Support@2x.png"; sourceTree = "<group>"; };
 		A146A93E16FB059100698A49 /* PayPalDonate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = PayPalDonate.png; sourceTree = "<group>"; };
 		A146A93F16FB059100698A49 /* PayPalDonate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "PayPalDonate@2x.png"; sourceTree = "<group>"; };
-		A150074816E8E86C00B1A877 /* raopserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = raopserver.h; sourceTree = "<group>"; };
-		A150074916E8E87B00B1A877 /* raopserver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = raopserver.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
-		A150075116E9359700B1A877 /* raopsession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = raopsession.h; sourceTree = "<group>"; };
-		A150075216E935A500B1A877 /* raopsession.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = raopsession.c; sourceTree = "<group>"; };
-		A150075516E9485500B1A877 /* dacpclient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dacpclient.h; sourceTree = "<group>"; };
-		A150075616E9486100B1A877 /* dacpclient.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dacpclient.c; sourceTree = "<group>"; };
-		A150075816E94BEF00B1A877 /* rtprecorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rtprecorder.h; sourceTree = "<group>"; };
-		A150075916E94BFA00B1A877 /* rtprecorder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rtprecorder.c; sourceTree = "<group>"; };
-		A150075F16ED018E00B1A877 /* zeroconf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = zeroconf.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		A150076016ED019900B1A877 /* zeroconf_apple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = zeroconf_apple.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
-		A150B60C16E6A03100C369C5 /* hardware.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hardware.h; sourceTree = "<group>"; };
-		A150B60D16E6A03800C369C5 /* hardware_apple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hardware_apple.c; sourceTree = "<group>"; };
 		A1594D9116FCA38C00D14269 /* SettingsInputBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SettingsInputBackground.png; sourceTree = "<group>"; };
 		A1594D9216FCA38C00D14269 /* SettingsInputBackground@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "SettingsInputBackground@2x.png"; sourceTree = "<group>"; };
 		A1594D9516FCAB7A00D14269 /* SettingsInputClearButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SettingsInputClearButton.png; sourceTree = "<group>"; };
@@ -259,68 +231,17 @@
 		A176B70D1739013A00024A3D /* Default-Landscape@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape@2x~ipad.png"; path = "../Default-Landscape@2x~ipad.png"; sourceTree = "<group>"; };
 		A176B70F1739081700024A3D /* NoArtwork~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NoArtwork~ipad.png"; sourceTree = "<group>"; };
 		A176B7101739081700024A3D /* NoArtwork@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NoArtwork@2x~ipad.png"; sourceTree = "<group>"; };
-		A179A2FD16DC274D00A1E58F /* crypt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
-		A179A2FE16DC275F00A1E58F /* crypt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crypt.c; sourceTree = "<group>"; };
 		A17D49DA163E7A4C00A94C23 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "../Default-568h@2x.png"; sourceTree = "<group>"; };
 		A17E9233152DA909000331D3 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		A194311E14D46878009FC07B /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
-		A19E4ACA16CA951500E5D60F /* settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
-		A19E4ACE16CA952700E5D60F /* endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = endian.h; sourceTree = "<group>"; };
-		A19E4ACF16CA952700E5D60F /* dmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dmap.h; sourceTree = "<group>"; };
-		A19E4AD016CA952700E5D60F /* dmap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dmap.c; sourceTree = "<group>"; };
-		A19E4AD316CA953600E5D60F /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
-		A19E4AD416CA953600E5D60F /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = log.c; sourceTree = "<group>"; };
-		A19E4AD716CA954500E5D60F /* mutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mutex.h; sourceTree = "<group>"; };
-		A19E4AD816CA954500E5D60F /* mutex_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mutex_posix.c; sourceTree = "<group>"; };
-		A19E4AD916CA954500E5D60F /* condition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = condition.h; sourceTree = "<group>"; };
-		A19E4ADA16CA954500E5D60F /* condition_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = condition_posix.c; sourceTree = "<group>"; };
-		A19E4AF116CA959700E5D60F /* audiooutput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audiooutput.h; sourceTree = "<group>"; };
-		A19E4AF216CA959700E5D60F /* audiooutput_apple.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = audiooutput_apple.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
-		A19E4AF516CA959700E5D60F /* audioqueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audioqueue.h; sourceTree = "<group>"; };
-		A19E4AF616CA959700E5D60F /* audioqueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = audioqueue.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
-		A19E4B0B16CA95AC00E5D60F /* alac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alac.h; sourceTree = "<group>"; };
-		A19E4B0C16CA95AC00E5D60F /* alac.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alac.c; sourceTree = "<group>"; };
-		A19E4B1016CA95C900E5D60F /* socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = socket.h; sourceTree = "<group>"; };
-		A19E4B1116CA95C900E5D60F /* socket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = socket.c; sourceTree = "<group>"; };
-		A19E4B1216CA95C900E5D60F /* sockaddr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sockaddr.h; sourceTree = "<group>"; };
-		A19E4B1316CA95C900E5D60F /* sockaddr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sockaddr.c; sourceTree = "<group>"; };
-		A19E4B1C16CA95D300E5D60F /* webtools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webtools.h; sourceTree = "<group>"; };
-		A19E4B1D16CA95D300E5D60F /* webtools.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webtools.c; sourceTree = "<group>"; };
-		A19E4B1E16CA95D300E5D60F /* webheaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webheaders.h; sourceTree = "<group>"; };
-		A19E4B1F16CA95D300E5D60F /* webheaders.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webheaders.c; sourceTree = "<group>"; };
-		A19E4B2016CA95D300E5D60F /* webresponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webresponse.h; sourceTree = "<group>"; };
-		A19E4B2116CA95D300E5D60F /* webresponse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webresponse.c; sourceTree = "<group>"; };
-		A19E4B2216CA95D300E5D60F /* webrequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webrequest.h; sourceTree = "<group>"; };
-		A19E4B2316CA95D300E5D60F /* webrequest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webrequest.c; sourceTree = "<group>"; };
-		A19E4B2416CA95D300E5D60F /* webserverconnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webserverconnection.h; sourceTree = "<group>"; };
-		A19E4B2516CA95D300E5D60F /* webserverconnection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webserverconnection.c; sourceTree = "<group>"; };
-		A19E4B2616CA95D300E5D60F /* webserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webserver.h; sourceTree = "<group>"; };
-		A19E4B2716CA95D300E5D60F /* webserver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webserver.c; sourceTree = "<group>"; };
-		A19E4B2E16CA95E200E5D60F /* base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = base64.h; sourceTree = "<group>"; };
-		A19E4B2F16CA95E200E5D60F /* base64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = base64.c; sourceTree = "<group>"; };
-		A19E4B3216CA95E200E5D60F /* parameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parameters.h; sourceTree = "<group>"; };
-		A19E4B3316CA95E200E5D60F /* parameters.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = parameters.c; sourceTree = "<group>"; };
 		A1ACB4ED16FA2264008E4C4F /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		A1ACB4F016FA2350008E4C4F /* UIImage+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+AirFloatAdditions.h"; sourceTree = "<group>"; };
 		A1ACB4F116FA2350008E4C4F /* UIImage+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+AirFloatAdditions.m"; sourceTree = "<group>"; };
 		A1ACB4F316FA286F008E4C4F /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
-		A1B5D8E016DABEDA00181FCE /* settings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = settings.c; sourceTree = "<group>"; };
 		A1C7F7991500D22100D7DE52 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "../Default@2x.png"; sourceTree = "<group>"; };
 		A1C7F79B1500D2B600D7DE52 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = ../Default.png; sourceTree = "<group>"; };
-		A1CD9F2817076E6A0015CBBA /* webclientconnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = webclientconnection.h; sourceTree = "<group>"; };
-		A1CD9F2917076E720015CBBA /* webclientconnection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webclientconnection.c; sourceTree = "<group>"; };
-		A1CF856416F3C02B009114B2 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
-		A1D490BF16D4EB000082AFDD /* rtpsocket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rtpsocket.c; sourceTree = "<group>"; };
-		A1D490C016D4EB000082AFDD /* rtpsocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rtpsocket.h; sourceTree = "<group>"; };
 		A1DE598614CF163500A6767D /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		A1DF3AF414C4623700252C95 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		A1E9740716DBAD5F000AD9E4 /* decoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = decoder.h; sourceTree = "<group>"; };
-		A1E9740816DBAE79000AD9E4 /* decoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decoder.c; sourceTree = "<group>"; };
-		A1E9740B16DBAE8F000AD9E4 /* decoder_alac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = decoder_alac.h; sourceTree = "<group>"; };
-		A1E9740C16DBAE9B000AD9E4 /* decoder_alac_apple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decoder_alac_apple.c; sourceTree = "<group>"; };
-		A1E9740E16DBAEAA000AD9E4 /* decoder_alac_other.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decoder_alac_other.c; sourceTree = "<group>"; };
-		A1E9741016DBB23B000AD9E4 /* alac_format.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = alac_format.h; sourceTree = "<group>"; };
-		A1E9741116DBB24D000AD9E4 /* alac_format.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alac_format.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -328,6 +249,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A12CB48A195047C00093C7AE /* libairfloat.a in Frameworks */,
 				A1ACB4F416FA286F008E4C4F /* OpenGLES.framework in Frameworks */,
 				A1ACB4EE16FA2264008E4C4F /* CoreImage.framework in Frameworks */,
 				A13F21C716ED10A900365A6D /* CFNetwork.framework in Frameworks */,
@@ -340,7 +262,6 @@
 				4898F9F313CDAAD1006EC97E /* UIKit.framework in Frameworks */,
 				4898F9F513CDAAD1006EC97E /* Foundation.framework in Frameworks */,
 				4898F9F713CDAAD1006EC97E /* CoreGraphics.framework in Frameworks */,
-				A1CF856516F3C02B009114B2 /* libcrypto.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,7 +287,7 @@
 		4898F9F113CDAAD1006EC97E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A1CF856416F3C02B009114B2 /* libcrypto.a */,
+				A12CB482195047B30093C7AE /* libairfloat.xcodeproj */,
 				A17E9233152DA909000331D3 /* libz.dylib */,
 				A1ACB4F316FA286F008E4C4F /* OpenGLES.framework */,
 				A1ACB4ED16FA2264008E4C4F /* CoreImage.framework */,
@@ -388,7 +309,6 @@
 		4898F9F813CDAAD1006EC97E /* AirFloat */ = {
 			isa = PBXGroup;
 			children = (
-				A19E4AC716CA94FA00E5D60F /* Server */,
 				A1B3E3DE14CE09A300379E8C /* Additions */,
 				A116EA8B16EE6278005530E9 /* App */,
 				4898F9F913CDAAD1006EC97E /* Supporting Files */,
@@ -438,6 +358,14 @@
 			name = Intro;
 			sourceTree = "<group>";
 		};
+		A12CB483195047B30093C7AE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A12CB487195047B30093C7AE /* libairfloat.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		A146A93216FA5C0300698A49 /* Support */ = {
 			isa = PBXGroup;
 			children = (
@@ -448,42 +376,6 @@
 				A146A93316FA5C1000698A49 /* Support.html */,
 			);
 			name = Support;
-			sourceTree = "<group>";
-		};
-		A150074316E8DA2E00B1A877 /* Crypt */ = {
-			isa = PBXGroup;
-			children = (
-				A179A2FD16DC274D00A1E58F /* crypt.h */,
-				A179A2FE16DC275F00A1E58F /* crypt.c */,
-			);
-			name = Crypt;
-			sourceTree = "<group>";
-		};
-		A150075D16ECA2A800B1A877 /* DACP Client */ = {
-			isa = PBXGroup;
-			children = (
-				A150075516E9485500B1A877 /* dacpclient.h */,
-				A150075616E9486100B1A877 /* dacpclient.c */,
-			);
-			name = "DACP Client";
-			sourceTree = "<group>";
-		};
-		A150075E16ED000100B1A877 /* Bonjour */ = {
-			isa = PBXGroup;
-			children = (
-				A150075F16ED018E00B1A877 /* zeroconf.h */,
-				A150076016ED019900B1A877 /* zeroconf_apple.c */,
-			);
-			name = Bonjour;
-			sourceTree = "<group>";
-		};
-		A150B60B16E6A02900C369C5 /* Hardware */ = {
-			isa = PBXGroup;
-			children = (
-				A150B60C16E6A03100C369C5 /* hardware.h */,
-				A150B60D16E6A03800C369C5 /* hardware_apple.c */,
-			);
-			name = Hardware;
 			sourceTree = "<group>";
 		};
 		A1594D9916FCB22900D14269 /* Controls */ = {
@@ -687,141 +579,6 @@
 			name = Other;
 			sourceTree = "<group>";
 		};
-		A19E4AC716CA94FA00E5D60F /* Server */ = {
-			isa = PBXGroup;
-			children = (
-				A19E4AC916CA950C00E5D60F /* Tools */,
-				A19E4ADE16CA955C00E5D60F /* Audio */,
-				A19E4ADF16CA956400E5D60F /* Server */,
-			);
-			name = Server;
-			sourceTree = "<group>";
-		};
-		A19E4AC816CA950500E5D60F /* Settings */ = {
-			isa = PBXGroup;
-			children = (
-				A19E4ACA16CA951500E5D60F /* settings.h */,
-				A1B5D8E016DABEDA00181FCE /* settings.c */,
-			);
-			name = Settings;
-			sourceTree = "<group>";
-		};
-		A19E4AC916CA950C00E5D60F /* Tools */ = {
-			isa = PBXGroup;
-			children = (
-				A150B60B16E6A02900C369C5 /* Hardware */,
-				A1E9741316DC19E5000AD9E4 /* Endian */,
-				A1E9741416DC19F4000AD9E4 /* Base 64 */,
-				A19E4AC816CA950500E5D60F /* Settings */,
-				A19E4ACD16CA951A00E5D60F /* Name Values */,
-				A19E4AD216CA952C00E5D60F /* Logging */,
-				A19E4AD616CA953A00E5D60F /* Threading */,
-			);
-			name = Tools;
-			sourceTree = "<group>";
-		};
-		A19E4ACD16CA951A00E5D60F /* Name Values */ = {
-			isa = PBXGroup;
-			children = (
-				A19E4ACF16CA952700E5D60F /* dmap.h */,
-				A19E4AD016CA952700E5D60F /* dmap.c */,
-				A19E4B3216CA95E200E5D60F /* parameters.h */,
-				A19E4B3316CA95E200E5D60F /* parameters.c */,
-			);
-			name = "Name Values";
-			sourceTree = "<group>";
-		};
-		A19E4AD216CA952C00E5D60F /* Logging */ = {
-			isa = PBXGroup;
-			children = (
-				A19E4AD316CA953600E5D60F /* log.h */,
-				A19E4AD416CA953600E5D60F /* log.c */,
-			);
-			name = Logging;
-			sourceTree = "<group>";
-		};
-		A19E4AD616CA953A00E5D60F /* Threading */ = {
-			isa = PBXGroup;
-			children = (
-				A19E4AD716CA954500E5D60F /* mutex.h */,
-				A19E4AD816CA954500E5D60F /* mutex_posix.c */,
-				A19E4AD916CA954500E5D60F /* condition.h */,
-				A19E4ADA16CA954500E5D60F /* condition_posix.c */,
-				A14583A916DAE42900911FE6 /* thread.h */,
-				A14583AA16DAE43400911FE6 /* thread_posix.c */,
-			);
-			name = Threading;
-			sourceTree = "<group>";
-		};
-		A19E4ADE16CA955C00E5D60F /* Audio */ = {
-			isa = PBXGroup;
-			children = (
-				A1E9740616DBAD45000AD9E4 /* Decoders */,
-				A19E4AF116CA959700E5D60F /* audiooutput.h */,
-				A19E4AF216CA959700E5D60F /* audiooutput_apple.m */,
-				A19E4AF516CA959700E5D60F /* audioqueue.h */,
-				A19E4AF616CA959700E5D60F /* audioqueue.c */,
-			);
-			name = Audio;
-			sourceTree = "<group>";
-		};
-		A19E4ADF16CA956400E5D60F /* Server */ = {
-			isa = PBXGroup;
-			children = (
-				A150075E16ED000100B1A877 /* Bonjour */,
-				A19E4B0F16CA95C000E5D60F /* Socket */,
-				A19E4B0E16CA95BB00E5D60F /* Web */,
-				A150074316E8DA2E00B1A877 /* Crypt */,
-				A150075D16ECA2A800B1A877 /* DACP Client */,
-				A1D490C016D4EB000082AFDD /* rtpsocket.h */,
-				A1D490BF16D4EB000082AFDD /* rtpsocket.c */,
-				A150075816E94BEF00B1A877 /* rtprecorder.h */,
-				A150075916E94BFA00B1A877 /* rtprecorder.c */,
-				A150075116E9359700B1A877 /* raopsession.h */,
-				A150075216E935A500B1A877 /* raopsession.c */,
-				A150074816E8E86C00B1A877 /* raopserver.h */,
-				A150074916E8E87B00B1A877 /* raopserver.c */,
-			);
-			name = Server;
-			sourceTree = "<group>";
-		};
-		A19E4AEA16CA958E00E5D60F /* Software Decoder */ = {
-			isa = PBXGroup;
-			children = (
-				A19E4B0B16CA95AC00E5D60F /* alac.h */,
-				A19E4B0C16CA95AC00E5D60F /* alac.c */,
-			);
-			name = "Software Decoder";
-			sourceTree = "<group>";
-		};
-		A19E4B0E16CA95BB00E5D60F /* Web */ = {
-			isa = PBXGroup;
-			children = (
-				A1CD9F2717076E350015CBBA /* Client */,
-				A1CD9F2617076D880015CBBA /* Server */,
-				A19E4B1C16CA95D300E5D60F /* webtools.h */,
-				A19E4B1D16CA95D300E5D60F /* webtools.c */,
-				A19E4B1E16CA95D300E5D60F /* webheaders.h */,
-				A19E4B1F16CA95D300E5D60F /* webheaders.c */,
-				A19E4B2016CA95D300E5D60F /* webresponse.h */,
-				A19E4B2116CA95D300E5D60F /* webresponse.c */,
-				A19E4B2216CA95D300E5D60F /* webrequest.h */,
-				A19E4B2316CA95D300E5D60F /* webrequest.c */,
-			);
-			name = Web;
-			sourceTree = "<group>";
-		};
-		A19E4B0F16CA95C000E5D60F /* Socket */ = {
-			isa = PBXGroup;
-			children = (
-				A19E4B1016CA95C900E5D60F /* socket.h */,
-				A19E4B1116CA95C900E5D60F /* socket.c */,
-				A19E4B1216CA95C900E5D60F /* sockaddr.h */,
-				A19E4B1316CA95C900E5D60F /* sockaddr.c */,
-			);
-			name = Socket;
-			sourceTree = "<group>";
-		};
 		A1A8079614F10FB5005FFDA5 /* Custom Classes */ = {
 			isa = PBXGroup;
 			children = (
@@ -850,66 +607,6 @@
 			name = Additions;
 			sourceTree = "<group>";
 		};
-		A1CD9F2617076D880015CBBA /* Server */ = {
-			isa = PBXGroup;
-			children = (
-				A19E4B2416CA95D300E5D60F /* webserverconnection.h */,
-				A19E4B2516CA95D300E5D60F /* webserverconnection.c */,
-				A19E4B2616CA95D300E5D60F /* webserver.h */,
-				A19E4B2716CA95D300E5D60F /* webserver.c */,
-			);
-			name = Server;
-			sourceTree = "<group>";
-		};
-		A1CD9F2717076E350015CBBA /* Client */ = {
-			isa = PBXGroup;
-			children = (
-				A1CD9F2817076E6A0015CBBA /* webclientconnection.h */,
-				A1CD9F2917076E720015CBBA /* webclientconnection.c */,
-			);
-			name = Client;
-			sourceTree = "<group>";
-		};
-		A1E9740616DBAD45000AD9E4 /* Decoders */ = {
-			isa = PBXGroup;
-			children = (
-				A1E9740A16DBAE7C000AD9E4 /* Apple Lossless */,
-				A1E9740716DBAD5F000AD9E4 /* decoder.h */,
-				A1E9740816DBAE79000AD9E4 /* decoder.c */,
-			);
-			name = Decoders;
-			sourceTree = "<group>";
-		};
-		A1E9740A16DBAE7C000AD9E4 /* Apple Lossless */ = {
-			isa = PBXGroup;
-			children = (
-				A19E4AEA16CA958E00E5D60F /* Software Decoder */,
-				A1E9741016DBB23B000AD9E4 /* alac_format.h */,
-				A1E9741116DBB24D000AD9E4 /* alac_format.c */,
-				A1E9740B16DBAE8F000AD9E4 /* decoder_alac.h */,
-				A1E9740C16DBAE9B000AD9E4 /* decoder_alac_apple.c */,
-				A1E9740E16DBAEAA000AD9E4 /* decoder_alac_other.c */,
-			);
-			name = "Apple Lossless";
-			sourceTree = "<group>";
-		};
-		A1E9741316DC19E5000AD9E4 /* Endian */ = {
-			isa = PBXGroup;
-			children = (
-				A19E4ACE16CA952700E5D60F /* endian.h */,
-			);
-			name = Endian;
-			sourceTree = "<group>";
-		};
-		A1E9741416DC19F4000AD9E4 /* Base 64 */ = {
-			isa = PBXGroup;
-			children = (
-				A19E4B2E16CA95E200E5D60F /* base64.h */,
-				A19E4B2F16CA95E200E5D60F /* base64.c */,
-			);
-			name = "Base 64";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -925,6 +622,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				A12CB489195047BA0093C7AE /* PBXTargetDependency */,
 			);
 			name = AirFloat;
 			productName = AirFloat;
@@ -937,7 +635,7 @@
 		4898F9E513CDAAD1006EC97E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0510;
 			};
 			buildConfigurationList = 4898F9E813CDAAD1006EC97E /* Build configuration list for PBXProject "AirFloat" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -949,12 +647,28 @@
 			mainGroup = 4898F9E313CDAAD1006EC97E;
 			productRefGroup = 4898F9EF13CDAAD1006EC97E /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = A12CB483195047B30093C7AE /* Products */;
+					ProjectRef = A12CB482195047B30093C7AE /* libairfloat.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				4898F9ED13CDAAD1006EC97E /* AirFloat */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		A12CB487195047B30093C7AE /* libairfloat.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libairfloat.a;
+			remoteRef = A12CB486195047B30093C7AE /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		4898F9EC13CDAAD1006EC97E /* Resources */ = {
@@ -1063,37 +777,6 @@
 				4898FA0313CDAAD1006EC97E /* AirFloatAppDelegate.m in Sources */,
 				A10392DA14E9B6C400DB356F /* AirFloatBarButton.m in Sources */,
 				A12B7AFF14FDCBE20068538D /* AirFloatAdView.m in Sources */,
-				A19E4AD116CA952700E5D60F /* dmap.c in Sources */,
-				A19E4AD516CA953600E5D60F /* log.c in Sources */,
-				A19E4ADB16CA954500E5D60F /* mutex_posix.c in Sources */,
-				A19E4ADC16CA954500E5D60F /* condition_posix.c in Sources */,
-				A19E4AFC16CA959700E5D60F /* audioqueue.c in Sources */,
-				A19E4B0D16CA95AC00E5D60F /* alac.c in Sources */,
-				A19E4B1816CA95C900E5D60F /* socket.c in Sources */,
-				A19E4B1916CA95C900E5D60F /* sockaddr.c in Sources */,
-				A19E4B2816CA95D300E5D60F /* webtools.c in Sources */,
-				A19E4B2916CA95D300E5D60F /* webheaders.c in Sources */,
-				A19E4B2A16CA95D300E5D60F /* webresponse.c in Sources */,
-				A19E4B2B16CA95D300E5D60F /* webrequest.c in Sources */,
-				A19E4B2C16CA95D300E5D60F /* webserverconnection.c in Sources */,
-				A19E4B2D16CA95D300E5D60F /* webserver.c in Sources */,
-				A19E4B3816CA95E200E5D60F /* base64.c in Sources */,
-				A19E4B3A16CA95E200E5D60F /* parameters.c in Sources */,
-				A1D490C116D4EB000082AFDD /* rtpsocket.c in Sources */,
-				A1B5D8E116DABEDA00181FCE /* settings.c in Sources */,
-				A14583AB16DAE43400911FE6 /* thread_posix.c in Sources */,
-				A1E9740916DBAE79000AD9E4 /* decoder.c in Sources */,
-				A1E9740D16DBAE9B000AD9E4 /* decoder_alac_apple.c in Sources */,
-				A1E9740F16DBAEAA000AD9E4 /* decoder_alac_other.c in Sources */,
-				A1E9741216DBB24E000AD9E4 /* alac_format.c in Sources */,
-				A179A2F816DC248400A1E58F /* audiooutput_apple.m in Sources */,
-				A179A2FF16DC275F00A1E58F /* crypt.c in Sources */,
-				A150B60E16E6A03800C369C5 /* hardware_apple.c in Sources */,
-				A150074A16E8E87B00B1A877 /* raopserver.c in Sources */,
-				A150075316E935AA00B1A877 /* raopsession.c in Sources */,
-				A150075716E9486200B1A877 /* dacpclient.c in Sources */,
-				A150075A16E94BFC00B1A877 /* rtprecorder.c in Sources */,
-				A150076116ED019900B1A877 /* zeroconf_apple.c in Sources */,
 				A116EA8616EE448D005530E9 /* AirFloatFlipInView.m in Sources */,
 				A116EA8E16EE6297005530E9 /* AppViewController.m in Sources */,
 				A129DD6316F93586004AA3BD /* AirFloatReflectionView.m in Sources */,
@@ -1103,22 +786,25 @@
 				A174B37816FB0F4C0063035C /* AirFloatScrollingLabel.m in Sources */,
 				A1594D9C16FCB24100D14269 /* AirFloatSwitch.m in Sources */,
 				A1594DB816FD29DD00D14269 /* UIView+AirFloatAdditions.m in Sources */,
-				A1CD9F2A17076E720015CBBA /* webclientconnection.c in Sources */,
 				A176B6F717385FD600024A3D /* PanelViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		A12CB489195047BA0093C7AE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = airfloat;
+			targetProxy = A12CB488195047BA0093C7AE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
 		4898FA0D13CDAAD1006EC97E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					armv6,
-					armv7,
-				);
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1130,6 +816,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DDEBUG",
 					"-DALLOW_LOCALHOST",
@@ -1143,10 +830,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					armv6,
-					armv7,
-				);
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_THUMB_SUPPORT = NO;
@@ -1164,10 +847,6 @@
 		4898FA1013CDAAD1006EC97E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					armv6,
-					armv7,
-				);
 				CLANG_ENABLE_OBJC_ARC = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1175,7 +854,7 @@
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = (
@@ -1196,16 +875,12 @@
 		4898FA1113CDAAD1006EC97E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					armv6,
-					armv7,
-				);
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = (
@@ -1228,10 +903,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					armv6,
-					armv7,
-				);
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_THUMB_SUPPORT = NO;
@@ -1253,16 +924,12 @@
 		A116EA6516EDFDC7005530E9 /* Release (Server Logs) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					armv6,
-					armv7,
-				);
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = (
@@ -1285,10 +952,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					armv6,
-					armv7,
-				);
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1313,10 +976,6 @@
 		A149209514E7323900849DC3 /* Debug (Server Logs) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					armv6,
-					armv7,
-				);
 				CLANG_ENABLE_OBJC_ARC = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1324,7 +983,7 @@
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = (
@@ -1346,10 +1005,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					armv6,
-					armv7,
-				);
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_THUMB_SUPPORT = NO;
@@ -1366,16 +1021,12 @@
 		A1A76012151B56B800728C9C /* App Store Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					armv6,
-					armv7,
-				);
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = (
@@ -1398,10 +1049,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					armv6,
-					armv7,
-				);
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_THUMB_SUPPORT = NO;
@@ -1418,16 +1065,12 @@
 		A1C7F7AB1501048400D7DE52 /* Ad Hoc Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					armv6,
-					armv7,
-				);
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = (
@@ -1450,10 +1093,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					armv6,
-					armv7,
-				);
 				CODE_SIGN_IDENTITY = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1478,10 +1117,6 @@
 		A1ECED9016E8CFA500F8E7E3 /* Debug (Server Logs - ALAC Software) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					armv6,
-					armv7,
-				);
 				CLANG_ENABLE_OBJC_ARC = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1489,7 +1124,7 @@
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/\"";
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = (

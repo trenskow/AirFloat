@@ -1,0 +1,3 @@
+[submodule "libairfloat"]
+	path = libairfloat
+	url = http://github.com/trenskow/libairfloat.git
