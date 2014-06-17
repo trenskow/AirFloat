@@ -131,7 +131,7 @@ struct zeroconf_raop_ad_t* zeroconf_raop_ad_create(uint16_t port, const char *na
     za->condition = condition_create();
     
     mutex_lock(za->mutex);
-    za->thread = thread_create(_zeroconf_raop_ad_run_loop_thread, za);
+    za->thread = thread_create_a(_zeroconf_raop_ad_run_loop_thread, za);
     condition_wait(za->condition, za->mutex);
     mutex_unlock(za->mutex);
     
@@ -274,7 +274,7 @@ struct zeroconf_dacp_discover_t* zeroconf_dacp_discover_create() {
     
     zd->domain_browser = CFNetServiceBrowserCreate(kCFAllocatorDefault, _zeroconf_dacp_discover_browse_callback, &context);
     zd->mutex = mutex_create();
-    zd->thread = thread_create(_zeroconf_dacp_discover_run_loop_thread, zd);
+    zd->thread = thread_create_a(_zeroconf_dacp_discover_run_loop_thread, zd);
     
     return zd;
     

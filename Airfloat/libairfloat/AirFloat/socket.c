@@ -326,7 +326,7 @@ void socket_connect(struct socket_t* s, struct sockaddr* end_point) {
         
         s->remote_end_point = sockaddr_copy(end_point);
         
-        s->receive_thread = thread_create(_socket_connect, s);
+        s->receive_thread = thread_create_a(_socket_connect, s);
         
     }
     
@@ -340,7 +340,7 @@ void socket_set_accept_callback(struct socket_t* s, socket_accept_callback callb
     if (!s->is_udp && s->accept_thread == NULL) {
         
         if (listen(s->socket, 5) == 0)
-            s->accept_thread = thread_create(_socket_accept_loop, s);
+            s->accept_thread = thread_create_a(_socket_accept_loop, s);
         
     }
     
@@ -366,7 +366,7 @@ void socket_set_receive_callback(struct socket_t* s, socket_receive_callback cal
     s->callbacks.ctx.receive = ctx;
     
     if (s->receive_thread == NULL && (s->is_udp || s->is_connected))
-        s->receive_thread = thread_create(_socket_receive_loop, s);
+        s->receive_thread = thread_create_a(_socket_receive_loop, s);
     
 }
 

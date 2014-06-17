@@ -55,7 +55,7 @@ void* thread_pthread_head(void* ctx) {
     
 }
 
-struct thread_t* thread_create(thread_start_fnc start_fnc, void* ctx) {
+struct thread_t* thread_create_a(thread_start_fnc start_fnc, void* ctx) {
     
     struct thread_t* t = (struct thread_t*)malloc(sizeof(struct thread_t));
     
