@@ -1,0 +1,915 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1D0DC80195037EE004717F5 /* hardware_apple.c in Sources */ = {isa = PBXBuildFile; fileRef = A150B60D16E6A03800C369C5 /* hardware_apple.c */; };
+		A1D0DC81195037EE004717F5 /* base64.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2F16CA95E200E5D60F /* base64.c */; };
+		A1D0DC82195037EE004717F5 /* settings.c in Sources */ = {isa = PBXBuildFile; fileRef = A1B5D8E016DABEDA00181FCE /* settings.c */; };
+		A1D0DC83195037EE004717F5 /* dmap.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AD016CA952700E5D60F /* dmap.c */; };
+		A1D0DC84195037EE004717F5 /* parameters.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B3316CA95E200E5D60F /* parameters.c */; };
+		A1D0DC85195037EE004717F5 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AD416CA953600E5D60F /* log.c */; };
+		A1D0DC86195037EE004717F5 /* mutex_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AD816CA954500E5D60F /* mutex_posix.c */; };
+		A1D0DC87195037EE004717F5 /* condition_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4ADA16CA954500E5D60F /* condition_posix.c */; };
+		A1D0DC88195037EE004717F5 /* thread_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = A14583AA16DAE43400911FE6 /* thread_posix.c */; };
+		A1D0DC89195037FD004717F5 /* alac.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B0C16CA95AC00E5D60F /* alac.c */; };
+		A1D0DC8A195037FD004717F5 /* alac_format.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9741116DBB24D000AD9E4 /* alac_format.c */; };
+		A1D0DC8B195037FD004717F5 /* decoder_alac_apple.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9740C16DBAE9B000AD9E4 /* decoder_alac_apple.c */; };
+		A1D0DC8C195037FD004717F5 /* decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9740816DBAE79000AD9E4 /* decoder.c */; };
+		A1D0DC8D19503824004717F5 /* audiooutput_apple.m in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AF216CA959700E5D60F /* audiooutput_apple.m */; };
+		A1D0DC8E19503826004717F5 /* audioqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AF616CA959700E5D60F /* audioqueue.c */; };
+		A1D0DC8F1950382F004717F5 /* zeroconf_apple.c in Sources */ = {isa = PBXBuildFile; fileRef = A150076016ED019900B1A877 /* zeroconf_apple.c */; };
+		A1D0DC9019503833004717F5 /* socket.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1116CA95C900E5D60F /* socket.c */; };
+		A1D0DC9119503833004717F5 /* sockaddr.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1316CA95C900E5D60F /* sockaddr.c */; };
+		A1D0DC921950383D004717F5 /* webclientconnection.c in Sources */ = {isa = PBXBuildFile; fileRef = A1CD9F2917076E720015CBBA /* webclientconnection.c */; };
+		A1D0DC931950383D004717F5 /* webserverconnection.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2516CA95D300E5D60F /* webserverconnection.c */; };
+		A1D0DC941950383D004717F5 /* webserver.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2716CA95D300E5D60F /* webserver.c */; };
+		A1D0DC951950383D004717F5 /* webtools.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1D16CA95D300E5D60F /* webtools.c */; };
+		A1D0DC961950383D004717F5 /* webheaders.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1F16CA95D300E5D60F /* webheaders.c */; };
+		A1D0DC971950383D004717F5 /* webresponse.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2116CA95D300E5D60F /* webresponse.c */; };
+		A1D0DC981950383D004717F5 /* webrequest.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2316CA95D300E5D60F /* webrequest.c */; };
+		A1D0DC9E1950384F004717F5 /* crypt_openssl.c in Sources */ = {isa = PBXBuildFile; fileRef = A179A2FE16DC275F00A1E58F /* crypt_openssl.c */; };
+		A1D0DC9F1950384F004717F5 /* rtpsocket.c in Sources */ = {isa = PBXBuildFile; fileRef = A1D490BF16D4EB000082AFDD /* rtpsocket.c */; };
+		A1D0DCA01950384F004717F5 /* rtprecorder.c in Sources */ = {isa = PBXBuildFile; fileRef = A150075916E94BFA00B1A877 /* rtprecorder.c */; };
+		A1D0DCA11950384F004717F5 /* raopsession.c in Sources */ = {isa = PBXBuildFile; fileRef = A150075216E935A500B1A877 /* raopsession.c */; };
+		A1D0DCA21950384F004717F5 /* raopserver.c in Sources */ = {isa = PBXBuildFile; fileRef = A150074916E8E87B00B1A877 /* raopserver.c */; };
+		A1D0DCA319503854004717F5 /* dacpclient.c in Sources */ = {isa = PBXBuildFile; fileRef = A150075616E9486100B1A877 /* dacpclient.c */; };
+		A1D0DCA419503B38004717F5 /* decoder_alac_other.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9740E16DBAEAA000AD9E4 /* decoder_alac_other.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A1D0DC4E1950378A004717F5 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		4898F9F213CDAAD1006EC97E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		4898F9F413CDAAD1006EC97E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		4898F9F613CDAAD1006EC97E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		4898FA9413CF17BC006EC97E /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		4898FA9613CF2D6C006EC97E /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		A1389E1E14E43683004FE040 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		A13F21C616ED10A900365A6D /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		A14583A916DAE42900911FE6 /* thread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = thread.h; sourceTree = "<group>"; };
+		A14583AA16DAE43400911FE6 /* thread_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thread_posix.c; sourceTree = "<group>"; };
+		A150074816E8E86C00B1A877 /* raopserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = raopserver.h; sourceTree = "<group>"; };
+		A150074916E8E87B00B1A877 /* raopserver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = raopserver.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
+		A150075116E9359700B1A877 /* raopsession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = raopsession.h; sourceTree = "<group>"; };
+		A150075216E935A500B1A877 /* raopsession.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = raopsession.c; sourceTree = "<group>"; };
+		A150075516E9485500B1A877 /* dacpclient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dacpclient.h; sourceTree = "<group>"; };
+		A150075616E9486100B1A877 /* dacpclient.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dacpclient.c; sourceTree = "<group>"; };
+		A150075816E94BEF00B1A877 /* rtprecorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rtprecorder.h; sourceTree = "<group>"; };
+		A150075916E94BFA00B1A877 /* rtprecorder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rtprecorder.c; sourceTree = "<group>"; };
+		A150075F16ED018E00B1A877 /* zeroconf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = zeroconf.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		A150076016ED019900B1A877 /* zeroconf_apple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = zeroconf_apple.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
+		A150B60C16E6A03100C369C5 /* hardware.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hardware.h; sourceTree = "<group>"; };
+		A150B60D16E6A03800C369C5 /* hardware_apple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hardware_apple.c; sourceTree = "<group>"; };
+		A179A2FD16DC274D00A1E58F /* crypt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
+		A179A2FE16DC275F00A1E58F /* crypt_openssl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crypt_openssl.c; sourceTree = "<group>"; };
+		A17E9233152DA909000331D3 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		A194311E14D46878009FC07B /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		A19E4ACA16CA951500E5D60F /* settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
+		A19E4ACE16CA952700E5D60F /* endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = endian.h; sourceTree = "<group>"; };
+		A19E4ACF16CA952700E5D60F /* dmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dmap.h; sourceTree = "<group>"; };
+		A19E4AD016CA952700E5D60F /* dmap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dmap.c; sourceTree = "<group>"; };
+		A19E4AD316CA953600E5D60F /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
+		A19E4AD416CA953600E5D60F /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = log.c; sourceTree = "<group>"; };
+		A19E4AD716CA954500E5D60F /* mutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mutex.h; sourceTree = "<group>"; };
+		A19E4AD816CA954500E5D60F /* mutex_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mutex_posix.c; sourceTree = "<group>"; };
+		A19E4AD916CA954500E5D60F /* condition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = condition.h; sourceTree = "<group>"; };
+		A19E4ADA16CA954500E5D60F /* condition_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = condition_posix.c; sourceTree = "<group>"; };
+		A19E4AF116CA959700E5D60F /* audiooutput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audiooutput.h; sourceTree = "<group>"; };
+		A19E4AF216CA959700E5D60F /* audiooutput_apple.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = audiooutput_apple.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		A19E4AF516CA959700E5D60F /* audioqueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audioqueue.h; sourceTree = "<group>"; };
+		A19E4AF616CA959700E5D60F /* audioqueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = audioqueue.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		A19E4B0B16CA95AC00E5D60F /* alac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alac.h; sourceTree = "<group>"; };
+		A19E4B0C16CA95AC00E5D60F /* alac.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alac.c; sourceTree = "<group>"; };
+		A19E4B1016CA95C900E5D60F /* socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = socket.h; sourceTree = "<group>"; };
+		A19E4B1116CA95C900E5D60F /* socket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = socket.c; sourceTree = "<group>"; };
+		A19E4B1216CA95C900E5D60F /* sockaddr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sockaddr.h; sourceTree = "<group>"; };
+		A19E4B1316CA95C900E5D60F /* sockaddr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sockaddr.c; sourceTree = "<group>"; };
+		A19E4B1C16CA95D300E5D60F /* webtools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webtools.h; sourceTree = "<group>"; };
+		A19E4B1D16CA95D300E5D60F /* webtools.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webtools.c; sourceTree = "<group>"; };
+		A19E4B1E16CA95D300E5D60F /* webheaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webheaders.h; sourceTree = "<group>"; };
+		A19E4B1F16CA95D300E5D60F /* webheaders.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webheaders.c; sourceTree = "<group>"; };
+		A19E4B2016CA95D300E5D60F /* webresponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webresponse.h; sourceTree = "<group>"; };
+		A19E4B2116CA95D300E5D60F /* webresponse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webresponse.c; sourceTree = "<group>"; };
+		A19E4B2216CA95D300E5D60F /* webrequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webrequest.h; sourceTree = "<group>"; };
+		A19E4B2316CA95D300E5D60F /* webrequest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webrequest.c; sourceTree = "<group>"; };
+		A19E4B2416CA95D300E5D60F /* webserverconnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webserverconnection.h; sourceTree = "<group>"; };
+		A19E4B2516CA95D300E5D60F /* webserverconnection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webserverconnection.c; sourceTree = "<group>"; };
+		A19E4B2616CA95D300E5D60F /* webserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webserver.h; sourceTree = "<group>"; };
+		A19E4B2716CA95D300E5D60F /* webserver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webserver.c; sourceTree = "<group>"; };
+		A19E4B2E16CA95E200E5D60F /* base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = base64.h; sourceTree = "<group>"; };
+		A19E4B2F16CA95E200E5D60F /* base64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = base64.c; sourceTree = "<group>"; };
+		A19E4B3216CA95E200E5D60F /* parameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parameters.h; sourceTree = "<group>"; };
+		A19E4B3316CA95E200E5D60F /* parameters.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = parameters.c; sourceTree = "<group>"; };
+		A1ACB4ED16FA2264008E4C4F /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
+		A1ACB4F316FA286F008E4C4F /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		A1B5D8E016DABEDA00181FCE /* settings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = settings.c; sourceTree = "<group>"; };
+		A1CD9F2817076E6A0015CBBA /* webclientconnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = webclientconnection.h; sourceTree = "<group>"; };
+		A1CD9F2917076E720015CBBA /* webclientconnection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = webclientconnection.c; sourceTree = "<group>"; };
+		A1CF856416F3C02B009114B2 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
+		A1D0DC501950378A004717F5 /* libairfloat.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libairfloat.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1D490BF16D4EB000082AFDD /* rtpsocket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rtpsocket.c; sourceTree = "<group>"; };
+		A1D490C016D4EB000082AFDD /* rtpsocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rtpsocket.h; sourceTree = "<group>"; };
+		A1DE598614CF163500A6767D /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		A1DF3AF414C4623700252C95 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		A1E9740716DBAD5F000AD9E4 /* decoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = decoder.h; sourceTree = "<group>"; };
+		A1E9740816DBAE79000AD9E4 /* decoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decoder.c; sourceTree = "<group>"; };
+		A1E9740B16DBAE8F000AD9E4 /* decoder_alac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = decoder_alac.h; sourceTree = "<group>"; };
+		A1E9740C16DBAE9B000AD9E4 /* decoder_alac_apple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decoder_alac_apple.c; sourceTree = "<group>"; };
+		A1E9740E16DBAEAA000AD9E4 /* decoder_alac_other.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decoder_alac_other.c; sourceTree = "<group>"; };
+		A1E9741016DBB23B000AD9E4 /* alac_format.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = alac_format.h; sourceTree = "<group>"; };
+		A1E9741116DBB24D000AD9E4 /* alac_format.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alac_format.c; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A1D0DC4D1950378A004717F5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4898F9E313CDAAD1006EC97E = {
+			isa = PBXGroup;
+			children = (
+				4898F9F813CDAAD1006EC97E /* libairfloat */,
+				4898F9F113CDAAD1006EC97E /* Frameworks */,
+				4898F9EF13CDAAD1006EC97E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4898F9EF13CDAAD1006EC97E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1D0DC501950378A004717F5 /* libairfloat.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4898F9F113CDAAD1006EC97E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A1CF856416F3C02B009114B2 /* libcrypto.a */,
+				A17E9233152DA909000331D3 /* libz.dylib */,
+				A1ACB4F316FA286F008E4C4F /* OpenGLES.framework */,
+				A1ACB4ED16FA2264008E4C4F /* CoreImage.framework */,
+				A1389E1E14E43683004FE040 /* SystemConfiguration.framework */,
+				A194311E14D46878009FC07B /* CoreAudio.framework */,
+				A1DE598614CF163500A6767D /* MediaPlayer.framework */,
+				A1DF3AF414C4623700252C95 /* AVFoundation.framework */,
+				4898FA9613CF2D6C006EC97E /* AudioToolbox.framework */,
+				4898FA9413CF17BC006EC97E /* QuartzCore.framework */,
+				4898F9F213CDAAD1006EC97E /* UIKit.framework */,
+				4898F9F413CDAAD1006EC97E /* Foundation.framework */,
+				4898F9F613CDAAD1006EC97E /* CoreGraphics.framework */,
+				A13F21C616ED10A900365A6D /* CFNetwork.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4898F9F813CDAAD1006EC97E /* libairfloat */ = {
+			isa = PBXGroup;
+			children = (
+				A1D0DCA519503E8D004717F5 /* Tools */,
+				A19E4ADE16CA955C00E5D60F /* Audio */,
+				A19E4ADF16CA956400E5D60F /* Server */,
+			);
+			name = libairfloat;
+			path = AirFloat;
+			sourceTree = "<group>";
+		};
+		A150074316E8DA2E00B1A877 /* Crypt */ = {
+			isa = PBXGroup;
+			children = (
+				A179A2FD16DC274D00A1E58F /* crypt.h */,
+				A179A2FE16DC275F00A1E58F /* crypt_openssl.c */,
+			);
+			name = Crypt;
+			sourceTree = "<group>";
+		};
+		A150075D16ECA2A800B1A877 /* DACP Client */ = {
+			isa = PBXGroup;
+			children = (
+				A150075516E9485500B1A877 /* dacpclient.h */,
+				A150075616E9486100B1A877 /* dacpclient.c */,
+			);
+			name = "DACP Client";
+			sourceTree = "<group>";
+		};
+		A150075E16ED000100B1A877 /* Bonjour */ = {
+			isa = PBXGroup;
+			children = (
+				A150075F16ED018E00B1A877 /* zeroconf.h */,
+				A150076016ED019900B1A877 /* zeroconf_apple.c */,
+			);
+			name = Bonjour;
+			sourceTree = "<group>";
+		};
+		A150B60B16E6A02900C369C5 /* Hardware */ = {
+			isa = PBXGroup;
+			children = (
+				A150B60C16E6A03100C369C5 /* hardware.h */,
+				A150B60D16E6A03800C369C5 /* hardware_apple.c */,
+			);
+			name = Hardware;
+			sourceTree = "<group>";
+		};
+		A19E4AC816CA950500E5D60F /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4ACA16CA951500E5D60F /* settings.h */,
+				A1B5D8E016DABEDA00181FCE /* settings.c */,
+			);
+			name = Settings;
+			sourceTree = "<group>";
+		};
+		A19E4ACD16CA951A00E5D60F /* Name Values */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4ACF16CA952700E5D60F /* dmap.h */,
+				A19E4AD016CA952700E5D60F /* dmap.c */,
+				A19E4B3216CA95E200E5D60F /* parameters.h */,
+				A19E4B3316CA95E200E5D60F /* parameters.c */,
+			);
+			name = "Name Values";
+			sourceTree = "<group>";
+		};
+		A19E4AD216CA952C00E5D60F /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4AD316CA953600E5D60F /* log.h */,
+				A19E4AD416CA953600E5D60F /* log.c */,
+			);
+			name = Logging;
+			sourceTree = "<group>";
+		};
+		A19E4AD616CA953A00E5D60F /* Threading */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4AD716CA954500E5D60F /* mutex.h */,
+				A19E4AD816CA954500E5D60F /* mutex_posix.c */,
+				A19E4AD916CA954500E5D60F /* condition.h */,
+				A19E4ADA16CA954500E5D60F /* condition_posix.c */,
+				A14583A916DAE42900911FE6 /* thread.h */,
+				A14583AA16DAE43400911FE6 /* thread_posix.c */,
+			);
+			name = Threading;
+			sourceTree = "<group>";
+		};
+		A19E4ADE16CA955C00E5D60F /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				A1E9740616DBAD45000AD9E4 /* Decoders */,
+				A19E4AF116CA959700E5D60F /* audiooutput.h */,
+				A19E4AF216CA959700E5D60F /* audiooutput_apple.m */,
+				A19E4AF516CA959700E5D60F /* audioqueue.h */,
+				A19E4AF616CA959700E5D60F /* audioqueue.c */,
+			);
+			name = Audio;
+			sourceTree = "<group>";
+		};
+		A19E4ADF16CA956400E5D60F /* Server */ = {
+			isa = PBXGroup;
+			children = (
+				A150075E16ED000100B1A877 /* Bonjour */,
+				A19E4B0F16CA95C000E5D60F /* Socket */,
+				A19E4B0E16CA95BB00E5D60F /* Web */,
+				A150074316E8DA2E00B1A877 /* Crypt */,
+				A150075D16ECA2A800B1A877 /* DACP Client */,
+				A1D490C016D4EB000082AFDD /* rtpsocket.h */,
+				A1D490BF16D4EB000082AFDD /* rtpsocket.c */,
+				A150075816E94BEF00B1A877 /* rtprecorder.h */,
+				A150075916E94BFA00B1A877 /* rtprecorder.c */,
+				A150075116E9359700B1A877 /* raopsession.h */,
+				A150075216E935A500B1A877 /* raopsession.c */,
+				A150074816E8E86C00B1A877 /* raopserver.h */,
+				A150074916E8E87B00B1A877 /* raopserver.c */,
+			);
+			name = Server;
+			sourceTree = "<group>";
+		};
+		A19E4AEA16CA958E00E5D60F /* Software Decoder */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4B0B16CA95AC00E5D60F /* alac.h */,
+				A19E4B0C16CA95AC00E5D60F /* alac.c */,
+			);
+			name = "Software Decoder";
+			sourceTree = "<group>";
+		};
+		A19E4B0E16CA95BB00E5D60F /* Web */ = {
+			isa = PBXGroup;
+			children = (
+				A1CD9F2717076E350015CBBA /* Client */,
+				A1CD9F2617076D880015CBBA /* Server */,
+				A19E4B1C16CA95D300E5D60F /* webtools.h */,
+				A19E4B1D16CA95D300E5D60F /* webtools.c */,
+				A19E4B1E16CA95D300E5D60F /* webheaders.h */,
+				A19E4B1F16CA95D300E5D60F /* webheaders.c */,
+				A19E4B2016CA95D300E5D60F /* webresponse.h */,
+				A19E4B2116CA95D300E5D60F /* webresponse.c */,
+				A19E4B2216CA95D300E5D60F /* webrequest.h */,
+				A19E4B2316CA95D300E5D60F /* webrequest.c */,
+			);
+			name = Web;
+			sourceTree = "<group>";
+		};
+		A19E4B0F16CA95C000E5D60F /* Socket */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4B1016CA95C900E5D60F /* socket.h */,
+				A19E4B1116CA95C900E5D60F /* socket.c */,
+				A19E4B1216CA95C900E5D60F /* sockaddr.h */,
+				A19E4B1316CA95C900E5D60F /* sockaddr.c */,
+			);
+			name = Socket;
+			sourceTree = "<group>";
+		};
+		A1CD9F2617076D880015CBBA /* Server */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4B2416CA95D300E5D60F /* webserverconnection.h */,
+				A19E4B2516CA95D300E5D60F /* webserverconnection.c */,
+				A19E4B2616CA95D300E5D60F /* webserver.h */,
+				A19E4B2716CA95D300E5D60F /* webserver.c */,
+			);
+			name = Server;
+			sourceTree = "<group>";
+		};
+		A1CD9F2717076E350015CBBA /* Client */ = {
+			isa = PBXGroup;
+			children = (
+				A1CD9F2817076E6A0015CBBA /* webclientconnection.h */,
+				A1CD9F2917076E720015CBBA /* webclientconnection.c */,
+			);
+			name = Client;
+			sourceTree = "<group>";
+		};
+		A1D0DCA519503E8D004717F5 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				A150B60B16E6A02900C369C5 /* Hardware */,
+				A1E9741316DC19E5000AD9E4 /* Endian */,
+				A1E9741416DC19F4000AD9E4 /* Base 64 */,
+				A19E4AC816CA950500E5D60F /* Settings */,
+				A19E4ACD16CA951A00E5D60F /* Name Values */,
+				A19E4AD216CA952C00E5D60F /* Logging */,
+				A19E4AD616CA953A00E5D60F /* Threading */,
+			);
+			name = Tools;
+			sourceTree = "<group>";
+		};
+		A1E9740616DBAD45000AD9E4 /* Decoders */ = {
+			isa = PBXGroup;
+			children = (
+				A1E9740A16DBAE7C000AD9E4 /* Apple Lossless */,
+				A1E9740716DBAD5F000AD9E4 /* decoder.h */,
+				A1E9740816DBAE79000AD9E4 /* decoder.c */,
+			);
+			name = Decoders;
+			sourceTree = "<group>";
+		};
+		A1E9740A16DBAE7C000AD9E4 /* Apple Lossless */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4AEA16CA958E00E5D60F /* Software Decoder */,
+				A1E9741016DBB23B000AD9E4 /* alac_format.h */,
+				A1E9741116DBB24D000AD9E4 /* alac_format.c */,
+				A1E9740B16DBAE8F000AD9E4 /* decoder_alac.h */,
+				A1E9740C16DBAE9B000AD9E4 /* decoder_alac_apple.c */,
+				A1E9740E16DBAEAA000AD9E4 /* decoder_alac_other.c */,
+			);
+			name = "Apple Lossless";
+			sourceTree = "<group>";
+		};
+		A1E9741316DC19E5000AD9E4 /* Endian */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4ACE16CA952700E5D60F /* endian.h */,
+			);
+			name = Endian;
+			sourceTree = "<group>";
+		};
+		A1E9741416DC19F4000AD9E4 /* Base 64 */ = {
+			isa = PBXGroup;
+			children = (
+				A19E4B2E16CA95E200E5D60F /* base64.h */,
+				A19E4B2F16CA95E200E5D60F /* base64.c */,
+			);
+			name = "Base 64";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A1D0DC4F1950378A004717F5 /* airfloat */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1D0DC701950378A004717F5 /* Build configuration list for PBXNativeTarget "airfloat" */;
+			buildPhases = (
+				A1D0DC4C1950378A004717F5 /* Sources */,
+				A1D0DC4D1950378A004717F5 /* Frameworks */,
+				A1D0DC4E1950378A004717F5 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = airfloat;
+			productName = libairfloat;
+			productReference = A1D0DC501950378A004717F5 /* libairfloat.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4898F9E513CDAAD1006EC97E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+			};
+			buildConfigurationList = 4898F9E813CDAAD1006EC97E /* Build configuration list for PBXProject "libairfloat" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 4898F9E313CDAAD1006EC97E;
+			productRefGroup = 4898F9EF13CDAAD1006EC97E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1D0DC4F1950378A004717F5 /* airfloat */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A1D0DC4C1950378A004717F5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1D0DC951950383D004717F5 /* webtools.c in Sources */,
+				A1D0DC8B195037FD004717F5 /* decoder_alac_apple.c in Sources */,
+				A1D0DCA01950384F004717F5 /* rtprecorder.c in Sources */,
+				A1D0DC9019503833004717F5 /* socket.c in Sources */,
+				A1D0DCA11950384F004717F5 /* raopsession.c in Sources */,
+				A1D0DC971950383D004717F5 /* webresponse.c in Sources */,
+				A1D0DCA21950384F004717F5 /* raopserver.c in Sources */,
+				A1D0DC9119503833004717F5 /* sockaddr.c in Sources */,
+				A1D0DC921950383D004717F5 /* webclientconnection.c in Sources */,
+				A1D0DC89195037FD004717F5 /* alac.c in Sources */,
+				A1D0DC8D19503824004717F5 /* audiooutput_apple.m in Sources */,
+				A1D0DC8C195037FD004717F5 /* decoder.c in Sources */,
+				A1D0DCA419503B38004717F5 /* decoder_alac_other.c in Sources */,
+				A1D0DC85195037EE004717F5 /* log.c in Sources */,
+				A1D0DC81195037EE004717F5 /* base64.c in Sources */,
+				A1D0DC88195037EE004717F5 /* thread_posix.c in Sources */,
+				A1D0DC981950383D004717F5 /* webrequest.c in Sources */,
+				A1D0DC86195037EE004717F5 /* mutex_posix.c in Sources */,
+				A1D0DC941950383D004717F5 /* webserver.c in Sources */,
+				A1D0DC8F1950382F004717F5 /* zeroconf_apple.c in Sources */,
+				A1D0DC8E19503826004717F5 /* audioqueue.c in Sources */,
+				A1D0DC87195037EE004717F5 /* condition_posix.c in Sources */,
+				A1D0DCA319503854004717F5 /* dacpclient.c in Sources */,
+				A1D0DC84195037EE004717F5 /* parameters.c in Sources */,
+				A1D0DC9E1950384F004717F5 /* crypt_openssl.c in Sources */,
+				A1D0DC961950383D004717F5 /* webheaders.c in Sources */,
+				A1D0DC9F1950384F004717F5 /* rtpsocket.c in Sources */,
+				A1D0DC83195037EE004717F5 /* dmap.c in Sources */,
+				A1D0DC8A195037FD004717F5 /* alac_format.c in Sources */,
+				A1D0DC80195037EE004717F5 /* hardware_apple.c in Sources */,
+				A1D0DC82195037EE004717F5 /* settings.c in Sources */,
+				A1D0DC931950383D004717F5 /* webserverconnection.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4898FA0D13CDAAD1006EC97E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = (
+					"-DDEBUG",
+					"-DALLOW_LOCALHOST",
+					"-DUSE_BSD_SOCKETS",
+				);
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		4898FA0E13CDAAD1006EC97E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_CFLAGS = "-DUSE_BSD_SOCKETS";
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
+		A116EA6416EDFDC7005530E9 /* Release (Server Logs) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_CFLAGS = (
+					"-DLOG_SERVER",
+					"-DALLOW_LOCALHOST",
+					"-DUSE_BSD_SOCKETS",
+				);
+				SDKROOT = iphoneos;
+			};
+			name = "Release (Server Logs)";
+		};
+		A149209414E7323900849DC3 /* Debug (Server Logs) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_CFLAGS = (
+					"-DDEBUG",
+					"-DLOG_SERVER",
+					"-DALLOW_LOCALHOST",
+					"-DUSE_BSD_SOCKETS",
+				);
+				SDKROOT = iphoneos;
+			};
+			name = "Debug (Server Logs)";
+		};
+		A1A76011151B56B800728C9C /* App Store Distribution */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = iphoneos;
+			};
+			name = "App Store Distribution";
+		};
+		A1C7F7AA1501048400D7DE52 /* Ad Hoc Distribution */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = iphoneos;
+			};
+			name = "Ad Hoc Distribution";
+		};
+		A1D0DC711950378A004717F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DSTROOT = /tmp/airfloat.dst;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		A1D0DC721950378A004717F5 /* Debug (Server Logs) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DSTROOT = /tmp/airfloat.dst;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Debug (Server Logs)";
+		};
+		A1D0DC731950378A004717F5 /* Debug (Server Logs - ALAC Software) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DSTROOT = /tmp/airfloat.dst;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Debug (Server Logs - ALAC Software)";
+		};
+		A1D0DC741950378A004717F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DSTROOT = /tmp/airfloat.dst;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A1D0DC751950378A004717F5 /* Release (Server Logs) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DSTROOT = /tmp/airfloat.dst;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release (Server Logs)";
+		};
+		A1D0DC761950378A004717F5 /* App Store Distribution */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DSTROOT = /tmp/airfloat.dst;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "App Store Distribution";
+		};
+		A1D0DC771950378A004717F5 /* Ad Hoc Distribution */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DSTROOT = /tmp/airfloat.dst;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Ad Hoc Distribution";
+		};
+		A1ECED8F16E8CFA500F8E7E3 /* Debug (Server Logs - ALAC Software) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_CFLAGS = (
+					"-DDEBUG",
+					"-DLOG_SERVER",
+					"-DALAC_SOFTWARE",
+					"-DUSE_BSD_SOCKETS",
+				);
+				SDKROOT = iphoneos;
+			};
+			name = "Debug (Server Logs - ALAC Software)";
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4898F9E813CDAAD1006EC97E /* Build configuration list for PBXProject "libairfloat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4898FA0D13CDAAD1006EC97E /* Debug */,
+				A149209414E7323900849DC3 /* Debug (Server Logs) */,
+				A1ECED8F16E8CFA500F8E7E3 /* Debug (Server Logs - ALAC Software) */,
+				4898FA0E13CDAAD1006EC97E /* Release */,
+				A116EA6416EDFDC7005530E9 /* Release (Server Logs) */,
+				A1A76011151B56B800728C9C /* App Store Distribution */,
+				A1C7F7AA1501048400D7DE52 /* Ad Hoc Distribution */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1D0DC701950378A004717F5 /* Build configuration list for PBXNativeTarget "airfloat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1D0DC711950378A004717F5 /* Debug */,
+				A1D0DC721950378A004717F5 /* Debug (Server Logs) */,
+				A1D0DC731950378A004717F5 /* Debug (Server Logs - ALAC Software) */,
+				A1D0DC741950378A004717F5 /* Release */,
+				A1D0DC751950378A004717F5 /* Release (Server Logs) */,
+				A1D0DC761950378A004717F5 /* App Store Distribution */,
+				A1D0DC771950378A004717F5 /* Ad Hoc Distribution */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4898F9E513CDAAD1006EC97E /* Project object */;
+}
