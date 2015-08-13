@@ -40,6 +40,7 @@
 #include "log.h"
 #include "mutex.h"
 #include "base64.h"
+#include "hex.h"
 #include "settings.h"
 #include "hardware.h"
 
@@ -146,8 +147,8 @@ bool _raop_session_check_authentication(struct raop_session_t* rs, const char* m
                     
                     char ha1[33], ha2[33];
                     ha1[32] = ha2[32] = '\0';
-                    crypt_hex_encode(a1, 16, ha1, 32);
-                    crypt_hex_encode(a2, 16, ha2, 32);
+                    hex_encode(a1, 16, ha1, 32);
+                    hex_encode(a2, 16, ha2, 32);
                     
                     char finalpre[67 + strlen(rs->authentication_digest_nonce)];
                     sprintf(finalpre, "%s:%s:%s", ha1, rs->authentication_digest_nonce, ha2);
@@ -157,7 +158,7 @@ bool _raop_session_check_authentication(struct raop_session_t* rs, const char* m
                     
                     char hfinal[33];
                     hfinal[32] = '\0';
-                    crypt_hex_encode(final, 16, hfinal, 32);
+                    hex_encode(final, 16, hfinal, 32);
                     
                     for (int i = 0 ; i < 32 ; i++) {
                         hfinal[i] = tolower(hfinal[i]);
@@ -577,7 +578,7 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
             for (uint32_t i = 0 ; i < 16 ; i++)
                 nonce[i] = (char) rand() % 256;
             
-            crypt_hex_encode(nonce, 16, rs->authentication_digest_nonce, 32);
+            hex_encode(nonce, 16, rs->authentication_digest_nonce, 32);
             rs->authentication_digest_nonce[32] = '\0';
             
             web_headers_set_value(response_headers, "WWW-Authenticate", "Digest realm=\"raop\", nonce=\"%s\"", rs->authentication_digest_nonce);

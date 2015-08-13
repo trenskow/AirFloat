@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A12364281B7C111100E1605D /* hex.c in Sources */ = {isa = PBXBuildFile; fileRef = A12364261B7C111100E1605D /* hex.c */; };
+		A123642C1B7C15FC00E1605D /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1CF856416F3C02B009114B2 /* libcrypto.a */; };
+		A123642E1B7C17C600E1605D /* crypt_openssl.c in Sources */ = {isa = PBXBuildFile; fileRef = A179A2FE16DC275F00A1E58F /* crypt_openssl.c */; };
 		A1D0DC80195037EE004717F5 /* hardware_apple.c in Sources */ = {isa = PBXBuildFile; fileRef = A150B60D16E6A03800C369C5 /* hardware_apple.c */; };
 		A1D0DC81195037EE004717F5 /* base64.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2F16CA95E200E5D60F /* base64.c */; };
 		A1D0DC82195037EE004717F5 /* settings.c in Sources */ = {isa = PBXBuildFile; fileRef = A1B5D8E016DABEDA00181FCE /* settings.c */; };
@@ -32,17 +35,15 @@
 		A1D0DC961950383D004717F5 /* webheaders.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B1F16CA95D300E5D60F /* webheaders.c */; };
 		A1D0DC971950383D004717F5 /* webresponse.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2116CA95D300E5D60F /* webresponse.c */; };
 		A1D0DC981950383D004717F5 /* webrequest.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2316CA95D300E5D60F /* webrequest.c */; };
-		A1D0DC9E1950384F004717F5 /* crypt_openssl.c in Sources */ = {isa = PBXBuildFile; fileRef = A179A2FE16DC275F00A1E58F /* crypt_openssl.c */; };
 		A1D0DC9F1950384F004717F5 /* rtpsocket.c in Sources */ = {isa = PBXBuildFile; fileRef = A1D490BF16D4EB000082AFDD /* rtpsocket.c */; };
 		A1D0DCA01950384F004717F5 /* rtprecorder.c in Sources */ = {isa = PBXBuildFile; fileRef = A150075916E94BFA00B1A877 /* rtprecorder.c */; };
 		A1D0DCA11950384F004717F5 /* raopsession.c in Sources */ = {isa = PBXBuildFile; fileRef = A150075216E935A500B1A877 /* raopsession.c */; };
 		A1D0DCA21950384F004717F5 /* raopserver.c in Sources */ = {isa = PBXBuildFile; fileRef = A150074916E8E87B00B1A877 /* raopserver.c */; };
 		A1D0DCA319503854004717F5 /* dacpclient.c in Sources */ = {isa = PBXBuildFile; fileRef = A150075616E9486100B1A877 /* dacpclient.c */; };
-		A1D0DCA419503B38004717F5 /* decoder_alac_other.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9740E16DBAEAA000AD9E4 /* decoder_alac_other.c */; };
 		A1D0DCA619503F85004717F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898F9F413CDAAD1006EC97E /* Foundation.framework */; };
 		A1D0DCA719503F89004717F5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898F9F213CDAAD1006EC97E /* UIKit.framework */; };
-		A1D0DCA819504037004717F5 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1CF856416F3C02B009114B2 /* libcrypto.a */; };
 		A1D0DCAC19504234004717F5 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1D0DCAB19504234004717F5 /* AVFoundation.framework */; };
+		A1FE60E81B7BFD9800C314ED /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1FE60E71B7BFD9800C314ED /* Security.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -60,6 +61,8 @@
 /* Begin PBXFileReference section */
 		4898F9F213CDAAD1006EC97E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		4898F9F413CDAAD1006EC97E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		A12364261B7C111100E1605D /* hex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hex.c; sourceTree = "<group>"; };
+		A12364271B7C111100E1605D /* hex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hex.h; sourceTree = "<group>"; };
 		A14583A916DAE42900911FE6 /* thread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = thread.h; sourceTree = "<group>"; };
 		A14583AA16DAE43400911FE6 /* thread_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thread_posix.c; sourceTree = "<group>"; };
 		A150074816E8E86C00B1A877 /* raopserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = raopserver.h; sourceTree = "<group>"; };
@@ -127,6 +130,9 @@
 		A1E9740E16DBAEAA000AD9E4 /* decoder_alac_other.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decoder_alac_other.c; sourceTree = "<group>"; };
 		A1E9741016DBB23B000AD9E4 /* alac_format.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = alac_format.h; sourceTree = "<group>"; };
 		A1E9741116DBB24D000AD9E4 /* alac_format.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alac_format.c; sourceTree = "<group>"; };
+		A1FE60E11B7BFB2100C314ED /* crypt_key.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypt_key.h; sourceTree = "<group>"; };
+		A1FE60E21B7BFB6500C314ED /* crypt_cc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crypt_cc.c; sourceTree = "<group>"; };
+		A1FE60E71B7BFD9800C314ED /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,10 +140,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A123642C1B7C15FC00E1605D /* libcrypto.a in Frameworks */,
+				A1FE60E81B7BFD9800C314ED /* Security.framework in Frameworks */,
 				A1D0DCAC19504234004717F5 /* AVFoundation.framework in Frameworks */,
 				A1D0DCA719503F89004717F5 /* UIKit.framework in Frameworks */,
 				A1D0DCA619503F85004717F5 /* Foundation.framework in Frameworks */,
-				A1D0DCA819504037004717F5 /* libcrypto.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -164,6 +171,7 @@
 		4898F9F113CDAAD1006EC97E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A1FE60E71B7BFD9800C314ED /* Security.framework */,
 				A1D0DCAB19504234004717F5 /* AVFoundation.framework */,
 				A1CF856416F3C02B009114B2 /* libcrypto.a */,
 				4898F9F213CDAAD1006EC97E /* UIKit.framework */,
@@ -179,15 +187,25 @@
 				A19E4ADE16CA955C00E5D60F /* Audio */,
 				A19E4ADF16CA956400E5D60F /* Server */,
 			);
-			name = libairfloat;
 			path = libairfloat;
+			sourceTree = "<group>";
+		};
+		A12364251B7C110600E1605D /* Hex */ = {
+			isa = PBXGroup;
+			children = (
+				A12364271B7C111100E1605D /* hex.h */,
+				A12364261B7C111100E1605D /* hex.c */,
+			);
+			name = Hex;
 			sourceTree = "<group>";
 		};
 		A150074316E8DA2E00B1A877 /* Crypt */ = {
 			isa = PBXGroup;
 			children = (
 				A179A2FD16DC274D00A1E58F /* crypt.h */,
+				A1FE60E11B7BFB2100C314ED /* crypt_key.h */,
 				A179A2FE16DC275F00A1E58F /* crypt_openssl.c */,
+				A1FE60E21B7BFB6500C314ED /* crypt_cc.c */,
 			);
 			name = Crypt;
 			sourceTree = "<group>";
@@ -356,6 +374,7 @@
 				A150B60B16E6A02900C369C5 /* Hardware */,
 				A1E9741316DC19E5000AD9E4 /* Endian */,
 				A1E9741416DC19F4000AD9E4 /* Base 64 */,
+				A12364251B7C110600E1605D /* Hex */,
 				A19E4AC816CA950500E5D60F /* Settings */,
 				A19E4ACD16CA951A00E5D60F /* Name Values */,
 				A19E4AD216CA952C00E5D60F /* Logging */,
@@ -454,6 +473,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A12364281B7C111100E1605D /* hex.c in Sources */,
 				A1D0DC951950383D004717F5 /* webtools.c in Sources */,
 				A1D0DC8B195037FD004717F5 /* decoder_alac_apple.c in Sources */,
 				A1D0DCA01950384F004717F5 /* rtprecorder.c in Sources */,
@@ -466,7 +486,6 @@
 				A1D0DC89195037FD004717F5 /* alac.c in Sources */,
 				A1D0DC8D19503824004717F5 /* audiooutput_apple.m in Sources */,
 				A1D0DC8C195037FD004717F5 /* decoder.c in Sources */,
-				A1D0DCA419503B38004717F5 /* decoder_alac_other.c in Sources */,
 				A1D0DC85195037EE004717F5 /* log.c in Sources */,
 				A1D0DC81195037EE004717F5 /* base64.c in Sources */,
 				A1D0DC88195037EE004717F5 /* thread_posix.c in Sources */,
@@ -475,10 +494,10 @@
 				A1D0DC941950383D004717F5 /* webserver.c in Sources */,
 				A1D0DC8F1950382F004717F5 /* zeroconf_apple.c in Sources */,
 				A1D0DC8E19503826004717F5 /* audioqueue.c in Sources */,
+				A123642E1B7C17C600E1605D /* crypt_openssl.c in Sources */,
 				A1D0DC87195037EE004717F5 /* condition_posix.c in Sources */,
 				A1D0DCA319503854004717F5 /* dacpclient.c in Sources */,
 				A1D0DC84195037EE004717F5 /* parameters.c in Sources */,
-				A1D0DC9E1950384F004717F5 /* crypt_openssl.c in Sources */,
 				A1D0DC961950383D004717F5 /* webheaders.c in Sources */,
 				A1D0DC9F1950384F004717F5 /* rtpsocket.c in Sources */,
 				A1D0DC83195037EE004717F5 /* dmap.c in Sources */,
@@ -652,6 +671,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(SDKROOT)/usr/lib/system",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -696,6 +716,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(SDKROOT)/usr/lib/system",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -740,6 +761,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(SDKROOT)/usr/lib/system",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -780,6 +802,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(SDKROOT)/usr/lib/system",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -821,6 +844,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(SDKROOT)/usr/lib/system",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -862,6 +886,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(SDKROOT)/usr/lib/system",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -903,6 +928,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(SDKROOT)/usr/lib/system",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -966,6 +992,7 @@
 				A1D0DC771950378A004717F5 /* Ad Hoc Distribution */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
