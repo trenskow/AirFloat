@@ -49,6 +49,7 @@
 		A13F21C716ED10A900365A6D /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A13F21C616ED10A900365A6D /* CFNetwork.framework */; };
 		A14328CE16F8DFD0003AFC5D /* AppViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A14328CD16F8DFD0003AFC5D /* AppViewController.xib */; };
 		A144E3AB1B7E440200A6CE44 /* Default-375w-667h@2x~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = A144E3AA1B7E440200A6CE44 /* Default-375w-667h@2x~iphone.png */; };
+		A144E3AD1B7E45E600A6CE44 /* Default-414w-736h@3x~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = A144E3AC1B7E45E600A6CE44 /* Default-414w-736h@3x~iphone.png */; };
 		A146A93416FA5C1000698A49 /* Support.html in Resources */ = {isa = PBXBuildFile; fileRef = A146A93316FA5C1000698A49 /* Support.html */; };
 		A146A93816FA625600698A49 /* SupportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A146A93616FA625600698A49 /* SupportViewController.m */; };
 		A146A93916FA625600698A49 /* SupportViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A146A93716FA625600698A49 /* SupportViewController.xib */; };
@@ -179,6 +180,7 @@
 		A13F21C616ED10A900365A6D /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		A14328CD16F8DFD0003AFC5D /* AppViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AppViewController.xib; sourceTree = "<group>"; };
 		A144E3AA1B7E440200A6CE44 /* Default-375w-667h@2x~iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-375w-667h@2x~iphone.png"; sourceTree = SOURCE_ROOT; };
+		A144E3AC1B7E45E600A6CE44 /* Default-414w-736h@3x~iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-414w-736h@3x~iphone.png"; sourceTree = "<group>"; };
 		A146A93316FA5C1000698A49 /* Support.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Support.html; sourceTree = "<group>"; };
 		A146A93516FA625600698A49 /* SupportViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SupportViewController.h; sourceTree = "<group>"; };
 		A146A93616FA625600698A49 /* SupportViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SupportViewController.m; sourceTree = "<group>"; };
@@ -471,6 +473,7 @@
 			children = (
 				A1C7F79B1500D2B600D7DE52 /* Default.png */,
 				A1C7F7991500D22100D7DE52 /* Default@2x.png */,
+				A144E3AC1B7E45E600A6CE44 /* Default-414w-736h@3x~iphone.png */,
 				A17D49DA163E7A4C00A94C23 /* Default-568h@2x.png */,
 				A144E3AA1B7E440200A6CE44 /* Default-375w-667h@2x~iphone.png */,
 				A176B70D1739013A00024A3D /* Default-Landscape@2x~ipad.png */,
@@ -693,6 +696,7 @@
 				A10ECCA814E4F94400C1BFAA /* BottomBar@2x.png in Resources */,
 				A10ECCAB14E4F95000C1BFAA /* ArtworkFalloff.png in Resources */,
 				A10ECCAC14E4F95000C1BFAA /* ArtworkFalloff@2x.png in Resources */,
+				A144E3AD1B7E45E600A6CE44 /* Default-414w-736h@3x~iphone.png in Resources */,
 				A10EB41E14E8374F00615CDB /* Next.png in Resources */,
 				A10EB41F14E8374F00615CDB /* Next@2x.png in Resources */,
 				A10EB42014E8374F00615CDB /* Pause.png in Resources */,
