@@ -52,6 +52,7 @@
     
 }
 
+@property (nonatomic, strong) IBOutlet UIView *containerView;
 @property (nonatomic, strong) IBOutlet UIButton* supportButton;
 @property (nonatomic, strong) IBOutlet UIButton* settingsButton;
 @property (nonatomic, strong) IBOutlet AirFloatAdView* adView;
@@ -306,12 +307,30 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
     
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    
+    [super viewWillAppear:animated];
+    
+    if ([[UIDevice currentDevice].systemVersion floatValue] >= 7.0) {
+        CGRect frame = self.containerView.frame;
+        frame.origin.y = 20.0;
+        frame.size.height -= 20.0;
+        self.containerView.frame = frame;
+    }
+    
+}
+
 - (void)viewDidAppear:(BOOL)animated {
     
     [super viewDidAppear:animated];
     
     if (self.server)
         [self.adView startAnimation];
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    
+    return UIStatusBarStyleLightContent;
     
 }
 
