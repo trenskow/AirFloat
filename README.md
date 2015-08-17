@@ -1,5 +1,7 @@
 # AirFloat
 
+[![Join the chat at https://gitter.im/trenskow/AirFloat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/trenskow/AirFloat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ***Remark: AirFloat now compiles on iOS 8.***
 
 AirFloat implements the RAOP (Remote Audio Output Protocol) also known as AirPlay Audio. Essentially this app turns your iPhone into an AirPlay audio receivier like the AirPort Express.
