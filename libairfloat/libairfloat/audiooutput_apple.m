@@ -247,7 +247,7 @@ void audio_output_stop(struct audio_output_t* ao) {
     
 #if TARGET_OS_IPHONE
     @autoreleasepool {
-        [[AVAudioSession sharedInstance] setActive:NO error:nil];
+        [[AVAudioSession sharedInstance] setActive:NO withOptions: AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
     }
 #endif
     

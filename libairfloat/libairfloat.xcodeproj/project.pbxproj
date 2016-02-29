@@ -44,6 +44,7 @@
 		A1D0DCA719503F89004717F5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898F9F213CDAAD1006EC97E /* UIKit.framework */; };
 		A1D0DCAC19504234004717F5 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1D0DCAB19504234004717F5 /* AVFoundation.framework */; };
 		A1FE60E81B7BFD9800C314ED /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1FE60E71B7BFD9800C314ED /* Security.framework */; };
+		C80FE37F1C83F56D00E4A847 /* DeviceIDRetriver.m in Sources */ = {isa = PBXBuildFile; fileRef = C80FE37D1C83F56D00E4A847 /* DeviceIDRetriver.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -133,6 +134,8 @@
 		A1FE60E11B7BFB2100C314ED /* crypt_key.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypt_key.h; sourceTree = "<group>"; };
 		A1FE60E21B7BFB6500C314ED /* crypt_cc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crypt_cc.c; sourceTree = "<group>"; };
 		A1FE60E71B7BFD9800C314ED /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		C80FE37D1C83F56D00E4A847 /* DeviceIDRetriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceIDRetriver.m; sourceTree = "<group>"; };
+		C80FE37E1C83F56D00E4A847 /* DeviceIDRetriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceIDRetriver.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -323,6 +326,8 @@
 		A19E4B0E16CA95BB00E5D60F /* Web */ = {
 			isa = PBXGroup;
 			children = (
+				C80FE37D1C83F56D00E4A847 /* DeviceIDRetriver.m */,
+				C80FE37E1C83F56D00E4A847 /* DeviceIDRetriver.h */,
 				A1CD9F2717076E350015CBBA /* Client */,
 				A1CD9F2617076D880015CBBA /* Server */,
 				A19E4B1C16CA95D300E5D60F /* webtools.h */,
@@ -426,9 +431,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A1D0DC4F1950378A004717F5 /* airfloat */ = {
+		A1D0DC4F1950378A004717F5 /* libairfloat */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A1D0DC701950378A004717F5 /* Build configuration list for PBXNativeTarget "airfloat" */;
+			buildConfigurationList = A1D0DC701950378A004717F5 /* Build configuration list for PBXNativeTarget "libairfloat" */;
 			buildPhases = (
 				A1D0DC4C1950378A004717F5 /* Sources */,
 				A1D0DC4D1950378A004717F5 /* Frameworks */,
@@ -438,7 +443,7 @@
 			);
 			dependencies = (
 			);
-			name = airfloat;
+			name = libairfloat;
 			productName = libairfloat;
 			productReference = A1D0DC501950378A004717F5 /* libairfloat.a */;
 			productType = "com.apple.product-type.library.static";
@@ -463,7 +468,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A1D0DC4F1950378A004717F5 /* airfloat */,
+				A1D0DC4F1950378A004717F5 /* libairfloat */,
 			);
 		};
 /* End PBXProject section */
@@ -486,6 +491,7 @@
 				A1D0DC89195037FD004717F5 /* alac.c in Sources */,
 				A1D0DC8D19503824004717F5 /* audiooutput_apple.m in Sources */,
 				A1D0DC8C195037FD004717F5 /* decoder.c in Sources */,
+				C80FE37F1C83F56D00E4A847 /* DeviceIDRetriver.m in Sources */,
 				A1D0DC85195037EE004717F5 /* log.c in Sources */,
 				A1D0DC81195037EE004717F5 /* base64.c in Sources */,
 				A1D0DC88195037EE004717F5 /* thread_posix.c in Sources */,
@@ -654,10 +660,6 @@
 				DSTROOT = /tmp/airfloat.dst;
 				ENABLE_BITCODE = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -701,10 +703,6 @@
 				DSTROOT = /tmp/airfloat.dst;
 				ENABLE_BITCODE = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -748,10 +746,6 @@
 				DSTROOT = /tmp/airfloat.dst;
 				ENABLE_BITCODE = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -994,7 +988,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A1D0DC701950378A004717F5 /* Build configuration list for PBXNativeTarget "airfloat" */ = {
+		A1D0DC701950378A004717F5 /* Build configuration list for PBXNativeTarget "libairfloat" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A1D0DC711950378A004717F5 /* Debug */,

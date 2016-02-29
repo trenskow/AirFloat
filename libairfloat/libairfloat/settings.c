@@ -75,7 +75,7 @@ void settings_set_name(struct settings_t* s, const char* new_name) {
     if (new_name == NULL || strlen(new_name) == 0)
         s_name = "AirFloat";
     
-    s->name = (char*)malloc(strlen(s_name + 1));
+    s->name = (char*)malloc(strlen(s_name) + 1);
     strcpy(s->name, s_name);
 
 }

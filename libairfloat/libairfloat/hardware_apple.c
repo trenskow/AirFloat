@@ -1,5 +1,5 @@
 //
-//  hardware.c
+//  hardware_apple.c
 //  AirFloat
 //
 //  Copyright (c) 2013, Kristian Trenskow All rights reserved.
@@ -39,6 +39,8 @@
 #include <ifaddrs.h>
 
 #include <mach/mach_time.h>
+
+#include "DeviceIDRetriver.h"
 
 bool _hardware_time_initiated = false;
 uint32_t _hardware_time_to_nanos_numerator;
@@ -83,10 +85,13 @@ uint64_t hardware_identifier() {
     
     freeifaddrs(if_addrs);
     
-    return ret;
+    //return ret;
     
-}
-
+//}
+    
+    return iOSDeviceID();
+  }
+    
 double hardware_get_time() {
     
     return hardware_host_time_to_seconds(mach_absolute_time());

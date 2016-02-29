@@ -66,7 +66,7 @@ void _web_server_socket_closed(socket_p socket, void* ctx) {
         if (ws->connections[i].socket == socket) {
             
             web_server_connection_destroy(ws->connections[i].web_connection);
-            socket_destroy(ws->connections[i].socket);
+            //socket_destroy(ws->connections[i].socket);
             
             for (uint32_t x = i ; x < ws->connection_count - 1 ; x++)
                 ws->connections[x] = ws->connections[x + 1];

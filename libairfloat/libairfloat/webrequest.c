@@ -137,7 +137,7 @@ ssize_t web_request_parse(struct web_request_t* wr, const void* data, size_t dat
             strcpy(wr->command, cmd);
             wr->path = (char*)malloc(strlen(path) + 1);
             strcpy(wr->path, path);
-            wr->protocol = (char*)malloc(strlen(path) + 1);
+            wr->protocol = (char*)malloc(strlen(protocol) + 1);
             strcpy(wr->protocol, protocol);
             
             web_headers_destroy(wr->headers);
