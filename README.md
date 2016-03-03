@@ -6,7 +6,7 @@
 
 AirFloat implements the RAOP (Remote Audio Output Protocol) also known as AirPlay Audio. Essentially this app turns your iPhone into an AirPlay audio receivier like the AirPort Express.
 
-Please note this repo also includes integrated libairfloat.
+***Remark: Please note this repo also includes integrated libairfloat.
 
 ##Contributions
 @davhelm
