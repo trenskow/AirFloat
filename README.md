@@ -9,7 +9,7 @@ AirFloat implements the RAOP (Remote Audio Output Protocol) also known as AirPla
 Please note this repo also includes integrated libairfloat.
 
 ##Contributions
-@#davhelm
+@davhelm
 @yfliao
 @ataibarkai
 @faisalmemon
