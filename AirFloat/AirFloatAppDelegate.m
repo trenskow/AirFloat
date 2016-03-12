@@ -53,14 +53,18 @@
     
     NSString* filename = [[[NSBundle mainBundle] bundleIdentifier] stringByAppendingPathExtension:@"plist"];
     
-#if TARGET_IPHONE_SIMULATOR
-    NSString* path = [[NSString stringWithFormat:@"/Users/%@/Library/Preferences/", NSUserName()] stringByAppendingPathComponent:filename];
-#else
-    NSString* path = [@"/var/mobile/Library/Preferences/" stringByAppendingPathComponent:filename];
-#endif
+//#if TARGET_IPHONE_SIMULATOR
+    //NSString* path = [[NSString stringWithFormat:@"/Users/%@/Library/Preferences/", NSUserName()] stringByAppendingPathComponent:filename];
+//#else
+    //NSString* path = [@"/var/mobile/Library/Preferences/" stringByAppendingPathComponent:filename];
+//#endif
     
-    return path;
+    //return path;
+    NSArray *mypaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [mypaths objectAtIndex:0];
+    NSString *newpath = [documentsDirectory stringByAppendingPathComponent:filename];
     
+    return newpath;
 }
 
 - (NSDictionary *)settings {
