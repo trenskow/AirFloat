@@ -8,15 +8,17 @@ AirFloat implements the RAOP (Remote Audio Output Protocol) also known as AirPla
 
 ***Remark: Please note this repo also includes integrated libairfloat***
 
-##Contributions
+## Install
+
+Download, open in Xcode and build.
+
+##Contributors
+
 @davhelm
 @yfliao
 @ataibarkai
 @faisalmemon
-
-## Install
-
-Download, open in Xcode and build.
+@JBA474
 
 ## License
 
