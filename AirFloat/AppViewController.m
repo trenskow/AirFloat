@@ -733,11 +733,11 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
 
 - (void)updateScreenIdleState {
     
-    BOOL disabled = [[AirFloatSharedAppDelegate.settings objectForKey:@"keepScreenLit"] boolValue];
+    BOOL disabled = [[[AirFloatSharedAppDelegate getSettings] objectForKey:@"keepScreenLit"] boolValue];
     
-    disabled &= (![[AirFloatSharedAppDelegate.settings objectForKey:@"keepScreenLitOnlyWhenReceiving"] boolValue] || (_server != NULL && raop_server_is_recording(_server)));
+    disabled &= (![[[AirFloatSharedAppDelegate getSettings] objectForKey:@"keepScreenLitOnlyWhenReceiving"] boolValue] || (_server != NULL && raop_server_is_recording(_server)));
     
-    disabled &= (![[AirFloatSharedAppDelegate.settings objectForKey:@"keepScreenLitOnlyWhenConnectedToPower"] boolValue] || ([UIDevice currentDevice].batteryState == UIDeviceBatteryStateCharging || [UIDevice currentDevice].batteryState == UIDeviceBatteryStateFull));
+    disabled &= (![[[AirFloatSharedAppDelegate getSettings] objectForKey:@"keepScreenLitOnlyWhenConnectedToPower"] boolValue] || ([UIDevice currentDevice].batteryState == UIDeviceBatteryStateCharging || [UIDevice currentDevice].batteryState == UIDeviceBatteryStateFull));
     
     [UIApplication sharedApplication].idleTimerDisabled = disabled;
     

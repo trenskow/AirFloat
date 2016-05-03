@@ -37,6 +37,7 @@
 
 @property (nonatomic, strong) UIWindow *window;
 @property (nonatomic, strong) AppViewController* appViewController;
-
+- (NSDictionary*) getSettings;
+- (void) setSettings:(NSDictionary *)settings;
 
 @end

@@ -46,17 +46,11 @@
     NSDictionary *_settings;
 }
 
+#pragma mark - Application Settings
+
 - (NSString *)settingsPath {
-
+    
     NSString* filename = [[[NSBundle mainBundle] bundleIdentifier] stringByAppendingPathExtension:@"plist"];
-
-//#if TARGET_IPHONE_SIMULATOR
-    //NSString* path = [[NSString stringWithFormat:@"/Users/%@/Library/Preferences/", NSUserName()] stringByAppendingPathComponent:filename];
-//#else
-    //NSString* path = [@"/var/mobile/Library/Preferences/" stringByAppendingPathComponent:filename];
-//#endif
-
-    //return path;
     NSArray *mypaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [mypaths objectAtIndex:0];
     NSString *newpath = [documentsDirectory stringByAppendingPathComponent:filename];
@@ -64,7 +58,7 @@
     return newpath;
 }
 
-- (NSDictionary *)settings {
+- (NSDictionary *)getSettings {
     
     if (!_settings) {
         _settings = [[NSDictionary alloc] initWithContentsOfFile:[self settingsPath]];
@@ -94,7 +88,7 @@
     }
     
     [self didChangeValueForKey:@"settings"];
-        
+    
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -121,8 +115,8 @@
     if (!self.server) {
         
         struct raop_server_settings_t settings;
-        settings.name = [[self.settings objectForKey:@"name"] cStringUsingEncoding:NSUTF8StringEncoding];
-        settings.password = ([[self.settings objectForKey:@"authenticationEnabled"] boolValue] ? [[self.settings objectForKey:@"password"] cStringUsingEncoding:NSUTF8StringEncoding] : NULL);
+        settings.name = [[_settings objectForKey:@"name"] cStringUsingEncoding:NSUTF8StringEncoding];
+        settings.password = ([[_settings objectForKey:@"authenticationEnabled"] boolValue] ? [[_settings objectForKey:@"password"] cStringUsingEncoding:NSUTF8StringEncoding] : NULL);
         
         self.server = raop_server_create(settings);
         
