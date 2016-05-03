@@ -29,11 +29,12 @@
 //
 
 #import <UIKit/UIKit.h>
-
 #import <libairfloat/raopserver.h>
 
 @interface AppViewController : UIViewController
 
 @property (assign,nonatomic,readwrite) raop_server_p server;
+- (void)handleForegroundTasks;
+- (void)handleBackgroundTasks;
 
 @end
