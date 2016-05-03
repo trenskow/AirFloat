@@ -39,7 +39,6 @@
 		A129DD7D16F94D02004AA3BD /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A129DD7C16F94D02004AA3BD /* SettingsViewController.m */; };
 		A12B7AFF14FDCBE20068538D /* AirFloatAdView.m in Sources */ = {isa = PBXBuildFile; fileRef = A12B7AFC14FDCBE20068538D /* AirFloatAdView.m */; };
 		A12B7B0914FDCCB20068538D /* Images.plist in Resources */ = {isa = PBXBuildFile; fileRef = A12B7B0514FDCCB20068538D /* Images.plist */; };
-		A12CB48A195047C00093C7AE /* libairfloat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A12CB487195047B30093C7AE /* libairfloat.a */; };
 		A1389E0914E417E6004FE040 /* TopBar.png in Resources */ = {isa = PBXBuildFile; fileRef = A1389E0714E417E6004FE040 /* TopBar.png */; };
 		A1389E0A14E417E6004FE040 /* TopBar@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A1389E0814E417E6004FE040 /* TopBar@2x.png */; };
 		A1389E0D14E41A87004FE040 /* NoArtwork~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = A1389E0B14E41A87004FE040 /* NoArtwork~iphone.png */; };
@@ -108,22 +107,23 @@
 		A1C7F79C1500D2B600D7DE52 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = A1C7F79B1500D2B600D7DE52 /* Default.png */; };
 		A1DE598714CF163500A6767D /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1DE598614CF163500A6767D /* MediaPlayer.framework */; };
 		A1DF3AF514C4623700252C95 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1DF3AF414C4623700252C95 /* AVFoundation.framework */; };
+		C001F1F41CD888C1005954E3 /* liblibairfloat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C001F1F01CD8880B005954E3 /* liblibairfloat.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		A12CB486195047B30093C7AE /* PBXContainerItemProxy */ = {
+		C001F1EF1CD8880B005954E3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A12CB482195047B30093C7AE /* libairfloat.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = A1D0DC501950378A004717F5;
-			remoteInfo = airfloat;
+			remoteInfo = libairfloat;
 		};
-		A12CB488195047BA0093C7AE /* PBXContainerItemProxy */ = {
+		C001F1F21CD888BC005954E3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A12CB482195047B30093C7AE /* libairfloat.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = A1D0DC4F1950378A004717F5;
-			remoteInfo = airfloat;
+			remoteInfo = libairfloat;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -253,7 +253,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A12CB48A195047C00093C7AE /* libairfloat.a in Frameworks */,
+				C001F1F41CD888C1005954E3 /* liblibairfloat.a in Frameworks */,
 				A1ACB4F416FA286F008E4C4F /* OpenGLES.framework in Frameworks */,
 				A1ACB4EE16FA2264008E4C4F /* CoreImage.framework in Frameworks */,
 				A13F21C716ED10A900365A6D /* CFNetwork.framework in Frameworks */,
@@ -277,6 +277,7 @@
 			children = (
 				4898F9F813CDAAD1006EC97E /* AirFloat */,
 				4898F9EF13CDAAD1006EC97E /* Products */,
+				C001F23F1CD89645005954E3 /* libairfloat */,
 			);
 			sourceTree = "<group>";
 		};
@@ -291,7 +292,6 @@
 		4898F9F113CDAAD1006EC97E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A12CB482195047B30093C7AE /* libairfloat.xcodeproj */,
 				A17E9233152DA909000331D3 /* libz.1.tbd */,
 				A1ACB4F316FA286F008E4C4F /* OpenGLES.framework */,
 				A1ACB4ED16FA2264008E4C4F /* CoreImage.framework */,
@@ -313,9 +313,11 @@
 		4898F9F813CDAAD1006EC97E /* AirFloat */ = {
 			isa = PBXGroup;
 			children = (
-				A1B3E3DE14CE09A300379E8C /* Additions */,
-				A116EA8B16EE6278005530E9 /* App */,
+				4898FA0113CDAAD1006EC97E /* AirFloatAppDelegate.h */,
+				4898FA0213CDAAD1006EC97E /* AirFloatAppDelegate.m */,
+				A116EA8B16EE6278005530E9 /* Source */,
 				4898F9F913CDAAD1006EC97E /* Supporting Files */,
+				A1B3E3DE14CE09A300379E8C /* Additions */,
 				4898F9F113CDAAD1006EC97E /* Frameworks */,
 			);
 			path = AirFloat;
@@ -331,43 +333,43 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		A116EA8B16EE6278005530E9 /* App */ = {
+		A116EA8B16EE6278005530E9 /* Source */ = {
 			isa = PBXGroup;
 			children = (
 				A116EA8F16EE629C005530E9 /* View Controllers */,
-				4898FA0113CDAAD1006EC97E /* AirFloatAppDelegate.h */,
-				4898FA0213CDAAD1006EC97E /* AirFloatAppDelegate.m */,
+				A1594D9916FCB22900D14269 /* Controls */,
+				A12B7AF914FDCBCE0068538D /* Views */,
+				A1ACB4EF16FA2345008E4C4F /* Categories */,
 			);
-			name = App;
+			name = Source;
 			sourceTree = "<group>";
 		};
 		A116EA8F16EE629C005530E9 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				A176B6F817385FD900024A3D /* Panels */,
 				A116EA8C16EE6297005530E9 /* AppViewController.h */,
 				A116EA8D16EE6297005530E9 /* AppViewController.m */,
+				A146A93516FA625600698A49 /* SupportViewController.h */,
+				A146A93616FA625600698A49 /* SupportViewController.m */,
+				A129DD7B16F94D02004AA3BD /* SettingsViewController.h */,
+				A129DD7C16F94D02004AA3BD /* SettingsViewController.m */,
+				A176B6F517385FD600024A3D /* PanelViewController.h */,
+				A176B6F617385FD600024A3D /* PanelViewController.m */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
 		};
-		A12B7AF914FDCBCE0068538D /* Intro */ = {
+		A12B7AF914FDCBCE0068538D /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				A129DD6116F93586004AA3BD /* AirFloatReflectionView.h */,
+				A129DD6216F93586004AA3BD /* AirFloatReflectionView.m */,
 				A116EA8416EE448D005530E9 /* AirFloatFlipInView.h */,
 				A116EA8516EE448D005530E9 /* AirFloatFlipInView.m */,
 				A12B7AFB14FDCBE20068538D /* AirFloatAdView.h */,
 				A12B7AFC14FDCBE20068538D /* AirFloatAdView.m */,
 			);
-			name = Intro;
-			sourceTree = "<group>";
-		};
-		A12CB483195047B30093C7AE /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				A12CB487195047B30093C7AE /* libairfloat.a */,
-			);
-			name = Products;
+			name = Views;
 			sourceTree = "<group>";
 		};
 		A146A93216FA5C0300698A49 /* Support */ = {
@@ -385,8 +387,12 @@
 		A1594D9916FCB22900D14269 /* Controls */ = {
 			isa = PBXGroup;
 			children = (
+				A10392D814E9B6C400DB356F /* AirFloatBarButton.h */,
+				A10392D914E9B6C400DB356F /* AirFloatBarButton.m */,
 				A1594D9A16FCB24100D14269 /* AirFloatSwitch.h */,
 				A1594D9B16FCB24100D14269 /* AirFloatSwitch.m */,
+				A174B37616FB0F4C0063035C /* AirFloatScrollingLabel.h */,
+				A174B37716FB0F4C0063035C /* AirFloatScrollingLabel.m */,
 			);
 			name = Controls;
 			sourceTree = "<group>";
@@ -408,20 +414,6 @@
 			name = Switch;
 			sourceTree = "<group>";
 		};
-		A16EF34514FB79C800593466 /* Cocoa Touch */ = {
-			isa = PBXGroup;
-			children = (
-				A12B7AF914FDCBCE0068538D /* Intro */,
-				A10392D814E9B6C400DB356F /* AirFloatBarButton.h */,
-				A10392D914E9B6C400DB356F /* AirFloatBarButton.m */,
-				A129DD6116F93586004AA3BD /* AirFloatReflectionView.h */,
-				A129DD6216F93586004AA3BD /* AirFloatReflectionView.m */,
-				A174B37616FB0F4C0063035C /* AirFloatScrollingLabel.h */,
-				A174B37716FB0F4C0063035C /* AirFloatScrollingLabel.m */,
-			);
-			name = "Cocoa Touch";
-			sourceTree = "<group>";
-		};
 		A174B37D16FC70F20063035C /* Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -434,36 +426,6 @@
 				A1594DB316FD231800D14269 /* SettingsInputHighlightedBackground@2x.png */,
 				A174B37E16FC71050063035C /* SettingsGroupBackground.png */,
 				A174B37F16FC71050063035C /* SettingsGroupBackground@2x.png */,
-			);
-			name = Settings;
-			sourceTree = "<group>";
-		};
-		A176B6F817385FD900024A3D /* Panels */ = {
-			isa = PBXGroup;
-			children = (
-				A176B6F917385FE100024A3D /* Support */,
-				A176B6FA17385FE600024A3D /* Settings */,
-				A176B6F517385FD600024A3D /* PanelViewController.h */,
-				A176B6F617385FD600024A3D /* PanelViewController.m */,
-			);
-			name = Panels;
-			sourceTree = "<group>";
-		};
-		A176B6F917385FE100024A3D /* Support */ = {
-			isa = PBXGroup;
-			children = (
-				A146A93516FA625600698A49 /* SupportViewController.h */,
-				A146A93616FA625600698A49 /* SupportViewController.m */,
-			);
-			name = Support;
-			sourceTree = "<group>";
-		};
-		A176B6FA17385FE600024A3D /* Settings */ = {
-			isa = PBXGroup;
-			children = (
-				A1594D9916FCB22900D14269 /* Controls */,
-				A129DD7B16F94D02004AA3BD /* SettingsViewController.h */,
-				A129DD7C16F94D02004AA3BD /* SettingsViewController.m */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -585,15 +547,6 @@
 			name = Other;
 			sourceTree = "<group>";
 		};
-		A1A8079614F10FB5005FFDA5 /* Custom Classes */ = {
-			isa = PBXGroup;
-			children = (
-				A1ACB4EF16FA2345008E4C4F /* Categories */,
-				A16EF34514FB79C800593466 /* Cocoa Touch */,
-			);
-			name = "Custom Classes";
-			sourceTree = "<group>";
-		};
 		A1ACB4EF16FA2345008E4C4F /* Categories */ = {
 			isa = PBXGroup;
 			children = (
@@ -608,9 +561,24 @@
 		A1B3E3DE14CE09A300379E8C /* Additions */ = {
 			isa = PBXGroup;
 			children = (
-				A1A8079614F10FB5005FFDA5 /* Custom Classes */,
 			);
 			name = Additions;
+			sourceTree = "<group>";
+		};
+		C001F1EC1CD8880B005954E3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C001F1F01CD8880B005954E3 /* liblibairfloat.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C001F23F1CD89645005954E3 /* libairfloat */ = {
+			isa = PBXGroup;
+			children = (
+				A12CB482195047B30093C7AE /* libairfloat.xcodeproj */,
+			);
+			name = libairfloat;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -628,7 +596,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				A12CB489195047BA0093C7AE /* PBXTargetDependency */,
+				C001F1F31CD888BC005954E3 /* PBXTargetDependency */,
 			);
 			name = AirFloat;
 			productName = AirFloat;
@@ -641,12 +609,7 @@
 		4898F9E513CDAAD1006EC97E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
-				TargetAttributes = {
-					4898F9ED13CDAAD1006EC97E = {
-						DevelopmentTeam = 62L85VT9WB;
-					};
-				};
+				LastUpgradeCheck = 0730;
 			};
 			buildConfigurationList = 4898F9E813CDAAD1006EC97E /* Build configuration list for PBXProject "AirFloat" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -654,13 +617,14 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 4898F9E313CDAAD1006EC97E;
 			productRefGroup = 4898F9EF13CDAAD1006EC97E /* Products */;
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = A12CB483195047B30093C7AE /* Products */;
+					ProductGroup = C001F1EC1CD8880B005954E3 /* Products */;
 					ProjectRef = A12CB482195047B30093C7AE /* libairfloat.xcodeproj */;
 				},
 			);
@@ -672,11 +636,11 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		A12CB487195047B30093C7AE /* libairfloat.a */ = {
+		C001F1F01CD8880B005954E3 /* liblibairfloat.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libairfloat.a;
-			remoteRef = A12CB486195047B30093C7AE /* PBXContainerItemProxy */;
+			path = liblibairfloat.a;
+			remoteRef = C001F1EF1CD8880B005954E3 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -806,10 +770,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		A12CB489195047BA0093C7AE /* PBXTargetDependency */ = {
+		C001F1F31CD888BC005954E3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = airfloat;
-			targetProxy = A12CB488195047BA0093C7AE /* PBXContainerItemProxy */;
+			name = libairfloat;
+			targetProxy = C001F1F21CD888BC005954E3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -818,17 +782,21 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "";
+				ARCHS = armv7;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_BITCODE = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
@@ -836,7 +804,14 @@
 					"-DALLOW_LOCALHOST",
 					"-DUSE_BSD_SOCKETS",
 				);
+				OTHER_LDFLAGS = (
+					"-all_load",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tren.AirFloat;
+				PRODUCT_NAME = "";
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -844,49 +819,41 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "";
+				ARCHS = armv7;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = "-DUSE_BSD_SOCKETS";
-				SDKROOT = iphoneos;
-			};
-			name = Release;
-		};
-		4898FA1013CDAAD1006EC97E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				COPY_PHASE_STRIP = YES;
-				ENABLE_BITCODE = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/..\"",
 					"\"$(SRCROOT)\"",
 				);
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "-DUSE_BSD_SOCKETS";
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
 				);
-				PRODUCT_NAME = AirFloat;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tren.AirFloat;
+				PRODUCT_NAME = "";
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4898FA1013CDAAD1006EC97E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
+				PRODUCT_NAME = AirFloat;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -894,30 +861,8 @@
 		4898FA1113CDAAD1006EC97E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				COPY_PHASE_STRIP = YES;
-				ENABLE_BITCODE = NO;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
-				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/..\"",
-					"\"$(SRCROOT)\"",
-				);
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = (
-					"-all_load",
-					"-ObjC",
-				);
 				PRODUCT_NAME = AirFloat;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -926,53 +871,46 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "";
+				ARCHS = armv7;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = (
-					"-DLOG_SERVER",
-					"-DALLOW_LOCALHOST",
-					"-DUSE_BSD_SOCKETS",
-				);
-				SDKROOT = iphoneos;
-			};
-			name = "Release (Server Logs)";
-		};
-		A116EA6516EDFDC7005530E9 /* Release (Server Logs) */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				COPY_PHASE_STRIP = YES;
-				ENABLE_BITCODE = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
-				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
+				INFOPLIST_FILE = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/..\"",
 					"\"$(SRCROOT)\"",
 				);
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = (
+					"-DLOG_SERVER",
+					"-DALLOW_LOCALHOST",
+					"-DUSE_BSD_SOCKETS",
+				);
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
 				);
-				PRODUCT_NAME = AirFloat;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tren.AirFloat;
+				PRODUCT_NAME = "";
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release (Server Logs)";
+		};
+		A116EA6516EDFDC7005530E9 /* Release (Server Logs) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
+				PRODUCT_NAME = AirFloat;
 				WRAPPER_EXTENSION = app;
 			};
 			name = "Release (Server Logs)";
@@ -981,18 +919,26 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "";
+				ARCHS = armv7;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_BITCODE = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
+				INFOPLIST_FILE = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/..\"",
+					"\"$(SRCROOT)\"",
+				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DDEBUG",
@@ -1000,37 +946,23 @@
 					"-DALLOW_LOCALHOST",
 					"-DUSE_BSD_SOCKETS",
 				);
+				OTHER_LDFLAGS = (
+					"-all_load",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tren.AirFloat;
+				PRODUCT_NAME = "";
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = "Debug (Server Logs)";
 		};
 		A149209514E7323900849DC3 /* Debug (Server Logs) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				COPY_PHASE_STRIP = YES;
-				ENABLE_BITCODE = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
-				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/..\"",
-					"\"$(SRCROOT)\"",
-				);
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = (
-					"-all_load",
-					"-ObjC",
-				);
 				PRODUCT_NAME = AirFloat;
-				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = "Debug (Server Logs)";
@@ -1039,35 +971,19 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "";
+				ARCHS = armv7;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
-			};
-			name = "App Store Distribution";
-		};
-		A1A76012151B56B800728C9C /* App Store Distribution */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				COPY_PHASE_STRIP = YES;
-				ENABLE_BITCODE = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
-				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
+				INFOPLIST_FILE = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/..\"",
@@ -1078,9 +994,19 @@
 					"-all_load",
 					"-ObjC",
 				);
-				PRODUCT_NAME = AirFloat;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tren.AirFloat;
+				PRODUCT_NAME = "";
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = "App Store Distribution";
+		};
+		A1A76012151B56B800728C9C /* App Store Distribution */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
+				PRODUCT_NAME = AirFloat;
 				WRAPPER_EXTENSION = app;
 			};
 			name = "App Store Distribution";
@@ -1089,35 +1015,19 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "";
+				ARCHS = armv7;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
-			};
-			name = "Ad Hoc Distribution";
-		};
-		A1C7F7AB1501048400D7DE52 /* Ad Hoc Distribution */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				COPY_PHASE_STRIP = YES;
-				ENABLE_BITCODE = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
-				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
+				INFOPLIST_FILE = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/..\"",
@@ -1128,9 +1038,19 @@
 					"-all_load",
 					"-ObjC",
 				);
-				PRODUCT_NAME = AirFloat;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tren.AirFloat;
+				PRODUCT_NAME = "";
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = "Ad Hoc Distribution";
+		};
+		A1C7F7AB1501048400D7DE52 /* Ad Hoc Distribution */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
+				PRODUCT_NAME = AirFloat;
 				WRAPPER_EXTENSION = app;
 			};
 			name = "Ad Hoc Distribution";
@@ -1139,56 +1059,50 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "";
+				ARCHS = armv7;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_BITCODE = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = (
-					"-DDEBUG",
-					"-DLOG_SERVER",
-					"-DALAC_SOFTWARE",
-					"-DUSE_BSD_SOCKETS",
-				);
-				SDKROOT = iphoneos;
-			};
-			name = "Debug (Server Logs - ALAC Software)";
-		};
-		A1ECED9016E8CFA500F8E7E3 /* Debug (Server Logs - ALAC Software) */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				COPY_PHASE_STRIP = YES;
-				ENABLE_BITCODE = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirFloat/AirFloat-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libairfloat\"";
-				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
+				INFOPLIST_FILE = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/..\"",
 					"\"$(SRCROOT)\"",
 				);
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = (
+					"-DDEBUG",
+					"-DLOG_SERVER",
+					"-DALAC_SOFTWARE",
+					"-DUSE_BSD_SOCKETS",
+					"-LOG_SERVER",
+				);
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
 				);
-				PRODUCT_NAME = AirFloat;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tren.AirFloat;
+				PRODUCT_NAME = "";
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug (Server Logs - ALAC Software)";
+		};
+		A1ECED9016E8CFA500F8E7E3 /* Debug (Server Logs - ALAC Software) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
+				PRODUCT_NAME = AirFloat;
 				WRAPPER_EXTENSION = app;
 			};
 			name = "Debug (Server Logs - ALAC Software)";
