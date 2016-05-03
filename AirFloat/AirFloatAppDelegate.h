@@ -40,5 +40,6 @@
 - (NSDictionary*) getSettings;
 - (void) setSettings:(NSDictionary *)settings;
 - (void) startRaopServer;
+- (void) showNotification:(NSString*)messageTitle;
 
 @end

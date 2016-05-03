@@ -43,6 +43,62 @@
     NSDictionary *_settings;
 }
 
+
+#pragma mark - NSApplication delegates
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    self.appViewController = [[[AppViewController alloc] init] autorelease];
+    
+    self.window = [[[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds] autorelease];
+    
+    if ([self.window respondsToSelector:@selector(setRootViewController:)])
+        self.window.rootViewController = self.appViewController;
+    else {
+        self.appViewController.view.frame = CGRectMake(0, 20, 320, 460);
+        [self.window addSubview:self.appViewController.view];
+    }
+    
+    [self.window makeKeyAndVisible];
+    
+    if ([UIApplication instancesRespondToSelector:@selector(registerUserNotificationSettings:)]){
+        [application registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound categories:nil]];
+    }
+    
+    audio_output_session_start();
+    
+    return YES;
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application
+{
+    [self startRaopServer];
+}
+
+- (void)applicationWillResignActive:(UIApplication *)application
+{
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+    [self.appViewController handleForegroundTasks];
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    
+    if (self.server && !raop_server_is_recording(self.server)) {
+        raop_server_stop(self.server);
+        raop_server_destroy(self.server);
+        self.appViewController.server = self.server = NULL;
+    }
+    
+}
+
+- (void)applicationWillTerminate:(UIApplication *)application
+{
+}
+
+
 #pragma mark - Application Settings
 
 - (NSString *)settingsPath {
@@ -88,61 +144,6 @@
     
 }
 
-#pragma mark - NSApplication delegate methods
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
-    self.appViewController = [[[AppViewController alloc] init] autorelease];
-    
-    self.window = [[[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds] autorelease];
-    
-    if ([self.window respondsToSelector:@selector(setRootViewController:)])
-        self.window.rootViewController = self.appViewController;
-    else {
-        self.appViewController.view.frame = CGRectMake(0, 20, 320, 460);
-        [self.window addSubview:self.appViewController.view];
-    }
-    
-    [self.window makeKeyAndVisible];
-    
-    if ([UIApplication instancesRespondToSelector:@selector(registerUserNotificationSettings:)]){
-        [application registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound categories:nil]];
-    }
-    
-    audio_output_session_start();
-    
-    return YES;
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application
-{
-    [self startRaopServer];
-}
-
-
-- (void)applicationWillResignActive:(UIApplication *)application
-{
-}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application
-{
-    [self.appViewController handleTasksForApplicationInForeground];
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-    
-    if (self.server && !raop_server_is_recording(self.server)) {
-        raop_server_stop(self.server);
-        raop_server_destroy(self.server);
-        self.appViewController.server = self.server = NULL;
-    }
-    
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application
-{
-}
-
 
 #pragma mark - RAOP Server interface
 
@@ -164,6 +165,23 @@
         
     }
     
+}
+
+
+#pragma mark - Background Notifications
+
+-(void) showNotification:(NSString*)messageTitle
+{
+    if (!messageTitle) {
+        messageTitle = @"Stream started.";
+    }
+    
+    UILocalNotification *notification = [[UILocalNotification alloc] init];
+    notification.alertBody = messageTitle;
+    notification.fireDate = [NSDate date];
+    notification.soundName = UILocalNotificationDefaultSoundName;
+    
+    [[UIApplication sharedApplication] scheduleLocalNotification:notification];
 }
 
 @end
