@@ -224,16 +224,64 @@ void audio_output_set_callback(struct audio_output_t* ao, audio_output_callback 
     
 }
 
+void audio_output_session_start () {
+    
+        double sampleRate = 44100.0;
+        float frameCount = 4096.0f;
+        double bufferLength = (frameCount/sampleRate);   // 1500ms
+    
+        // AVAudioSession: Sample Rate
+        NSError *rateError = nil;
+        [[AVAudioSession sharedInstance] setPreferredSampleRate:sampleRate error:&rateError];
+        if (rateError) {
+            log_message(LOG_ERROR, "Error setting SampleRate: %@", [rateError description]);
+        }
+        
+        // AVAudioSession: Buffer Duration
+        NSError *bufferError = nil;
+        [[AVAudioSession sharedInstance] setPreferredIOBufferDuration:bufferLength error:&bufferError];
+        if (bufferError) {
+            log_message(LOG_ERROR, "Error setting BufferDuration: %@", [bufferError description]);
+        }
+        
+        // AVAudioSession: Category
+        NSError *categoryError = nil;
+        [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error:&categoryError];
+        if (categoryError) {
+            log_message(LOG_ERROR, "Error setting Category: %@", [categoryError description]);
+        }
+        
+        // AVAudioSession: Activation
+        NSError *activationError = nil;
+        BOOL didActivate = [[AVAudioSession sharedInstance] setActive: YES error: &activationError];
+        if (!didActivate) {
+            if (activationError) {
+                log_message(LOG_ERROR, "Could not activate AVAudioSession, Error %@", [activationError localizedDescription]);
+            } else {
+                log_message(LOG_ERROR, "Could not activate AVAudioSession");
+            }
+        }
+}
+
+void audio_output_session_stop () {
+    
+    // AVAudioSession: De-Activation
+    NSError *deactivationError = nil;
+    BOOL didDeactivate = [[AVAudioSession sharedInstance] setActive:NO withOptions: AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error: &deactivationError];
+    if (!didDeactivate) {
+        if (deactivationError) {
+            log_message(LOG_ERROR, "Could not deactivate AVAudioSession, Error %@", [deactivationError localizedDescription]);
+        } else {
+            log_message(LOG_ERROR, "Could not deactivate AVAudioSession");
+        }
+    }
+}
+
 void audio_output_start(struct audio_output_t* ao) {
     
 #if TARGET_OS_IPHONE
     @autoreleasepool {
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
-                                               error:nil];
-        [[AVAudioSession sharedInstance] setPreferredIOBufferDuration:4096.0f / 44100.0f
-                                                                error:nil];
-        [[AVAudioSession sharedInstance] setActive:YES error:nil];
-        
+        audio_output_session_start();
     }
 #endif
     
@@ -247,7 +295,7 @@ void audio_output_stop(struct audio_output_t* ao) {
     
 #if TARGET_OS_IPHONE
     @autoreleasepool {
-        [[AVAudioSession sharedInstance] setActive:NO withOptions: AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
+        audio_output_session_stop();
     }
 #endif
     
