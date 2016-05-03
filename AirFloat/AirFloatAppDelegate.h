@@ -29,23 +29,14 @@
 //
 
 #import <UIKit/UIKit.h>
-
 #import "AppViewController.h"
-
-#import <libairfloat/raopserver.h>
 
 #define AirFloatSharedAppDelegate ((AirFloatAppDelegate*)[UIApplication sharedApplication].delegate)
 
-@interface AirFloatAppDelegate : NSObject <UIApplicationDelegate> {
-    
-    raop_server_p _server;
-    UIBackgroundTaskIdentifier _backgroundTask;
-    
-}
+@interface AirFloatAppDelegate : NSObject <UIApplicationDelegate> 
 
 @property (nonatomic, strong) UIWindow *window;
 @property (nonatomic, strong) AppViewController* appViewController;
-@property (nonatomic, assign) raop_server_p server;
-@property (nonatomic, strong) NSDictionary* settings;
+
 
 @end

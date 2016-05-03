@@ -35,30 +35,27 @@
 
 #import "AirFloatAppDelegate.h"
 
-@interface AirFloatAppDelegate () {
-    
-    NSDictionary* _settings;
-    
-}
+@interface AirFloatAppDelegate ()
+
+@property (nonatomic, assign) raop_server_p server;
 
 @end
-
-@implementation AirFloatAppDelegate
-
-@synthesize window=_window;
-@synthesize appViewController=_appViewController;
-@synthesize server=_server;
+    
+@implementation AirFloatAppDelegate {
+    UIBackgroundTaskIdentifier *_backgroundTask;
+    NSDictionary *_settings;
+}
 
 - (NSString *)settingsPath {
-    
+
     NSString* filename = [[[NSBundle mainBundle] bundleIdentifier] stringByAppendingPathExtension:@"plist"];
-    
+
 //#if TARGET_IPHONE_SIMULATOR
     //NSString* path = [[NSString stringWithFormat:@"/Users/%@/Library/Preferences/", NSUserName()] stringByAppendingPathComponent:filename];
 //#else
     //NSString* path = [@"/var/mobile/Library/Preferences/" stringByAppendingPathComponent:filename];
 //#endif
-    
+
     //return path;
     NSArray *mypaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [mypaths objectAtIndex:0];
@@ -101,9 +98,9 @@
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
+
     self.appViewController = [[[AppViewController alloc] init] autorelease];
-    
+
     self.window = [[[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds] autorelease];
     
     if ([self.window respondsToSelector:@selector(setRootViewController:)])
