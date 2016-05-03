@@ -28,12 +28,9 @@
 //  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <libairfloat/audioqueue.h>
-#import <libairfloat/raopserver.h>
-
 #import "AppViewController.h"
-
 #import "AirFloatAppDelegate.h"
+#import <libairfloat/audiooutput.h>
 
 @interface AirFloatAppDelegate ()
 
@@ -91,10 +88,12 @@
     
 }
 
+#pragma mark - NSApplication delegate methods
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-
+    
     self.appViewController = [[[AppViewController alloc] init] autorelease];
-
+    
     self.window = [[[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds] autorelease];
     
     if ([self.window respondsToSelector:@selector(setRootViewController:)])
@@ -106,39 +105,28 @@
     
     [self.window makeKeyAndVisible];
     
+    if ([UIApplication instancesRespondToSelector:@selector(registerUserNotificationSettings:)]){
+        [application registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound categories:nil]];
+    }
+    
+    audio_output_session_start();
+    
     return YES;
-    
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    
-    if (!self.server) {
-        
-        struct raop_server_settings_t settings;
-        settings.name = [[_settings objectForKey:@"name"] cStringUsingEncoding:NSUTF8StringEncoding];
-        settings.password = ([[_settings objectForKey:@"authenticationEnabled"] boolValue] ? [[_settings objectForKey:@"password"] cStringUsingEncoding:NSUTF8StringEncoding] : NULL);
-        
-        self.server = raop_server_create(settings);
-        
-    }
-    
-    if (!raop_server_is_running(self.server)) {
-        
-        uint16_t port = 5000;
-        while (port < 5010 && !raop_server_start(_server, port++));
-        
-        self.appViewController.server = _server;
-        
-    }
-    
+- (void)applicationDidBecomeActive:(UIApplication *)application
+{
+    [self startRaopServer];
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application {
-    
+
+- (void)applicationWillResignActive:(UIApplication *)application
+{
 }
 
-- (void)applicationWillEnterForeground:(UIApplication *)application {
-    
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+    [self.appViewController handleTasksForApplicationInForeground];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
@@ -151,7 +139,30 @@
     
 }
 
-- (void)applicationWillTerminate:(UIApplication *)application {
+- (void)applicationWillTerminate:(UIApplication *)application
+{
+}
+
+
+#pragma mark - RAOP Server interface
+
+- (void)startRaopServer  {
+    
+    if (!self.server) {
+        struct raop_server_settings_t settings;
+        settings.name = [[_settings objectForKey:@"name"] cStringUsingEncoding:NSUTF8StringEncoding];
+        settings.password = ([[_settings objectForKey:@"authenticationEnabled"] boolValue] ? [[_settings objectForKey:@"password"] cStringUsingEncoding:NSUTF8StringEncoding] : NULL);
+        self.server = raop_server_create(settings);
+    }
+    
+    if (!raop_server_is_running(self.server)) {
+        
+        uint16_t port = 5000;
+        while (port < 5010 && !raop_server_start(_server, port++));
+        
+        self.appViewController.server = _server;
+        
+    }
     
 }
 

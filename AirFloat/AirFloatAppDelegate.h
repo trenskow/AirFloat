@@ -39,5 +39,6 @@
 @property (nonatomic, strong) AppViewController* appViewController;
 - (NSDictionary*) getSettings;
 - (void) setSettings:(NSDictionary *)settings;
+- (void) startRaopServer;
 
 @end
