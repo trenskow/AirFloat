@@ -167,7 +167,7 @@ struct raop_server_settings_t raop_server_get_settings(struct raop_server_t* rs)
 void raop_server_set_settings(struct raop_server_t* rs, struct raop_server_settings_t settings) {
     
     const char* old_name = settings_get_name(rs->settings);
-    char* old_name_c = (char*)malloc(strlen(settings_get_name(rs->settings) + 1));
+    char* old_name_c = (char*)malloc(strlen(old_name) + 1);
     strcpy(old_name_c, old_name);
     
     settings_set_name(rs->settings, settings.name);
