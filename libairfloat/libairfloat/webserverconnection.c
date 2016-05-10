@@ -215,3 +215,15 @@ struct sockaddr* web_server_connection_get_remote_end_point(struct web_server_co
     return socket_get_remote_end_point(wc->socket);
     
 }
+
+const char* web_server_connection_get_host(struct web_server_connection_t* wc) {
+    
+    return sockaddr_get_host(socket_get_remote_end_point(wc->socket));
+    
+}
+
+uint16_t web_server_connection_get_port(struct web_server_connection_t* wc) {
+    
+    return sockaddr_get_port(socket_get_remote_end_point(wc->socket));
+    
+}

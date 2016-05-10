@@ -51,11 +51,24 @@ struct raop_server_t {
     uint32_t sessions_count;
     raop_server_new_session_callback new_session_callback;
     void* new_session_ctx;
+    raop_server_accept_callback session_accept_callback;
+    void* session_accept_callback_ctx;
 };
 
 bool _raop_server_web_connection_accept_callback(web_server_p server, web_server_connection_p connection, void* ctx) {
     
     struct raop_server_t* rs = (struct raop_server_t*)ctx;
+    
+    if (rs->session_accept_callback != NULL) {
+        const char *ip = web_server_connection_get_host(connection);
+        uint16_t port = web_server_connection_get_port(connection);
+        
+        bool is_access_allowed = rs->session_accept_callback(rs, ip, port, rs->session_accept_callback_ctx);
+        if (!is_access_allowed) {
+            log_message(LOG_INFO, "Connection refused");
+            return false;
+        }
+    }
     
 #if (!defined(ALLOW_LOCALHOST))
     if (!sockaddr_equals_host(web_server_connection_get_local_end_point(connection), web_server_connection_get_remote_end_point(connection))) {
@@ -217,6 +230,13 @@ void raop_server_set_new_session_callback(struct raop_server_t* rs, raop_server_
     
     rs->new_session_callback = new_session_callback;
     rs->new_session_ctx = ctx;
+    
+}
+
+void raop_server_set_session_accept_callback(struct raop_server_t* rs, raop_server_accept_callback session_accept_callback, void* ctx) {
+    
+    rs->session_accept_callback = session_accept_callback;
+    rs->session_accept_callback_ctx = ctx;
     
 }
 

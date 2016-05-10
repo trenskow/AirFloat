@@ -47,6 +47,7 @@ typedef struct raop_session_t *raop_session_p;
 #endif
 
 typedef void(*raop_server_new_session_callback)(raop_server_p server, raop_session_p new_session, void* ctx);
+typedef bool(*raop_server_accept_callback)(raop_server_p server, const char* connection_host, uint16_t connection_port, void* ctx);
 
 raop_server_p raop_server_create(struct raop_server_settings_t settings);
 void raop_server_destroy(raop_server_p rs);
@@ -57,5 +58,6 @@ struct raop_server_settings_t raop_server_get_settings(raop_server_p rs);
 void raop_server_set_settings(raop_server_p rs, struct raop_server_settings_t settings);
 void raop_server_stop(raop_server_p rs);
 void raop_server_set_new_session_callback(raop_server_p rs, raop_server_new_session_callback new_session_callback, void* ctx);
+void raop_server_set_session_accept_callback(raop_server_p rs, raop_server_accept_callback session_accept_callback, void* ctx);
 
 #endif
