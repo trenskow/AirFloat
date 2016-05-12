@@ -93,6 +93,7 @@ struct raop_session_t {
         raop_session_client_updated_track_info_callback updated_track_info;
         raop_session_client_updated_track_position_callback updated_track_position;
         raop_session_client_updated_artwork_callback updated_artwork;
+        raop_session_client_updated_volume_callback updated_volume;
         raop_session_client_ended_recording_callback ended_recording;
         raop_session_ended_callback ended;
         struct {
@@ -101,6 +102,7 @@ struct raop_session_t {
             void* updated_track_info;
             void* updated_track_position;
             void* updated_artwork;
+            void* updated_volume;
             void* ended_recording;
             void* ended;
         } ctx;
@@ -494,21 +496,41 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
                     const char* progress;
                     if ((volume = parameters_value_for_key(parameters, "volume"))) {
                         
+                        //The volume is a float value representing the audio attenuation in dB
+                        //A value of –144 means the audio is muted. Then it goes from –30 to 0.
                         float volume_db;
                         sscanf(volume, "%f", &volume_db);
                         
-                        float volume_p = MAX(pow(10.0, 0.05 * volume_db), 0.0);
+                        // input       : output
+                        // -144.0      : silence
+                        // -30.0 - 0.0 : 0.0 - 1.0
                         
-                        log_message(LOG_INFO, "Client set volume: %f", volume_p);
+                        float volume_p = 0;
+                        if (volume_db < -144) {
+                            volume_db = -144;
+                        }
+                        if (volume_db > 0) {
+                            volume_db = 0;
+                        }
+                        if (volume_db == -144) {
+                            volume_p = 0;
+                        } else {
+                            volume_p = 1.0 + volume_db / 30.0;
+                        }
+                        
+                        log_message(LOG_INFO, "Client set volume: %f (%f)", volume_p, volume_db);
                         
                         audio_output_set_volume(audio_queue_get_output(rtp_session->queue), volume_p);
+                        if (rs->callbacks.updated_volume != NULL) {
+                            rs->callbacks.updated_volume(rs, volume_p, rs->callbacks.ctx.updated_volume);
+                        }
                         
                     } else if (rs->callbacks.updated_track_position != NULL && (progress = parameters_value_for_key(parameters, "progress"))) {
                         
                         unsigned int start, curr, end;
                         sscanf(progress, "%u/%u/%u", &start, &curr, &end);
                         
-                        log_message(LOG_INFO, "Client set progress (%s): %u/%u/u", progress, start, curr, end);
+                        log_message(LOG_INFO, "Client set progress (%s): %u/%u/%u", progress, start, curr, end);
                         
                         struct decoder_output_format_t output_format = decoder_get_output_format(rs->decoder);
                         
@@ -801,6 +823,13 @@ void raop_session_set_client_updated_artwork_callback(struct raop_session_t* rs,
     
 }
 
+void raop_session_set_client_updated_volume_callback(raop_session_p rs, raop_session_client_updated_volume_callback callback, void* ctx) {
+    
+    rs->callbacks.updated_volume = callback;
+    rs->callbacks.ctx.updated_volume = ctx;
+    
+}
+
 void raop_session_set_client_ended_recording_callback(struct raop_session_t* rs, raop_session_client_ended_recording_callback callback, void* ctx) {
     
     rs->callbacks.ended_recording = callback;
@@ -828,5 +857,13 @@ bool raop_session_is_recording(struct raop_session_t* rs) {
 dacp_client_p raop_session_get_dacp_client(struct raop_session_t* rs) {
     
     return rs->dacp_client;
+    
+}
+
+//Sets the session volume level. The valid range is 0.0 to 1.0.
+void raop_session_set_volume(struct raop_session_t* rs, float volume) {
+    
+    struct raop_rtp_session_t* rtp_session = rs->rtp_session;
+    audio_output_set_volume(audio_queue_get_output(rtp_session->queue), volume);
     
 }

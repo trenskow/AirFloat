@@ -257,3 +257,16 @@ void raop_server_session_ended(struct raop_server_t* rs, raop_session_p session)
     
     
 }
+
+void raop_server_set_volume(struct raop_server_t* rs, float volume) {
+    if (raop_server_is_recording(rs)) {
+        mutex_lock(rs->mutex);
+        uint32_t count = rs->sessions_count;
+        mutex_unlock(rs->mutex);
+        
+        for (uint32_t i = 0 ; i < count ; i++)
+            if (raop_session_is_recording(rs->sessions[i])) {
+                raop_session_set_volume(rs->sessions[i], volume);
+            }
+    }
+}
