@@ -84,14 +84,9 @@
     [self.appViewController handleForegroundTasks];
 }
 
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-    
-    if (self.server && !raop_server_is_recording(self.server)) {
-        raop_server_stop(self.server);
-        raop_server_destroy(self.server);
-        self.appViewController.server = self.server = NULL;
-    }
-    
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    [self.appViewController handleBackgroundTasks];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
