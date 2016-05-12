@@ -778,13 +778,11 @@ dispatch_block_t helperBackgroundTaskBlock = ^{
 
 -(void) handleBackgroundTasks {
     UIDevice *device = [UIDevice currentDevice];
-    BOOL playing = (dacp_client_get_playback_state(_dacp_client) == dacp_client_playback_state_playing);
     BOOL backgroundSupported = NO;
     if ([device respondsToSelector:@selector(isMultitaskingSupported)]) {
         backgroundSupported = device.multitaskingSupported;
     }
-    
-    if(backgroundSupported && !playing) { // perform a background task
+    if(backgroundSupported) { // perform a background task
         
         helperBackgroundTaskBlock = ^{
             [[UIApplication sharedApplication] endBackgroundTask: helperBackgroundTask];
@@ -827,5 +825,6 @@ dispatch_block_t helperBackgroundTaskBlock = ^{
 
 -(void) keepAlive {
     [AirFloatSharedAppDelegate startRaopServer];
+    NSLog(@"keepAlive");
 }
 @end
