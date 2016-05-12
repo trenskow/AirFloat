@@ -105,7 +105,24 @@ struct raop_session_t {
             void* ended;
         } ctx;
     } callbacks;
+    
+    unsigned int start_rtp_timestamp;
+    double total_length;
 };
+
+void recorder_updated_track_position_callback(rtp_recorder_p rr, unsigned int curr, void* ctx) {
+    struct raop_session_t* rs = (struct raop_session_t*)ctx;
+    struct decoder_output_format_t output_format = decoder_get_output_format(rs->decoder);
+    
+    double srate = (double)output_format.sample_rate;
+    if (srate == 0.0) {
+        srate = 44100;
+    }
+    double position = (double)(curr - rs->start_rtp_timestamp) / srate;
+    if (rs->callbacks.updated_track_position != NULL && (rs->total_length == 0 || position < rs->total_length)) {
+        rs->callbacks.updated_track_position(rs, position, rs->total_length, rs->callbacks.ctx.updated_track_position);
+    }
+}
 
 bool _raop_session_check_authentication(struct raop_session_t* rs, const char* method, const char* uri, const char* authentication_parameter) {
     
@@ -419,6 +436,7 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
                         struct sockaddr* local_end_point = web_server_connection_get_local_end_point(rs->raop_connection);
                         struct sockaddr* remote_end_point = web_server_connection_get_remote_end_point(rs->raop_connection);
                         rtp_recorder_p new_recorder = rtp_recorder_create(rs->crypt_aes, audio_queue, local_end_point, remote_end_point, control_port, timing_port);
+                        rtp_recorder_set_updated_track_position_callback(new_recorder, recorder_updated_track_position_callback, rs);
                         
                         uint32_t session_id = ++rs->rtp_last_session_id;
                         rs->rtp_session = (struct raop_rtp_session_t*)malloc(sizeof(struct raop_rtp_session_t));
@@ -487,19 +505,24 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
                         
                     } else if (rs->callbacks.updated_track_position != NULL && (progress = parameters_value_for_key(parameters, "progress"))) {
                         
-                        const char* parts[3] = { NULL, NULL, NULL };
-                        uint32_t c_art = 1;
-                        parts[0] = progress;
+                        unsigned int start, curr, end;
+                        sscanf(progress, "%u/%u/%u", &start, &curr, &end);
                         
-                        for (size_t i = 0 ; i < strlen(progress) ; i++)
-                            if (progress[i] == '/')
-                                parts[c_art++] = &progress[i+1];
-                        
-                        double start = atoi(parts[0]);
+                        log_message(LOG_INFO, "Client set progress (%s): %u/%u/u", progress, start, curr, end);
                         
                         struct decoder_output_format_t output_format = decoder_get_output_format(rs->decoder);
                         
-                        rs->callbacks.updated_track_position(rs, (atoi(parts[1]) - start) / (double)output_format.sample_rate, (atoi(parts[2]) - start) / (double)output_format.sample_rate, rs->callbacks.ctx.updated_track_position);
+                        double srate = (double)output_format.sample_rate;
+                        if (srate == 0.0) {
+                            srate = 44100;
+                        }
+                        double position = (double)(curr - start) / srate;
+                        double total = (double)(end - start) / srate;
+                        rs->total_length = total;
+                        rs->start_rtp_timestamp = start;
+                        if (rs->callbacks.updated_track_position != NULL) {
+                            rs->callbacks.updated_track_position(rs, position, total, rs->callbacks.ctx.updated_track_position);
+                        }
                         
                     }
                     
@@ -636,6 +659,8 @@ struct raop_session_t* raop_session_create(raop_server_p server, web_server_conn
     
     rs->server = server;
     rs->raop_connection = connection;
+    rs->total_length = 0;
+    rs->start_rtp_timestamp = 0;
     
     const char* password = settings_get_password(settings);
     if (password != NULL && strlen(password) > 0) {

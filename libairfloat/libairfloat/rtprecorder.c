@@ -159,6 +159,9 @@ struct rtp_recorder_t {
     struct sockaddr* remote_timing_end_point;
     struct sockaddr* remote_control_end_point;
     uint16_t emulated_seq_no;
+    
+    rtp_recorder_updated_track_position_callback updated_track_position_callback;
+    void* updated_track_position_callback_ctx;
 };
 
 void _rtp_recorder_process_timing_packet(struct rtp_recorder_t* rr, struct rtp_packet_t* packet) {
@@ -227,6 +230,9 @@ void _rtp_recorder_process_sync_packet(struct rtp_recorder_t* rr, struct rtp_pac
     uint32_t next_rtp_time = ntohl(*((uint32_t*)packet->packet_data + 12));
     
     log_message(LOG_INFO, "Sync packet (Playhead frame: %u - current time: %1.6f - next frame: %u)", current_rtp_time, current_time, next_rtp_time);
+    if (rr->updated_track_position_callback != NULL) {
+        rr->updated_track_position_callback(rr, current_rtp_time, rr->updated_track_position_callback_ctx);
+    }
     
     audio_queue_synchronize(rr->audio_queue, current_rtp_time, current_time, next_rtp_time);
     
@@ -400,6 +406,9 @@ struct rtp_recorder_t* rtp_recorder_create(crypt_aes_p crypt, audio_queue_p audi
     rr->control_socket = _rtp_recorder_create_socket(rr, "Control socket", local_end_point, remote_end_point);
     rr->timing_socket = _rtp_recorder_create_socket(rr, "Timing socket", local_end_point, remote_end_point);
     
+    rr->updated_track_position_callback = NULL;
+    rr->updated_track_position_callback_ctx = NULL;
+    
     return rr;
     
 }
@@ -480,4 +489,9 @@ uint16_t rtp_recorder_get_timing_port(struct rtp_recorder_t* rr) {
     
     return rtp_socket_get_local_port(rr->timing_socket);
     
+}
+
+void rtp_recorder_set_updated_track_position_callback(struct rtp_recorder_t* rr, rtp_recorder_updated_track_position_callback callback, void* ctx) {
+    rr->updated_track_position_callback = callback;
+    rr->updated_track_position_callback_ctx = ctx;
 }
