@@ -56,5 +56,8 @@ void dacp_client_update_playback_state(dacp_client_p dc);
 void dacp_client_next(dacp_client_p dc);
 void dacp_client_toggle_playback(dacp_client_p dc);
 void dacp_client_previous(dacp_client_p dc);
+void dacp_client_stop(dacp_client_p dc);
+void dacp_client_seek(dacp_client_p dc, float seconds);
+void dacp_client_set_volume(dacp_client_p dc, float volume);
 
 #endif
