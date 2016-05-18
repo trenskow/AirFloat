@@ -28,38 +28,77 @@
 //  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import <libairfloat/audioqueue.h>
-#import <libairfloat/raopserver.h>
-
 #import "AppViewController.h"
-
 #import "AirFloatAppDelegate.h"
+#import <libairfloat/audiooutput.h>
 
-@interface AirFloatAppDelegate () {
-    
-    NSDictionary* _settings;
-    
-}
+@interface AirFloatAppDelegate ()
+
+@property (nonatomic, assign) raop_server_p server;
 
 @end
+    
+@implementation AirFloatAppDelegate {
+    UIBackgroundTaskIdentifier *_backgroundTask;
+    NSDictionary *_settings;
+}
 
-@implementation AirFloatAppDelegate
 
-@synthesize window=_window;
-@synthesize appViewController=_appViewController;
-@synthesize server=_server;
+#pragma mark - NSApplication delegates
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    self.appViewController = [[[AppViewController alloc] init] autorelease];
+    
+    self.window = [[[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds] autorelease];
+    
+    if ([self.window respondsToSelector:@selector(setRootViewController:)])
+        self.window.rootViewController = self.appViewController;
+    else {
+        self.appViewController.view.frame = CGRectMake(0, 20, 320, 460);
+        [self.window addSubview:self.appViewController.view];
+    }
+    
+    [self.window makeKeyAndVisible];
+    
+    if ([UIApplication instancesRespondToSelector:@selector(registerUserNotificationSettings:)]){
+        [application registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound categories:nil]];
+    }
+    
+    audio_output_session_start();
+    
+    return YES;
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application
+{
+    [self startRaopServer];
+}
+
+- (void)applicationWillResignActive:(UIApplication *)application
+{
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+    [self.appViewController handleForegroundTasks];
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    [self.appViewController handleBackgroundTasks];
+}
+
+- (void)applicationWillTerminate:(UIApplication *)application
+{
+}
+
+
+#pragma mark - Application Settings
 
 - (NSString *)settingsPath {
     
     NSString* filename = [[[NSBundle mainBundle] bundleIdentifier] stringByAppendingPathExtension:@"plist"];
-    
-//#if TARGET_IPHONE_SIMULATOR
-    //NSString* path = [[NSString stringWithFormat:@"/Users/%@/Library/Preferences/", NSUserName()] stringByAppendingPathComponent:filename];
-//#else
-    //NSString* path = [@"/var/mobile/Library/Preferences/" stringByAppendingPathComponent:filename];
-//#endif
-    
-    //return path;
     NSArray *mypaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [mypaths objectAtIndex:0];
     NSString *newpath = [documentsDirectory stringByAppendingPathComponent:filename];
@@ -67,7 +106,7 @@
     return newpath;
 }
 
-- (NSDictionary *)settings {
+- (NSDictionary *)getSettings {
     
     if (!_settings) {
         _settings = [[NSDictionary alloc] initWithContentsOfFile:[self settingsPath]];
@@ -97,38 +136,19 @@
     }
     
     [self didChangeValueForKey:@"settings"];
-        
-}
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
-    self.appViewController = [[[AppViewController alloc] init] autorelease];
-    
-    self.window = [[[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds] autorelease];
-    
-    if ([self.window respondsToSelector:@selector(setRootViewController:)])
-        self.window.rootViewController = self.appViewController;
-    else {
-        self.appViewController.view.frame = CGRectMake(0, 20, 320, 460);
-        [self.window addSubview:self.appViewController.view];
-    }
-    
-    [self.window makeKeyAndVisible];
-    
-    return YES;
     
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application {
+
+#pragma mark - RAOP Server interface
+
+- (void)startRaopServer  {
     
     if (!self.server) {
-        
         struct raop_server_settings_t settings;
-        settings.name = [[self.settings objectForKey:@"name"] cStringUsingEncoding:NSUTF8StringEncoding];
-        settings.password = ([[self.settings objectForKey:@"authenticationEnabled"] boolValue] ? [[self.settings objectForKey:@"password"] cStringUsingEncoding:NSUTF8StringEncoding] : NULL);
-        
+        settings.name = [[_settings objectForKey:@"name"] cStringUsingEncoding:NSUTF8StringEncoding];
+        settings.password = ([[_settings objectForKey:@"authenticationEnabled"] boolValue] ? [[_settings objectForKey:@"password"] cStringUsingEncoding:NSUTF8StringEncoding] : NULL);
         self.server = raop_server_create(settings);
-        
     }
     
     if (!raop_server_is_running(self.server)) {
@@ -142,26 +162,21 @@
     
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application {
-    
-}
 
-- (void)applicationWillEnterForeground:(UIApplication *)application {
-    
-}
+#pragma mark - Background Notifications
 
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-    
-    if (self.server && !raop_server_is_recording(self.server)) {
-        raop_server_stop(self.server);
-        raop_server_destroy(self.server);
-        self.appViewController.server = self.server = NULL;
+-(void) showNotification:(NSString*)messageTitle
+{
+    if (!messageTitle) {
+        messageTitle = @"Stream started.";
     }
     
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application {
+    UILocalNotification *notification = [[UILocalNotification alloc] init];
+    notification.alertBody = messageTitle;
+    notification.fireDate = [NSDate date];
+    notification.soundName = UILocalNotificationDefaultSoundName;
     
+    [[UIApplication sharedApplication] scheduleLocalNotification:notification];
 }
 
 @end

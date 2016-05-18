@@ -29,13 +29,10 @@
 //
 
 #import <MediaPlayer/MediaPlayer.h>
-
 #import <libairfloat/webserverconnection.h>
 #import <libairfloat/dacpclient.h>
 #import <libairfloat/raopsession.h>
-
 #import "UIImage+AirFloatAdditions.h"
-
 #import "AirFloatAppDelegate.h"
 #import "AirFloatAdView.h"
 #import "SupportViewController.h"
@@ -78,6 +75,7 @@
 @end
 
 UIBackgroundTaskIdentifier backgroundTask = 0;
+UIBackgroundTaskIdentifier helperBackgroundTask = 0;
 
 void dacpClientControlsBecameAvailable(dacp_client_p client, void* ctx) {
     
@@ -131,8 +129,9 @@ void clientEndedRecording(raop_session_p raop_session, void* ctx) {
     
     AppViewController* viewController = (AppViewController*)ctx;
     
-    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground)
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
         backgroundTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:nil];
+    }
     
     [viewController performSelectorOnMainThread:@selector(clientEndedRecording) withObject:nil waitUntilDone:NO];
     
@@ -141,6 +140,10 @@ void clientEndedRecording(raop_session_p raop_session, void* ctx) {
 void clientEnded(raop_session_p raop_session, void* ctx) {
     
     AppViewController* viewController = (AppViewController*)ctx;
+    
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+        [AirFloatSharedAppDelegate showNotification:@"Client disconnected."];
+    }
     
     [viewController performSelectorOnMainThread:@selector(clientEnded) withObject:nil waitUntilDone:NO];
     
@@ -188,7 +191,7 @@ void clientUpdatedTrackInfo(raop_session_p raop_session, const char* title, cons
     
     [trackTitle release];
     [artistTitle release];
-        
+    
     [pool release];
     
 }
@@ -457,7 +460,7 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
                 
                 if (_artworkImage)
                     [nowPlayingInfo setObject:[[[MPMediaItemArtwork alloc] initWithImage:_artworkImage] autorelease]
-                                   forKey:MPMediaItemPropertyArtwork];
+                                       forKey:MPMediaItemPropertyArtwork];
                 
                 [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = nowPlayingInfo;
                 
@@ -733,11 +736,11 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
 
 - (void)updateScreenIdleState {
     
-    BOOL disabled = [[AirFloatSharedAppDelegate.settings objectForKey:@"keepScreenLit"] boolValue];
+    BOOL disabled = [[[AirFloatSharedAppDelegate getSettings] objectForKey:@"keepScreenLit"] boolValue];
     
-    disabled &= (![[AirFloatSharedAppDelegate.settings objectForKey:@"keepScreenLitOnlyWhenReceiving"] boolValue] || (_server != NULL && raop_server_is_recording(_server)));
+    disabled &= (![[[AirFloatSharedAppDelegate getSettings] objectForKey:@"keepScreenLitOnlyWhenReceiving"] boolValue] || (_server != NULL && raop_server_is_recording(_server)));
     
-    disabled &= (![[AirFloatSharedAppDelegate.settings objectForKey:@"keepScreenLitOnlyWhenConnectedToPower"] boolValue] || ([UIDevice currentDevice].batteryState == UIDeviceBatteryStateCharging || [UIDevice currentDevice].batteryState == UIDeviceBatteryStateFull));
+    disabled &= (![[[AirFloatSharedAppDelegate getSettings] objectForKey:@"keepScreenLitOnlyWhenConnectedToPower"] boolValue] || ([UIDevice currentDevice].batteryState == UIDeviceBatteryStateCharging || [UIDevice currentDevice].batteryState == UIDeviceBatteryStateFull));
     
     [UIApplication sharedApplication].idleTimerDisabled = disabled;
     
@@ -752,7 +755,76 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
 - (void)batteryStateChanged:(NSNotification *)notification {
     
     [self updateScreenIdleState];
-    
 }
 
+
+#pragma mark - Workaround for iOS Background Mode restrictions
+
+dispatch_block_t helperBackgroundTaskBlock = ^{
+    [[UIApplication sharedApplication] endBackgroundTask:helperBackgroundTask];
+    helperBackgroundTask = UIBackgroundTaskInvalid;
+    helperBackgroundTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:helperBackgroundTaskBlock];
+};
+
+
+#pragma mark - Handler for background/foreground state switch
+
+-(void)handleForegroundTasks {
+    if(helperBackgroundTask) { // reset that task
+        [[UIApplication sharedApplication] endBackgroundTask: helperBackgroundTask];
+        helperBackgroundTask = UIBackgroundTaskInvalid;
+    }
+}
+
+-(void) handleBackgroundTasks {
+    UIDevice *device = [UIDevice currentDevice];
+    BOOL backgroundSupported = NO;
+    if ([device respondsToSelector:@selector(isMultitaskingSupported)]) {
+        backgroundSupported = device.multitaskingSupported;
+    }
+    if(backgroundSupported) { // perform a background task
+        
+        helperBackgroundTaskBlock = ^{
+            [[UIApplication sharedApplication] endBackgroundTask: helperBackgroundTask];
+            helperBackgroundTask = UIBackgroundTaskInvalid;
+        };
+        
+        [self doBackgroundTaskAsync:@selector(keepAlive)];
+        [self performSelector:@selector(doBackgroundTaskAsync:) withObject:nil afterDelay:170.0f];
+    }
+}
+
+-(void) doBackgroundTaskAsync:(SEL)selector {
+    
+    if( [[UIApplication sharedApplication] backgroundTimeRemaining] < 5 ) {
+        return;
+    }
+    
+    if(!helperBackgroundTaskBlock) {
+        helperBackgroundTaskBlock = ^{
+            [[UIApplication sharedApplication] endBackgroundTask:helperBackgroundTask];
+            helperBackgroundTask = UIBackgroundTaskInvalid;
+        };
+    }
+    
+    helperBackgroundTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:helperBackgroundTaskBlock];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        
+        while ([[UIApplication sharedApplication] backgroundTimeRemaining] > 5.0) {
+            int delta = 5.0;
+            [self performSelector: @selector(keepAlive)];
+            
+            sleep(delta);
+        }
+    });
+}
+
+
+#pragma mark - Restarts RAOP instance when needed
+
+-(void) keepAlive {
+    [AirFloatSharedAppDelegate startRaopServer];
+    NSLog(@"keepAlive");
+}
 @end

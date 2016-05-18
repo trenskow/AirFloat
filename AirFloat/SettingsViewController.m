@@ -63,7 +63,7 @@ NSString *const SettingsUpdatedNotification = @"SettingsUpdatedNotification";
     
     ((UIScrollView*)self.view).contentSize = CGSizeMake(320, 358);
     
-    NSDictionary* settings = AirFloatSharedAppDelegate.settings;
+    NSDictionary* settings = [AirFloatSharedAppDelegate getSettings];
     
     self.nameField.text = [settings objectForKey:@"name"];
     self.authenticationField.text = [settings objectForKey:@"password"];
@@ -144,7 +144,7 @@ NSString *const SettingsUpdatedNotification = @"SettingsUpdatedNotification";
         
     }
     
-    AirFloatSharedAppDelegate.settings = settings;
+    [AirFloatSharedAppDelegate setSettings: settings];
     
     [self updateVisuals:settings];
     
