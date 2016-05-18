@@ -44,4 +44,7 @@ uint16_t rtp_recorder_get_streaming_port(rtp_recorder_p rr);
 uint16_t rtp_recorder_get_control_port(rtp_recorder_p rr);
 uint16_t rtp_recorder_get_timing_port(rtp_recorder_p rr);
 
+typedef void(*rtp_recorder_updated_track_position_callback)(rtp_recorder_p rr, unsigned int curr, void* ctx);
+void rtp_recorder_set_updated_track_position_callback(rtp_recorder_p rr, rtp_recorder_updated_track_position_callback callback, void* ctx);
+
 #endif

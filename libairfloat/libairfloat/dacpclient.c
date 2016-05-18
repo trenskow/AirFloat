@@ -287,3 +287,28 @@ void dacp_client_previous(struct dacp_client_t* dc) {
     _dacp_client_send_request(dc, "previtem");
     
 }
+
+void dacp_client_stop(struct dacp_client_t* dc) {
+    
+    _dacp_client_send_request(dc, "stop");
+    
+}
+
+void dacp_client_seek(dacp_client_p dc, float seconds) {
+    
+    uint32_t milliseconds = seconds * 1000;
+    char cmd[100];
+    sprintf(cmd, "setproperty?dacp.playingtime=%d", milliseconds);
+    _dacp_client_send_request(dc, cmd);
+    
+}
+
+void dacp_client_set_volume(dacp_client_p dc, float volume) {
+    
+    if (volume >= 0 && volume <= 100.0) {
+        char cmd[100];
+        sprintf(cmd, "setproperty?dmcp.volume=%f", volume);
+        _dacp_client_send_request(dc, cmd);
+    }
+    
+}

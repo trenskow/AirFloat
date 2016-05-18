@@ -61,5 +61,7 @@ void web_server_connection_take_off(struct web_server_connection_t* wc);
 void web_server_connection_close(web_server_connection_p wc);
 struct sockaddr* web_server_connection_get_local_end_point(web_server_connection_p wc);
 struct sockaddr* web_server_connection_get_remote_end_point(web_server_connection_p wc);
+const char* web_server_connection_get_host(web_server_connection_p wc);
+uint16_t web_server_connection_get_port(web_server_connection_p wc);
 
 #endif
