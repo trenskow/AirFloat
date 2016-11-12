@@ -91,7 +91,7 @@ ssize_t web_response_parse(web_response_p wr, const void* data, size_t data_size
         char header[header_length];
         memcpy(header, buffer, content_start - buffer);
         
-        log_data(LOG_INFO, data, content_start - buffer);
+        log_data(LOG_COMMUNICATION, data, content_start - buffer);
         
         char* header_start = header;
         header_length = web_tools_convert_new_lines(header_start, header_length);

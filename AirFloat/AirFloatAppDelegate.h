@@ -37,9 +37,8 @@
 
 @property (nonatomic, strong) UIWindow *window;
 @property (nonatomic, strong) AppViewController* appViewController;
-- (NSDictionary*) getSettings;
-- (void) setSettings:(NSDictionary *)settings;
-- (void) startRaopServer;
-- (void) showNotification:(NSString*)messageTitle;
+- (void)startRaopServer;
+- (void)updateRaopSeverSettings;
+- (void)showNotification:(NSString*)messageTitle;
 
 @end

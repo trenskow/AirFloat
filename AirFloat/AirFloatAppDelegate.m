@@ -28,6 +28,8 @@
 //  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+#import "NSUserDefaults+AirFloatAdditions.h"
+
 #import "AppViewController.h"
 #import "AirFloatAppDelegate.h"
 #import <libairfloat/audiooutput.h>
@@ -40,7 +42,6 @@
     
 @implementation AirFloatAppDelegate {
     UIBackgroundTaskIdentifier *_backgroundTask;
-    NSDictionary *_settings;
 }
 
 
@@ -48,9 +49,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
-    self.appViewController = [[[AppViewController alloc] init] autorelease];
+    self.appViewController = [[AppViewController alloc] init];
     
-    self.window = [[[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds] autorelease];
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     
     if ([self.window respondsToSelector:@selector(setRootViewController:)])
         self.window.rootViewController = self.appViewController;
@@ -70,75 +71,17 @@
     return YES;
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application
-{
+- (void)applicationDidBecomeActive:(UIApplication *)application {
     [self startRaopServer];
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application
-{
-}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application
-{
+- (void)applicationWillEnterForeground:(UIApplication *)application {
     [self.appViewController handleForegroundTasks];
 }
 
-- (void)applicationDidEnterBackground:(UIApplication *)application
-{
+- (void)applicationDidEnterBackground:(UIApplication *)application {
     [self.appViewController handleBackgroundTasks];
 }
-
-- (void)applicationWillTerminate:(UIApplication *)application
-{
-}
-
-
-#pragma mark - Application Settings
-
-- (NSString *)settingsPath {
-    
-    NSString* filename = [[[NSBundle mainBundle] bundleIdentifier] stringByAppendingPathExtension:@"plist"];
-    NSArray *mypaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [mypaths objectAtIndex:0];
-    NSString *newpath = [documentsDirectory stringByAppendingPathComponent:filename];
-    
-    return newpath;
-}
-
-- (NSDictionary *)getSettings {
-    
-    if (!_settings) {
-        _settings = [[NSDictionary alloc] initWithContentsOfFile:[self settingsPath]];
-        _settings = (_settings ?: [[NSDictionary alloc] init]);
-    }
-    
-    return _settings;
-    
-}
-
-- (void)setSettings:(NSDictionary *)settings {
-    
-    [self willChangeValueForKey:@"settings"];
-    
-    [_settings release];
-    _settings = [settings copy];
-    
-    [_settings writeToFile:[self settingsPath]
-                atomically:YES];
-    
-    if (self.server) {
-        
-        NSString* password = [_settings objectForKey:@"password"];
-        
-        raop_server_set_settings(self.server, (struct raop_server_settings_t) { [[_settings objectForKey:@"name"] cStringUsingEncoding:NSASCIIStringEncoding], ([[_settings objectForKey:@"authenticationEnabled"] boolValue] && password && [password length] > 0 ? [[_settings objectForKey:@"password"] cStringUsingEncoding:NSUTF8StringEncoding] : NULL) });
-        
-    }
-    
-    [self didChangeValueForKey:@"settings"];
-    
-}
-
 
 #pragma mark - RAOP Server interface
 
@@ -146,8 +89,9 @@
     
     if (!self.server) {
         struct raop_server_settings_t settings;
-        settings.name = [[_settings objectForKey:@"name"] cStringUsingEncoding:NSUTF8StringEncoding];
-        settings.password = ([[_settings objectForKey:@"authenticationEnabled"] boolValue] ? [[_settings objectForKey:@"password"] cStringUsingEncoding:NSUTF8StringEncoding] : NULL);
+        settings.name =  [NSStandardUserDefaults.name UTF8String];
+        settings.password = (NSStandardUserDefaults.authenticationEnabled ? [NSStandardUserDefaults.password UTF8String] : NULL);
+        settings.ignore_source_volume = NSStandardUserDefaults.ignoreSourceVolume;
         self.server = raop_server_create(settings);
     }
     
@@ -162,6 +106,17 @@
     
 }
 
+- (void)updateRaopSeverSettings {
+    
+    if (self.server) {
+        raop_server_set_settings(self.server, (struct raop_server_settings_t) {
+            [NSStandardUserDefaults.name UTF8String],
+            (NSStandardUserDefaults.authenticationEnabled ? [NSStandardUserDefaults.password UTF8String] : NULL),
+            NSStandardUserDefaults.ignoreSourceVolume
+        });
+    }
+    
+}
 
 #pragma mark - Background Notifications
 

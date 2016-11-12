@@ -29,6 +29,7 @@
 //
 
 #import "UIView+AirFloatAdditions.h"
+#import "NSUserDefaults+AirFloatAdditions.h"
 
 #import "AirFloatAppDelegate.h"
 #import "AirFloatSwitch.h"
@@ -50,8 +51,9 @@ NSString *const SettingsUpdatedNotification = @"SettingsUpdatedNotification";
 @property (nonatomic, strong) IBOutlet AirFloatSwitch* keepScreenLitOnlyWhenReceivingSwitch;
 @property (nonatomic, strong) IBOutlet UILabel* keepScreenLitOnlyWhenConnectedToPowerLabel;
 @property (nonatomic, strong) IBOutlet AirFloatSwitch* keepScreenLitOnlyWhenConnectedToPowerSwitch;
+@property (nonatomic, strong) IBOutlet AirFloatSwitch* ignoreSourceVolumeSwitch;
 
-- (void)updateVisuals:(NSDictionary *)visuals;
+- (void)updateVisuals;
 
 @end
 
@@ -63,21 +65,21 @@ NSString *const SettingsUpdatedNotification = @"SettingsUpdatedNotification";
     
     ((UIScrollView*)self.view).contentSize = CGSizeMake(320, 358);
     
-    NSDictionary* settings = [AirFloatSharedAppDelegate getSettings];
+    self.nameField.text = NSStandardUserDefaults.name;
+    self.authenticationField.text = NSStandardUserDefaults.password;
+    self.authenticationEnabledSwitch.on = NSStandardUserDefaults.authenticationEnabled;
+    self.keepScreenLitSwitch.on = NSStandardUserDefaults.keepScreenLit;
+    self.keepScreenLitOnlyWhenReceivingSwitch.on = NSStandardUserDefaults.keepScreenLitOnlyWhenReceiving;
+    self.keepScreenLitOnlyWhenConnectedToPowerSwitch.on = NSStandardUserDefaults.keepScreenLitOnlyWhenConnectedToPower;
+    self.ignoreSourceVolumeSwitch.on = NSStandardUserDefaults.ignoreSourceVolume;
     
-    self.nameField.text = [settings objectForKey:@"name"];
-    self.authenticationField.text = [settings objectForKey:@"password"];
-    self.authenticationEnabledSwitch.on = [[settings objectForKey:@"authenticationEnabled"] boolValue];
-    self.keepScreenLitSwitch.on = [[settings objectForKey:@"keepScreenLit"] boolValue];
-    self.keepScreenLitOnlyWhenReceivingSwitch.on = [[settings objectForKey:@"keepScreenLitOnlyWhenReceiving"] boolValue];
-    self.keepScreenLitOnlyWhenConnectedToPowerSwitch.on = [[settings objectForKey:@"keepScreenLitOnlyWhenConnectedToPower"] boolValue];
-    
-    [self updateVisuals:settings];
+    [self updateVisuals];
     
     [self.authenticationEnabledSwitch addTarget:self action:@selector(authenticationSwitchValueChanged:) forControlEvents:UIControlEventValueChanged];
     [self.keepScreenLitSwitch addTarget:self action:@selector(litSwitchChangedValue:) forControlEvents:UIControlEventValueChanged];
     [self.keepScreenLitOnlyWhenReceivingSwitch addTarget:self action:@selector(litSwitchChangedValue:) forControlEvents:UIControlEventValueChanged];
     [self.keepScreenLitOnlyWhenConnectedToPowerSwitch addTarget:self action:@selector(litSwitchChangedValue:) forControlEvents:UIControlEventValueChanged];
+    [self.ignoreSourceVolumeSwitch addTarget:self action:@selector(ignoreSourceVolumeChangedValue:) forControlEvents:UIControlEventValueChanged];
     
 }
 
@@ -107,7 +109,7 @@ NSString *const SettingsUpdatedNotification = @"SettingsUpdatedNotification";
     
 }
 
-- (void)updateVisuals:(NSDictionary *)settings {
+- (void)updateVisuals {
     
     self.keepScreenLitOnlyWhenReceivingSwitch.userInteractionEnabled = self.keepScreenLitOnlyWhenConnectedToPowerSwitch.userInteractionEnabled = self.keepScreenLitSwitch.on;
     
@@ -122,35 +124,19 @@ NSString *const SettingsUpdatedNotification = @"SettingsUpdatedNotification";
 
 - (void)updateSettings {
     
-    NSMutableDictionary* settings = [[NSMutableDictionary alloc] init];
+    NSStandardUserDefaults.name = self.nameField.text;
+    NSStandardUserDefaults.password = self.authenticationField.text;
+    NSStandardUserDefaults.authenticationEnabled = self.authenticationEnabledSwitch.on;
+    NSStandardUserDefaults.keepScreenLit = self.keepScreenLitSwitch.on;
+    NSStandardUserDefaults.keepScreenLitOnlyWhenReceiving = self.keepScreenLitOnlyWhenReceivingSwitch.on;
+    NSStandardUserDefaults.keepScreenLitOnlyWhenConnectedToPower = self.keepScreenLitOnlyWhenConnectedToPowerSwitch.on;
+    NSStandardUserDefaults.ignoreSourceVolume = self.ignoreSourceVolumeSwitch.on;
     
-    if (self.nameField.text)
-        [settings setObject:self.nameField.text forKey:@"name"];
+    [self updateVisuals];
     
-    if (self.authenticationField.text)
-        [settings setObject:self.authenticationField.text forKey:@"password"];
+    [AirFloatSharedAppDelegate updateRaopSeverSettings];
     
-    if (self.authenticationEnabledSwitch.on)
-        [settings setObject:[NSNumber numberWithBool:self.authenticationEnabledSwitch.on] forKey:@"authenticationEnabled"];
-    
-    if (self.keepScreenLitSwitch.on) {
-        
-        [settings setObject:[NSNumber numberWithBool:self.keepScreenLitSwitch.on] forKey:@"keepScreenLit"];
-        
-        if (self.keepScreenLitOnlyWhenReceivingSwitch.on)
-            [settings setObject:[NSNumber numberWithBool:self.keepScreenLitOnlyWhenReceivingSwitch.on] forKey:@"keepScreenLitOnlyWhenReceiving"];
-        if (self.keepScreenLitOnlyWhenConnectedToPowerSwitch.on)
-            [settings setObject:[NSNumber numberWithBool:self.keepScreenLitOnlyWhenConnectedToPowerSwitch.on] forKey:@"keepScreenLitOnlyWhenConnectedToPower"];
-        
-    }
-    
-    [AirFloatSharedAppDelegate setSettings: settings];
-    
-    [self updateVisuals:settings];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:SettingsUpdatedNotification object:nil userInfo:settings];
-    
-    [settings release];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SettingsUpdatedNotification object:nil userInfo:nil];
     
 }
 
@@ -178,6 +164,12 @@ NSString *const SettingsUpdatedNotification = @"SettingsUpdatedNotification";
 }
 
 - (IBAction)litSwitchChangedValue:(id)sender {
+    
+    [self updateSettings];
+    
+}
+
+- (IBAction)ignoreSourceVolumeChangedValue:(id)sender {
     
     [self updateSettings];
     

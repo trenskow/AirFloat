@@ -107,6 +107,7 @@
 		A1C7F79C1500D2B600D7DE52 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = A1C7F79B1500D2B600D7DE52 /* Default.png */; };
 		A1DE598714CF163500A6767D /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1DE598614CF163500A6767D /* MediaPlayer.framework */; };
 		A1DF3AF514C4623700252C95 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1DF3AF414C4623700252C95 /* AVFoundation.framework */; };
+		A1EB94091DD7DDB600ED8159 /* NSUserDefaults+AirFloatAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A1EB94081DD7DDB600ED8159 /* NSUserDefaults+AirFloatAdditions.m */; };
 		C001F1F41CD888C1005954E3 /* liblibairfloat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C001F1F01CD8880B005954E3 /* liblibairfloat.a */; };
 /* End PBXBuildFile section */
 
@@ -246,6 +247,8 @@
 		A1C7F79B1500D2B600D7DE52 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = ../Default.png; sourceTree = "<group>"; };
 		A1DE598614CF163500A6767D /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		A1DF3AF414C4623700252C95 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		A1EB94071DD7DDB600ED8159 /* NSUserDefaults+AirFloatAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSUserDefaults+AirFloatAdditions.h"; sourceTree = "<group>"; };
+		A1EB94081DD7DDB600ED8159 /* NSUserDefaults+AirFloatAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSUserDefaults+AirFloatAdditions.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -554,6 +557,8 @@
 				A1ACB4F116FA2350008E4C4F /* UIImage+AirFloatAdditions.m */,
 				A1594DB616FD29DD00D14269 /* UIView+AirFloatAdditions.h */,
 				A1594DB716FD29DD00D14269 /* UIView+AirFloatAdditions.m */,
+				A1EB94071DD7DDB600ED8159 /* NSUserDefaults+AirFloatAdditions.h */,
+				A1EB94081DD7DDB600ED8159 /* NSUserDefaults+AirFloatAdditions.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -757,6 +762,7 @@
 				A116EA8616EE448D005530E9 /* AirFloatFlipInView.m in Sources */,
 				A116EA8E16EE6297005530E9 /* AppViewController.m in Sources */,
 				A129DD6316F93586004AA3BD /* AirFloatReflectionView.m in Sources */,
+				A1EB94091DD7DDB600ED8159 /* NSUserDefaults+AirFloatAdditions.m in Sources */,
 				A129DD7D16F94D02004AA3BD /* SettingsViewController.m in Sources */,
 				A1ACB4F216FA2350008E4C4F /* UIImage+AirFloatAdditions.m in Sources */,
 				A146A93816FA625600698A49 /* SupportViewController.m in Sources */,

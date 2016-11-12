@@ -172,7 +172,7 @@ void _dacp_client_send_request(struct dacp_client_t* dc, const char* request_nam
         char path[strlen(request_name) + 13];
         sprintf(path, "/ctrl-int/1/%s", request_name);
         
-        web_request_set_command(request, "GET");
+        web_request_set_method(request, "GET");
         web_request_set_path(request, path);
         web_request_set_protocol(request, "HTTP/1.1");
         

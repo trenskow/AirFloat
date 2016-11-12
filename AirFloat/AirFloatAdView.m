@@ -54,14 +54,8 @@
 
 - (void)dealloc {
     
-    [_images release];
-    
     for (NSTimer* timer in _timers)
         [timer invalidate];
-    
-    [_timers release];
-    
-    [super dealloc];
     
 }
 
@@ -84,7 +78,7 @@
 - (void)setImages:(NSArray *)images {
     
     _currentImage = 0;
-    _images = [images retain];
+    _images = images;
     
 }
 
@@ -107,7 +101,6 @@
         for (NSTimer* timer in _timers)
             [timer invalidate];
         
-        [_timers release];
         _timers = [[NSMutableArray alloc] init];
         
         [UIView animateWithDuration:1.0
@@ -285,11 +278,6 @@
         
         [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
         
-        [timer release];
-        
-        [label release];
-        [flipView release];
-        
     }
     
     UIView* oldView = nil;
@@ -327,13 +315,7 @@
     
     [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
     
-    [timer release];
-    
     [self addSubview:nextView];
-    
-    [imageView release];
-    [textView release];
-    [nextView release];
     
 }
 

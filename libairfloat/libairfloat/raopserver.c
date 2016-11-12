@@ -173,7 +173,11 @@ bool raop_server_is_recording(struct raop_server_t* rs) {
 
 struct raop_server_settings_t raop_server_get_settings(struct raop_server_t* rs) {
     
-    return  (struct raop_server_settings_t){ settings_get_name(rs->settings), settings_get_password(rs->settings) };
+    return (struct raop_server_settings_t){
+        settings_get_name(rs->settings),
+        settings_get_password(rs->settings),
+        settings_get_ignore_source_volume(rs->settings)
+    };
     
 }
 
@@ -185,6 +189,7 @@ void raop_server_set_settings(struct raop_server_t* rs, struct raop_server_setti
     
     settings_set_name(rs->settings, settings.name);
     settings_set_password(rs->settings, settings.password);
+    settings_set_ignore_source_volume(rs->settings, settings.ignore_source_volume);
     
     const char* new_name = settings_get_name(rs->settings);
     
@@ -256,17 +261,4 @@ void raop_server_session_ended(struct raop_server_t* rs, raop_session_p session)
     mutex_unlock(rs->mutex);
     
     
-}
-
-void raop_server_set_volume(struct raop_server_t* rs, float volume) {
-    if (raop_server_is_recording(rs)) {
-        mutex_lock(rs->mutex);
-        uint32_t count = rs->sessions_count;
-        mutex_unlock(rs->mutex);
-        
-        for (uint32_t i = 0 ; i < count ; i++)
-            if (raop_session_is_recording(rs->sessions[i])) {
-                raop_session_set_volume(rs->sessions[i], volume);
-            }
-    }
 }

@@ -79,7 +79,6 @@
             
             EAGLContext* glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
             CIContext* ciContext = [CIContext contextWithEAGLContext:glContext];
-            [glContext release];
             
             CGAffineTransform transform = CGAffineTransformIdentity;
             

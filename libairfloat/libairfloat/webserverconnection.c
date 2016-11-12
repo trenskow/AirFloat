@@ -146,7 +146,7 @@ void web_server_connection_send_response(web_server_connection_p wc, web_respons
     
     socket_send(wc->socket, buffer, content_length + response_length);
     
-    log_data(LOG_INFO, buffer, content_length + response_length);
+    log_data(LOG_COMMUNICATION, buffer, content_length + response_length);
     
     if (close_after_send)
         socket_close(wc->socket);

@@ -46,8 +46,6 @@ static int PanelViewControllerObserverContext;
         
     }
     
-    [super dealloc];
-    
 }
 
 - (UIScrollView*)findScrollViewInView:(UIView *)view {

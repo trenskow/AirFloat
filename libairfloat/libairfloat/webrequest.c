@@ -43,7 +43,7 @@
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
 struct web_request_t {
-    char* command;
+    char* method;
     char* path;
     char* protocol;
     void* content;
@@ -64,7 +64,7 @@ struct web_request_t* web_request_create() {
 
 void web_request_destroy(struct web_request_t* wr) {
     
-    free(wr->command);
+    free(wr->method);
     free(wr->path);
     free(wr->protocol);
     
@@ -92,7 +92,7 @@ ssize_t web_request_parse(struct web_request_t* wr, const void* data, size_t dat
         char header[header_length];
         memcpy(header, buffer, content_start - buffer);
         
-        log_data(LOG_INFO, data, content_start - buffer);
+        log_data(LOG_COMMUNICATION, data, content_start - buffer);
         
         char* header_start = header;
         header_length = web_tools_convert_new_lines(header_start, header_length);
@@ -133,8 +133,8 @@ ssize_t web_request_parse(struct web_request_t* wr, const void* data, size_t dat
         size_t actual_content_length = data_size - (content_start - buffer);
         if (content_length <= actual_content_length) {
             
-            wr->command = (char*)malloc(strlen(cmd) + 1);
-            strcpy(wr->command, cmd);
+            wr->method = (char*)malloc(strlen(cmd) + 1);
+            strcpy(wr->method, cmd);
             wr->path = (char*)malloc(strlen(path) + 1);
             strcpy(wr->path, path);
             wr->protocol = (char*)malloc(strlen(protocol) + 1);
@@ -143,14 +143,13 @@ ssize_t web_request_parse(struct web_request_t* wr, const void* data, size_t dat
             web_headers_destroy(wr->headers);
             wr->headers = headers;
             
-            log_message(LOG_INFO, "(Complete) - %d bytes", content_length);
+            log_message(LOG_INFO, "Req: %s %s (%d bytes)", wr->method, wr->path, content_length);
             
             web_request_set_content(wr, (void*)content_start, content_length);
             
             ret = content_start + content_length - buffer;
             
         } else {
-            log_message(LOG_INFO, "(Incomplete)");
             web_headers_destroy(headers);
         }
         
@@ -167,9 +166,9 @@ struct web_request_t* web_request_copy(struct web_request_t* wr) {
     struct web_request_t* request = (struct web_request_t*)malloc(sizeof(struct web_request_t));
     bzero(request, sizeof(struct web_request_t));
     
-    if (wr->command != NULL) {
-        request->command = malloc(strlen(wr->command) + 1);
-        strcpy(request->command, wr->command);
+    if (wr->method != NULL) {
+        request->method = malloc(strlen(wr->method) + 1);
+        strcpy(request->method, wr->method);
     }
     
     if (wr->path != NULL) {
@@ -194,23 +193,23 @@ struct web_request_t* web_request_copy(struct web_request_t* wr) {
     
 }
 
-void web_request_set_command(struct web_request_t* wr, const char* command) {
+void web_request_set_method(struct web_request_t* wr, const char* method) {
     
-    if (wr->command != NULL) {
-        free(wr->command);
-        wr->command = NULL;
+    if (wr->method != NULL) {
+        free(wr->method);
+        wr->method = NULL;
     }
     
-    if (command != NULL) {
-        wr->command = malloc(strlen(command) + 1);
-        strcpy(wr->command, command);
+    if (method != NULL) {
+        wr->method = malloc(strlen(method) + 1);
+        strcpy(wr->method, method);
     }
     
 }
 
-const char* web_request_get_command(struct web_request_t* wr) {
+const char* web_request_get_method(struct web_request_t* wr) {
     
-    return wr->command;
+    return wr->method;
     
 }
 
@@ -297,10 +296,10 @@ size_t web_request_write(struct web_request_t* wr, void* data, size_t data_size)
     
     size_t write_pos = 0;
     
-    size_t head_len = strlen(wr->command) + strlen(wr->path) + strlen(wr->protocol) + 4;
+    size_t head_len = strlen(wr->method) + strlen(wr->path) + strlen(wr->protocol) + 4;
     
     if (data != NULL && write_pos + head_len <= data_size)
-        sprintf(data, "%s %s %s\r\n", wr->command, wr->path, wr->protocol);
+        sprintf(data, "%s %s %s\r\n", wr->method, wr->path, wr->protocol);
     
     write_pos += head_len;
     

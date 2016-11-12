@@ -49,11 +49,6 @@
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     
-    [_maskLayer release];
-    [_currentLabels release];
-    
-    [super dealloc];
-    
 }
 
 #pragma mark - Private Methods
@@ -129,7 +124,7 @@
     
     if (!_maskLayer) {
         
-        _maskLayer = [[CAGradientLayer layer] retain];
+        _maskLayer = [CAGradientLayer layer];
         _maskLayer.frame = self.bounds;
         
         _maskLayer.colors = @[(id)[UIColor blackColor].CGColor, (id)[UIColor blackColor].CGColor, (id)[UIColor blackColor].CGColor, (id)[UIColor blackColor].CGColor];
@@ -176,8 +171,6 @@
     [_currentLabels addObject:newLabel];
     
     [self addSubview:newLabel];
-    
-    [newLabel release];
     
     [self performSelector:@selector(_scrollLabel:) withObject:newLabel afterDelay:2.7];
         

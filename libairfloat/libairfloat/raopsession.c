@@ -79,6 +79,7 @@ struct raop_session_t {
     bool is_running;
     raop_server_p server;
     char* password;
+    bool ignore_source_volume;
     web_server_connection_p raop_connection;
     char authentication_digest_nonce[33];
     dacp_client_p dacp_client;
@@ -283,7 +284,7 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
     
     bool keep_alive = true;
     
-    const char* cmd = web_request_get_command(request);
+    const char* cmd = web_request_get_method(request);
     const char* path = web_request_get_path(request);
     web_headers_p request_headers = web_request_get_headers(request);
     
@@ -496,33 +497,41 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
                     const char* progress;
                     if ((volume = parameters_value_for_key(parameters, "volume"))) {
                         
-                        //The volume is a float value representing the audio attenuation in dB
-                        //A value of –144 means the audio is muted. Then it goes from –30 to 0.
-                        float volume_db;
-                        sscanf(volume, "%f", &volume_db);
-                        
-                        // input       : output
-                        // -144.0      : silence
-                        // -30.0 - 0.0 : 0.0 - 1.0
-                        
-                        float volume_p = 0;
-                        if (volume_db < -144) {
-                            volume_db = -144;
-                        }
-                        if (volume_db > 0) {
-                            volume_db = 0;
-                        }
-                        if (volume_db == -144) {
-                            volume_p = 0;
+                        if (!rs->ignore_source_volume) {
+                            
+                            //The volume is a float value representing the audio attenuation in dB
+                            //A value of –144 means the audio is muted. Then it goes from –30 to 0.
+                            float volume_db;
+                            sscanf(volume, "%f", &volume_db);
+                            
+                            // input       : output
+                            // -144.0      : silence
+                            // -30.0 - 0.0 : 0.0 - 1.0
+                            
+                            float volume_p = 0;
+                            if (volume_db < -144) {
+                                volume_db = -144;
+                            }
+                            if (volume_db > 0) {
+                                volume_db = 0;
+                            }
+                            if (volume_db == -144) {
+                                volume_p = 0;
+                            } else {
+                                volume_p = 1.0 + volume_db / 30.0;
+                            }
+                            
+                            log_message(LOG_INFO, "Client set volume: %f (%f)", volume_p, volume_db);
+                            
+                            audio_output_set_volume(audio_queue_get_output(rtp_session->queue), volume_p);
+                            if (rs->callbacks.updated_volume != NULL) {
+                                rs->callbacks.updated_volume(rs, volume_p, rs->callbacks.ctx.updated_volume);
+                            }
+                            
                         } else {
-                            volume_p = 1.0 + volume_db / 30.0;
-                        }
-                        
-                        log_message(LOG_INFO, "Client set volume: %f (%f)", volume_p, volume_db);
-                        
-                        audio_output_set_volume(audio_queue_get_output(rtp_session->queue), volume_p);
-                        if (rs->callbacks.updated_volume != NULL) {
-                            rs->callbacks.updated_volume(rs, volume_p, rs->callbacks.ctx.updated_volume);
+                            
+                            log_message(LOG_INFO, "Ignored set volume.");
+                            
                         }
                         
                     } else if (rs->callbacks.updated_track_position != NULL && (progress = parameters_value_for_key(parameters, "progress"))) {
@@ -689,6 +698,8 @@ struct raop_session_t* raop_session_create(raop_server_p server, web_server_conn
         rs->password = (char*)malloc(strlen(password) + 1);
         strcpy(rs->password, password);
     }
+    
+    rs->ignore_source_volume = settings_get_ignore_source_volume(settings);
     
     web_server_connection_set_request_callback(rs->raop_connection, _raop_session_raop_connection_request_callback, rs);
     web_server_connection_set_closed_callback(rs->raop_connection, _raop_session_raop_closed_callback, rs);
@@ -857,13 +868,5 @@ bool raop_session_is_recording(struct raop_session_t* rs) {
 dacp_client_p raop_session_get_dacp_client(struct raop_session_t* rs) {
     
     return rs->dacp_client;
-    
-}
-
-//Sets the session volume level. The valid range is 0.0 to 1.0.
-void raop_session_set_volume(struct raop_session_t* rs, float volume) {
-    
-    struct raop_rtp_session_t* rtp_session = rs->rtp_session;
-    audio_output_set_volume(audio_queue_get_output(rtp_session->queue), volume);
     
 }

@@ -31,6 +31,8 @@
 #ifndef _settings_h
 #define _settings_h
 
+#include <stdbool.h>
+
 typedef struct settings_t *settings_p;
 
 typedef void(*settings_name_changed_callback)(settings_p settings, const char* new_name, void* ctx);
@@ -42,5 +44,7 @@ const char* settings_get_name(settings_p s);
 void settings_set_name(settings_p s, const char* new_name);
 void settings_set_password(settings_p s, const char* new_password);
 const char* settings_get_password(settings_p s);
+bool settings_get_ignore_source_volume(settings_p s);
+void settings_set_ignore_source_volume(settings_p s, bool ignore_source_volume);
 
 #endif

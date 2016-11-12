@@ -64,6 +64,4 @@ void raop_session_set_ended_callback(raop_session_p rs, raop_session_ended_callb
 bool raop_session_is_recording(raop_session_p rs);
 dacp_client_p raop_session_get_dacp_client(raop_session_p rs);
 
-void raop_session_set_volume(struct raop_session_t* rs, float volume);
-
 #endif

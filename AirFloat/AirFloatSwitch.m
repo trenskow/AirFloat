@@ -57,29 +57,6 @@
 
 @implementation AirFloatSwitch
 
-- (void)dealloc {
-    
-    [_backgroundImageView release];
-    [_backgroundHighligthedImageView release];
-    
-    [_knobView release];
-    [_knobImageView release];
-    [_knobOffImageView release];
-    [_knobOnImageView release];
-    
-    [_enabledLabelContainer release];
-    [_disabledLabelContainer release];
-    
-    [_enabledLabel release];
-    [_disabledLabel release];
-    
-    [_knobPanGestureRecognizer release];
-    [_tapGestureRecoginzer release];
-    
-    [super dealloc];
-    
-}
-
 - (void)awakeFromNib {
     
     [super awakeFromNib];

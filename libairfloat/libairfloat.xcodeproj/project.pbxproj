@@ -42,8 +42,8 @@
 		A1D0DCA719503F89004717F5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898F9F213CDAAD1006EC97E /* UIKit.framework */; };
 		A1D0DCAC19504234004717F5 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1D0DCAB19504234004717F5 /* AVFoundation.framework */; };
 		A1EB94051DD7C05B00ED8159 /* crypt_cc.c in Sources */ = {isa = PBXBuildFile; fileRef = A1FE60E21B7BFB6500C314ED /* crypt_cc.c */; };
+		A1EB94061DD7CD0100ED8159 /* decoder_alac_apple.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9740C16DBAE9B000AD9E4 /* decoder_alac_apple.c */; };
 		A1FE60E81B7BFD9800C314ED /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1FE60E71B7BFD9800C314ED /* Security.framework */; };
-		C0F1F2511CD3C88000A849D1 /* decoder_alac_other.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9740E16DBAEAA000AD9E4 /* decoder_alac_other.c */; };
 		C80FE37F1C83F56D00E4A847 /* DeviceIDRetriver.m in Sources */ = {isa = PBXBuildFile; fileRef = C80FE37D1C83F56D00E4A847 /* DeviceIDRetriver.m */; };
 /* End PBXBuildFile section */
 
@@ -494,8 +494,8 @@
 				A1D0DC8C195037FD004717F5 /* decoder.c in Sources */,
 				C80FE37F1C83F56D00E4A847 /* DeviceIDRetriver.m in Sources */,
 				A1D0DC85195037EE004717F5 /* log.c in Sources */,
+				A1EB94061DD7CD0100ED8159 /* decoder_alac_apple.c in Sources */,
 				A1D0DC81195037EE004717F5 /* base64.c in Sources */,
-				C0F1F2511CD3C88000A849D1 /* decoder_alac_other.c in Sources */,
 				A1D0DC88195037EE004717F5 /* thread_posix.c in Sources */,
 				A1D0DC981950383D004717F5 /* webrequest.c in Sources */,
 				A1D0DC86195037EE004717F5 /* mutex_posix.c in Sources */,

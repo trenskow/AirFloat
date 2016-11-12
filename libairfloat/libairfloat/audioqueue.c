@@ -748,10 +748,10 @@ struct audio_queue_missing_packet_window audio_queue_get_next_missing_window(str
     
     mutex_lock(aq->mutex);
     
-    if (aq->missing_count < aq->queue_count >> 2) {
+    if (aq->missing_count < aq->queue_count / 2) {
         
-        uint32_t queue_pos = 0; // Stop when half of queue has been searched
-        for (struct audio_packet_t* current_packet = aq->queue_head ; current_packet != NULL && queue_pos < aq->queue_count >> 1 ; current_packet = current_packet->next) {
+        uint32_t queue_pos = 0; // Stop when 3/4 of queue has been searched
+        for (struct audio_packet_t* current_packet = aq->queue_head ; current_packet != NULL && queue_pos < aq->queue_count - aq->queue_count / 4 ; current_packet = current_packet->next) {
             
             if (current_packet->state == audio_packet_state_missing) {
                 

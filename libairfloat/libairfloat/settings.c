@@ -30,12 +30,14 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "settings.h"
 
 struct settings_t {
     char* name;
     char* password;
+    bool ignore_source_volume;
 };
 
 struct settings_t* settings_create(const char* name, const char* password) {
@@ -97,5 +99,17 @@ void settings_set_password(struct settings_t* s, const char* new_password) {
         s->password = (char*)malloc(strlen(new_password) + 1);
         strcpy(s->password, new_password);
     }
+    
+}
+
+bool settings_get_ignore_source_volume(struct settings_t* s) {
+    
+    return s->ignore_source_volume;
+    
+}
+
+void settings_set_ignore_source_volume(struct settings_t*s, bool ignore_source_volume) {
+    
+    s->ignore_source_volume = ignore_source_volume;
     
 }

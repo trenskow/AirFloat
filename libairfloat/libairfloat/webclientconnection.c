@@ -66,7 +66,7 @@ void _web_client_connection_send_next_request(struct web_client_connection_t* wc
         char* data[request_len];
         web_request_write(wc->requests[0], data, request_len);
         
-        log_data(LOG_INFO, data, request_len);
+        log_data(LOG_COMMUNICATION, data, request_len);
         
         socket_send(wc->socket, data, request_len);
 

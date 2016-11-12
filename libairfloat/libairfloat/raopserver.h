@@ -37,6 +37,7 @@
 struct raop_server_settings_t {
     const char* name;
     const char* password;
+    bool ignore_source_volume;
 };
 
 typedef struct raop_server_t *raop_server_p;
@@ -56,7 +57,6 @@ bool raop_server_is_running(raop_server_p rs);
 bool raop_server_is_recording(raop_server_p rs);
 struct raop_server_settings_t raop_server_get_settings(raop_server_p rs);
 void raop_server_set_settings(raop_server_p rs, struct raop_server_settings_t settings);
-void raop_server_set_volume(raop_server_p rs, float volume);
 void raop_server_stop(raop_server_p rs);
 void raop_server_set_new_session_callback(raop_server_p rs, raop_server_new_session_callback new_session_callback, void* ctx);
 void raop_server_set_session_accept_callback(raop_server_p rs, raop_server_accept_callback session_accept_callback, void* ctx);
