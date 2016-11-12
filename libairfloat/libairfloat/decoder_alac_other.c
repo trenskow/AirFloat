@@ -28,7 +28,7 @@
 //  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#if (!defined(__APPLE__) || defined(ALAC_SOFTWARE))
+#if !defined(__APPLE__)
 
 #include <stdlib.h>
 #include <stdint.h>

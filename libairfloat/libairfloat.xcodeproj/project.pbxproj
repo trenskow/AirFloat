@@ -42,7 +42,9 @@
 		A1D0DCA719503F89004717F5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4898F9F213CDAAD1006EC97E /* UIKit.framework */; };
 		A1D0DCAC19504234004717F5 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1D0DCAB19504234004717F5 /* AVFoundation.framework */; };
 		A1EB94051DD7C05B00ED8159 /* crypt_cc.c in Sources */ = {isa = PBXBuildFile; fileRef = A1FE60E21B7BFB6500C314ED /* crypt_cc.c */; };
-		A1EB94061DD7CD0100ED8159 /* decoder_alac_apple.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9740C16DBAE9B000AD9E4 /* decoder_alac_apple.c */; };
+		A1EB940B1DD7E33100ED8159 /* decoder_alac_other.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9740E16DBAEAA000AD9E4 /* decoder_alac_other.c */; };
+		A1EB940C1DD7E33800ED8159 /* decoder_alac_apple.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9740C16DBAE9B000AD9E4 /* decoder_alac_apple.c */; };
+		A1EB940D1DD7E35600ED8159 /* crypt_openssl.c in Sources */ = {isa = PBXBuildFile; fileRef = A179A2FE16DC275F00A1E58F /* crypt_openssl.c */; };
 		A1FE60E81B7BFD9800C314ED /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1FE60E71B7BFD9800C314ED /* Security.framework */; };
 		C80FE37F1C83F56D00E4A847 /* DeviceIDRetriver.m in Sources */ = {isa = PBXBuildFile; fileRef = C80FE37D1C83F56D00E4A847 /* DeviceIDRetriver.m */; };
 /* End PBXBuildFile section */
@@ -494,12 +496,13 @@
 				A1D0DC8C195037FD004717F5 /* decoder.c in Sources */,
 				C80FE37F1C83F56D00E4A847 /* DeviceIDRetriver.m in Sources */,
 				A1D0DC85195037EE004717F5 /* log.c in Sources */,
-				A1EB94061DD7CD0100ED8159 /* decoder_alac_apple.c in Sources */,
 				A1D0DC81195037EE004717F5 /* base64.c in Sources */,
 				A1D0DC88195037EE004717F5 /* thread_posix.c in Sources */,
 				A1D0DC981950383D004717F5 /* webrequest.c in Sources */,
 				A1D0DC86195037EE004717F5 /* mutex_posix.c in Sources */,
+				A1EB940D1DD7E35600ED8159 /* crypt_openssl.c in Sources */,
 				A1D0DC941950383D004717F5 /* webserver.c in Sources */,
+				A1EB940C1DD7E33800ED8159 /* decoder_alac_apple.c in Sources */,
 				A1D0DC8F1950382F004717F5 /* zeroconf_apple.c in Sources */,
 				A1D0DC8E19503826004717F5 /* audioqueue.c in Sources */,
 				A1D0DC87195037EE004717F5 /* condition_posix.c in Sources */,
@@ -510,6 +513,7 @@
 				A1D0DC83195037EE004717F5 /* dmap.c in Sources */,
 				A1D0DC8A195037FD004717F5 /* alac_format.c in Sources */,
 				A1D0DC80195037EE004717F5 /* hardware_apple.c in Sources */,
+				A1EB940B1DD7E33100ED8159 /* decoder_alac_other.c in Sources */,
 				A1D0DC82195037EE004717F5 /* settings.c in Sources */,
 				A1D0DC931950383D004717F5 /* webserverconnection.c in Sources */,
 			);

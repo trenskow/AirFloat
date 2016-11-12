@@ -6,6 +6,8 @@
 //
 //
 
+#if defined(__APPLE__)
+
 #include <Security/Security.h>
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonKeyDerivation.h>
@@ -144,3 +146,5 @@ void crypt_md5_hash(const void* content, size_t content_size, void* md5, size_t 
     CC_MD5_Final(md5, &context);
     
 }
+
+#endif

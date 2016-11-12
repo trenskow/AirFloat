@@ -28,6 +28,8 @@
 //  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+#if !defined(__APPLE__)
+
 #include <stdint.h>
 #include <string.h>
 #include <assert.h>
@@ -127,3 +129,5 @@ void crypt_md5_hash(const void* content, size_t content_size, void* md5, size_t 
     MD5_Final(md5, &context);
     
 }
+
+#endif
