@@ -30,7 +30,7 @@
 
 #import "PanelViewController.h"
 
-NSString *const SettingsUpdatedNotification;
+extern NSString *const SettingsUpdatedNotification;
 
 @interface SettingsViewController : PanelViewController
 

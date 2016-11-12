@@ -81,7 +81,7 @@ struct decoder_output_format_t decoder_alac_get_output_format(void* data) {
 
 size_t decoder_alac_decode(void* data, void* in_audio_data, size_t in_audio_data_size, void* out_audio_data, size_t out_audio_data_size) {
     
-    int output_size = out_audio_data_size;
+    int output_size = (int)out_audio_data_size;
     decode_frame(((struct decoder_alac_other_t*)data)->alac, (unsigned char*)in_audio_data, (unsigned char*)out_audio_data, &output_size);
     
     return output_size;

@@ -44,6 +44,8 @@
 
 - (void)awakeFromNib {
     
+    [super awakeFromNib];
+    
     CGRect frame = self.frame;
     self.layer.anchorPoint = CGPointMake(0, 0);
     self.frame = frame;

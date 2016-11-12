@@ -21,7 +21,6 @@
 struct crypt_aes_t {
     uint8_t key[16];
     uint8_t iv[16];
-    CCCryptorRef cryptor;
 };
 
 SecKeyRef _crypt_get_private_key() {
@@ -107,30 +106,31 @@ crypt_aes_p crypt_aes_create(void* key, void* iv, size_t size) {
     memcpy(d->key, key, 16);
     memcpy(d->iv, iv, 16);
     
-    OSStatus err = CCCryptorCreate(kCCDecrypt, kCCAlgorithmAES128, kCCOptionPKCS7Padding, key, 16, iv, &d->cryptor);
-    
-    if (err != noErr)
-        return NULL;
-    
     return d;
     
 }
 
 void crypt_aes_destroy(crypt_aes_p d) {
-    
-    CCCryptorRelease(d->cryptor);
-    
     free(d);
-    
 }
 
 size_t crypt_aes_decrypt(crypt_aes_p d, void* encrypted_data, size_t encrypted_data_size, void* data, size_t data_size) {
     
+    CCCryptorRef cryptor;
+    
     size_t data_moved = 0;
     
-    CCCryptorUpdate(d->cryptor, encrypted_data, encrypted_data_size, data, data_size, &data_moved);
+    OSStatus err;
+    err = CCCryptorCreate(kCCDecrypt, kCCAlgorithmAES128, 0, d->key, 16, d->iv, &cryptor);
+    if (err != noErr) return 0;
+    err = CCCryptorUpdate(cryptor, encrypted_data, encrypted_data_size, data, data_size, &data_moved);
+    if (err != noErr) return 0;
+    if (data_moved < encrypted_data_size) {
+        memcpy(data + data_moved, encrypted_data + data_moved, encrypted_data_size - data_moved);
+    }
+    err = CCCryptorRelease(cryptor);
     
-    return data_moved;
+    return encrypted_data_size;
     
 }
 
