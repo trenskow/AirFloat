@@ -886,6 +886,7 @@
 		4898FA1013CDAAD1006EC97E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "-Your-identifier-";
@@ -897,6 +898,7 @@
 		4898FA1113CDAAD1006EC97E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "-Your-identifier-";
@@ -961,6 +963,7 @@
 		A116EA6516EDFDC7005530E9 /* Release (Server Logs) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "-Your-identifier-";
@@ -1029,6 +1032,7 @@
 		A149209514E7323900849DC3 /* Debug (Server Logs) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "-Your-identifier-";
@@ -1089,6 +1093,7 @@
 		A1A76012151B56B800728C9C /* App Store Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "-Your-identifier-";
@@ -1149,6 +1154,7 @@
 		A1C7F7AB1501048400D7DE52 /* Ad Hoc Distribution */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "-Your-identifier-";
@@ -1217,6 +1223,7 @@
 		A1ECED9016E8CFA500F8E7E3 /* Debug (Server Logs - ALAC Software) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "AirFloat/AirFloat-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "-Your-identifier-";
