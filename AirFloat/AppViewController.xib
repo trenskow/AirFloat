@@ -62,7 +62,7 @@
                             </subviews>
                             <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                         </view>
-                        <view contentMode="scaleToFill" id="24">
+                        <view clipsSubviews="YES" contentMode="scaleToFill" id="24">
                             <rect key="frame" x="0.0" y="0.0" width="375" height="48"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                             <subviews>
