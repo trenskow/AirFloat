@@ -35,7 +35,7 @@
 #include "log.h"
 #include "zeroconf.h"
 #include "dmap.h"
-#include "sockaddr.h"
+#include "endpoint.h"
 #include "webrequest.h"
 #include "webresponse.h"
 #include "webclientconnection.h"
@@ -43,7 +43,8 @@
 #include "dacpclient.h"
 
 struct dacp_client_t {
-    struct sockaddr* end_point;
+    object_p object;
+    endpoint_p endpoint;
     char* identifier;
     char* active_remove;
     zeroconf_dacp_discover_p dacp_discover;
@@ -77,7 +78,7 @@ void _dacp_client_web_connection_connect_failed_callback(web_client_connection_p
     
     struct dacp_client_t* dc = (struct dacp_client_t*)ctx;
     
-    web_client_connection_destroy(dc->web_connection);
+    object_release(dc->web_connection);
     dc->web_connection = NULL;
     
 }
@@ -92,7 +93,7 @@ void _dacp_client_web_connection_disconnected_callback(web_client_connection_p c
             dc->callbacks.controls_became_unavailable(dc, dc->callbacks.ctx.controls_became_unavailable);
         
         if (!dc->is_destroyed) {
-            web_client_connection_destroy(dc->web_connection);
+            object_release(dc->web_connection);
             dc->web_connection = NULL;
         }
         
@@ -130,7 +131,7 @@ void _dacp_client_web_connection_response_received_callback(web_client_connectio
                 
             }
             
-            dmap_destroy(dmap);
+            object_release(dmap);
             
         }
         
@@ -138,14 +139,14 @@ void _dacp_client_web_connection_response_received_callback(web_client_connectio
     
 }
 
-void _dacp_client_zeroconf_resolved_callback(zeroconf_dacp_discover_p zeroconf_dacp_discover, const char* name, struct sockaddr** end_points, uint32_t end_points_count, void* ctx) {
+void _dacp_client_zeroconf_resolved_callback(zeroconf_dacp_discover_p zeroconf_dacp_discover, const char* name, const endpoint_p* endpoints, uint32_t endpoints_count, void* ctx) {
     
     struct dacp_client_t* dc = (struct dacp_client_t*)ctx;
     
     if (dc->web_connection == NULL && strlen(name) > 12 && memcmp(name, "iTunes_Ctrl_", 12) == 0 && strcmp(name + 12, dc->identifier) == 0) {
         
-        for (uint32_t i = 0 ; i < end_points_count ; i++)
-            if (sockaddr_equals_host(end_points[i], dc->end_point)) {
+        for (uint32_t i = 0 ; i < endpoints_count ; i++)
+            if (endpoint_equals_host(endpoints[i], dc->endpoint)) {
                 
                 dc->web_connection = web_client_connection_create();
                 
@@ -153,7 +154,7 @@ void _dacp_client_zeroconf_resolved_callback(zeroconf_dacp_discover_p zeroconf_d
                 web_client_connection_set_connect_failed_callback(dc->web_connection, _dacp_client_web_connection_connect_failed_callback, dc);
                 web_client_connection_set_disconneced_callback(dc->web_connection, _dacp_client_web_connection_disconnected_callback, dc);
                 web_client_connection_set_response_received_callback(dc->web_connection, _dacp_client_web_connection_response_received_callback, dc);
-                web_client_connection_connect(dc->web_connection, end_points[i]);
+                web_client_connection_connect(dc->web_connection, endpoints[i]);
                 
                 break;
                 
@@ -180,19 +181,41 @@ void _dacp_client_send_request(struct dacp_client_t* dc, const char* request_nam
         
         web_client_connection_send_request(dc->web_connection, request);
         
-        web_request_destroy(request);
+        object_release(request);
         
     }
     
 }
 
-struct dacp_client_t* dacp_client_create(struct sockaddr* end_point, const char* identifier, const char* active_remote) {
+void _dacp_client_destroy(void* object) {
     
-    struct dacp_client_t* dc = (struct dacp_client_t*)malloc(sizeof(struct dacp_client_t));
-    bzero(dc, sizeof(struct dacp_client_t));
+    struct dacp_client_t* dc = (struct dacp_client_t*)object;
     
-    dc->end_point = sockaddr_copy(end_point);
-    sockaddr_set_port(dc->end_point, 3689);
+    object_release(dc->endpoint);
+    
+    dc->is_destroyed = true;
+    
+    if (dc->dacp_discover != NULL) {
+        object_release(dc->dacp_discover);
+        dc->dacp_discover = NULL;
+    }
+    
+    if (dc->web_connection != NULL) {
+        object_release(dc->web_connection);
+        dc->web_connection = NULL;
+    }
+    
+    free(dc->identifier);
+    free(dc->active_remove);
+    
+}
+
+struct dacp_client_t* dacp_client_create(endpoint_p endpoint, const char* identifier, const char* active_remote) {
+    
+    struct dacp_client_t* dc = (struct dacp_client_t*)object_create(sizeof(struct dacp_client_t), _dacp_client_destroy);
+    
+    dc->endpoint = endpoint_copy(endpoint);
+    endpoint_set_port(dc->endpoint, 3689);
     
     dc->identifier = malloc(strlen(identifier) + 1);
     strcpy(dc->identifier, identifier);
@@ -205,29 +228,6 @@ struct dacp_client_t* dacp_client_create(struct sockaddr* end_point, const char*
     dc->playback_state = dacp_client_playback_state_stopped;
     
     return dc;
-    
-}
-
-void dacp_client_destroy(struct dacp_client_t* dc) {
-    
-    sockaddr_destroy(dc->end_point);
-    
-    dc->is_destroyed = true;
-    
-    if (dc->dacp_discover != NULL) {
-        zeroconf_dacp_discover_destroy(dc->dacp_discover);
-        dc->dacp_discover = NULL;
-    }
-    
-    if (dc->web_connection != NULL) {
-        web_client_connection_destroy(dc->web_connection);
-        dc->web_connection = NULL;
-    }
-    
-    free(dc->identifier);
-    free(dc->active_remove);
-    
-    free(dc);
     
 }
 

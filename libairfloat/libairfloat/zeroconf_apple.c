@@ -46,6 +46,7 @@
 #include "zeroconf.h"
 
 struct zeroconf_raop_ad_t {
+    object_p object;
     CFNetServiceRef service;
     CFRunLoopRef run_loop;
     thread_p thread;
@@ -103,9 +104,25 @@ void _zeroconf_raop_ad_run_loop_thread(void* ctx) {
     
 }
 
+void _zeroconf_raop_ad_destroy(void* object) {
+    
+    struct zeroconf_raop_ad_t* za = (struct zeroconf_raop_ad_t*)object;
+    
+    CFRunLoopStop(za->run_loop);
+    
+    condition_destroy(za->condition);
+    mutex_destroy(za->mutex);
+    thread_join(za->thread);
+    
+    CFRelease(za->service);
+    
+    thread_destroy(za->thread);
+    
+}
+
 struct zeroconf_raop_ad_t* zeroconf_raop_ad_create(uint16_t port, const char *name) {
     
-    struct zeroconf_raop_ad_t* za = (struct zeroconf_raop_ad_t*)malloc(sizeof(struct zeroconf_raop_ad_t));
+    struct zeroconf_raop_ad_t* za = (struct zeroconf_raop_ad_t*)object_create(sizeof(struct zeroconf_raop_ad_t), _zeroconf_raop_ad_destroy);
         
     CFStringRef service_name = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
     uint64_t hardware_id = hardware_identifier();
@@ -147,23 +164,8 @@ struct zeroconf_raop_ad_t* zeroconf_raop_ad_create(uint16_t port, const char *na
     
 }
 
-void zeroconf_raop_ad_destroy(struct zeroconf_raop_ad_t* za) {
-    
-    CFRunLoopStop(za->run_loop);
-    
-    condition_destroy(za->condition);
-    mutex_destroy(za->mutex);
-    thread_join(za->thread);
-    
-    CFRelease(za->service);
-    
-    thread_destroy(za->thread);
-    
-    free(za);
-    
-}
-
 struct zeroconf_dacp_discover_t {
+    object_p object;
     CFNetServiceBrowserRef domain_browser;
     CFNetServiceBrowserRef* service_browsers;
     uint32_t service_browsers_count;
@@ -183,18 +185,19 @@ void _zeroconf_dacp_discover_resolve_callback(CFNetServiceRef service, CFStreamE
     if (addresses != NULL && zd->service_found_callback != NULL) {
         
         uint32_t addresses_count = (uint32_t)CFArrayGetCount(addresses);
-        struct sockaddr* end_points[addresses_count];
+        endpoint_p endpoints[addresses_count];
         
         for (uint32_t i = 0 ; i < addresses_count ; i++) {
             CFDataRef sockaddr_data = (CFDataRef)CFArrayGetValueAtIndex(addresses, i);
-            struct sockaddr* end_point = (struct sockaddr*)CFDataGetBytePtr(sockaddr_data);
-            end_points[i] = sockaddr_copy(end_point);
+            struct sockaddr* addr = (struct sockaddr*)CFDataGetBytePtr(sockaddr_data);
+            endpoints[i] = endpoint_create_sockaddr(addr);
         }
         
-        zd->service_found_callback(zd, CFStringGetCStringPtr(CFNetServiceGetName(service), kCFStringEncodingMacRoman), end_points, addresses_count, zd->service_found_callback_ctx);
+        zd->service_found_callback(zd, CFStringGetCStringPtr(CFNetServiceGetName(service), kCFStringEncodingMacRoman), endpoints, addresses_count, zd->service_found_callback_ctx);
         
-        for (uint32_t i = 0 ; i < addresses_count ; i++)
-            sockaddr_destroy(end_points[i]);
+        for (uint32_t i = 0 ; i < addresses_count ; i++) {
+            object_release(endpoints[i]);
+        }
         
     }
     
@@ -265,22 +268,9 @@ void _zeroconf_dacp_discover_run_loop_thread(void* ctx) {
     
 }
 
-struct zeroconf_dacp_discover_t* zeroconf_dacp_discover_create() {
+void _zeroconf_dacp_discover_destroy(void* object) {
     
-    struct zeroconf_dacp_discover_t* zd = (struct zeroconf_dacp_discover_t*)malloc(sizeof(struct zeroconf_dacp_discover_t));
-    bzero(zd, sizeof(struct zeroconf_dacp_discover_t));
-    
-    CFNetServiceClientContext context = { 0, zd, NULL, NULL, NULL };
-    
-    zd->domain_browser = CFNetServiceBrowserCreate(kCFAllocatorDefault, _zeroconf_dacp_discover_browse_callback, &context);
-    zd->mutex = mutex_create();
-    zd->thread = thread_create_a(_zeroconf_dacp_discover_run_loop_thread, zd);
-    
-    return zd;
-    
-}
-
-void zeroconf_dacp_discover_destroy(struct zeroconf_dacp_discover_t* zd) {
+    struct zeroconf_dacp_discover_t* zd = (struct zeroconf_dacp_discover_t*)object;
     
     mutex_lock(zd->mutex);
     
@@ -289,7 +279,7 @@ void zeroconf_dacp_discover_destroy(struct zeroconf_dacp_discover_t* zd) {
         CFNetServiceBrowserInvalidate(zd->service_browsers[i]);
         CFRelease(zd->service_browsers[i]);
     }
-        
+    
     free(zd->service_browsers);
     
     zd->service_browsers_count = 0;
@@ -306,7 +296,19 @@ void zeroconf_dacp_discover_destroy(struct zeroconf_dacp_discover_t* zd) {
     
     CFRelease(zd->domain_browser);
     
-    free(zd);
+}
+
+struct zeroconf_dacp_discover_t* zeroconf_dacp_discover_create() {
+    
+    struct zeroconf_dacp_discover_t* zd = (struct zeroconf_dacp_discover_t*)object_create(sizeof(struct zeroconf_dacp_discover_t), _zeroconf_dacp_discover_destroy);
+    
+    CFNetServiceClientContext context = { 0, zd, NULL, NULL, NULL };
+    
+    zd->domain_browser = CFNetServiceBrowserCreate(kCFAllocatorDefault, _zeroconf_dacp_discover_browse_callback, &context);
+    zd->mutex = mutex_create();
+    zd->thread = thread_create_a(_zeroconf_dacp_discover_run_loop_thread, zd);
+    
+    return zd;
     
 }
 

@@ -44,34 +44,30 @@ struct web_header_t {
 };
 
 struct web_headers_t {
+    object_p object;
     struct web_header_t* headers;
     uint32_t count;
 };
 
-struct web_headers_t* web_headers_create() {
+void _web_headers_destroy(void* object) {
     
-    struct web_headers_t* wh = (struct web_headers_t*)malloc(sizeof(struct web_headers_t));
-    bzero(wh, sizeof(struct web_headers_t));
+    struct web_headers_t* wh = (struct web_headers_t*)object;
     
-    return wh;
-    
-}
-
-void web_headers_destroy(struct web_headers_t* wh) {
-    
-    for (uint32_t i = 0 ; i < wh->count ; i++)
+    for (uint32_t i = 0 ; i < wh->count ; i++) {
         free(wh->headers[i].name);
+    }
     
     free(wh->headers);
     
-    free(wh);
-    
+}
+
+struct web_headers_t* web_headers_create() {
+    return (struct web_headers_t*)object_create(sizeof(struct web_headers_t), _web_headers_destroy);
 }
 
 struct web_headers_t* web_headers_copy(struct web_headers_t* wh) {
     
-    struct web_headers_t* headers = (struct web_headers_t*)malloc(sizeof(struct web_headers_t));
-    bzero(headers, sizeof(struct web_headers_t));
+    struct web_headers_t* headers = (struct web_headers_t*)object_create(sizeof(struct web_headers_t), _web_headers_destroy);
     
     headers->count = wh->count;
     headers->headers = (struct web_header_t*)malloc(sizeof(struct web_header_t) * wh->count);

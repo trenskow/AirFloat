@@ -1,5 +1,5 @@
 //
-//  sockaddr.h
+//  endpoint.h
 //  AirFloat
 //
 //  Copyright (c) 2013, Kristian Trenskow All rights reserved.
@@ -35,21 +35,25 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef enum {
-    
-    sockaddr_type_inet_4 = 1 << 1,
-    sockaddr_type_inet_6 = 1 << 2
-    
-} sockaddr_type;
+#include "object.h"
 
-struct sockaddr* sockaddr_create(const char* host, uint16_t port, sockaddr_type version, uint32_t scope_id);
-void sockaddr_destroy(struct sockaddr* addr);
-struct sockaddr* sockaddr_copy(struct sockaddr* addr);
-bool sockaddr_equals(struct sockaddr* addr1, struct sockaddr* addr2);
-bool sockaddr_equals_host(struct sockaddr* addr1, struct sockaddr* addr2);
-const char* sockaddr_get_host(struct sockaddr* addr);
-uint16_t sockaddr_get_port(struct sockaddr* addr);
-void sockaddr_set_port(struct sockaddr* addr, uint16_t new_port);
-bool sockaddr_is_ipv6(struct sockaddr* addr);
+typedef struct endpoint_t *endpoint_p;
+
+typedef enum {
+    endpoint_type_inet_4 = 1 << 1,
+    endpoint_type_inet_6 = 1 << 2
+} endpoint_type;
+
+endpoint_p endpoint_create(const char* host, uint16_t port, endpoint_type version, uint32_t scope_id);
+endpoint_p endpoint_create_sockaddr(struct sockaddr* addr);
+endpoint_p endpoint_copy(endpoint_p addr);
+bool endpoint_equals(endpoint_p addr1, endpoint_p addr2);
+bool endpoint_equals_host(endpoint_p addr1, endpoint_p addr2);
+const char* endpoint_get_host(endpoint_p addr);
+uint16_t endpoint_get_port(endpoint_p addr);
+void endpoint_set_port(endpoint_p addr, uint16_t new_port);
+bool endpoint_is_ipv6(endpoint_p addr);
+void endpoint_copy_sockaddr(endpoint_p endpoint, struct sockaddr* addr);
+const struct sockaddr* endpoint_get_sockaddr(endpoint_p endpoint);
 
 #endif

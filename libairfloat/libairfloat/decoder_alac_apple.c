@@ -38,11 +38,13 @@
 #include "endian.h"
 #include "decoder.h"
 #include "alac_format.h"
+#include "object.h"
 
 #define MIN(x, y) (x < y ? x : y)
 #define ca_assert(error) assert((error) == noErr)
 
 struct decoder_alac_mac_t {
+    object_p object;
     struct alac_magic_cookie_t magic_cookie;
     struct decoder_output_format_t output_format;
     AudioStreamBasicDescription out_desc;
@@ -53,10 +55,17 @@ struct decoder_alac_mac_t {
     size_t buffer_size;
 };
 
+void _decoder_alac_destroy(void* data) {
+    
+    struct decoder_alac_mac_t* d = (struct decoder_alac_mac_t*)data;
+    
+    ca_assert(AudioConverterDispose(d->converter_ref));
+    
+}
+
 void* decoder_alac_create(const char* rtp_fmtp) {
     
-    struct decoder_alac_mac_t* d = (struct decoder_alac_mac_t*)malloc(sizeof(struct decoder_alac_mac_t));
-    bzero(d, sizeof(struct decoder_alac_mac_t));
+    struct decoder_alac_mac_t* d = (struct decoder_alac_mac_t*)object_create(sizeof(struct decoder_alac_mac_t), _decoder_alac_destroy);
     
     d->magic_cookie = alac_format_parse(rtp_fmtp);
     
@@ -93,16 +102,6 @@ void* decoder_alac_create(const char* rtp_fmtp) {
     ca_assert(AudioConverterSetProperty(d->converter_ref, kAudioConverterInputChannelLayout, sizeof(channelLayout), &channelLayout));
     
     return d;
-    
-}
-
-void decoder_alac_destroy(void* data) {
-    
-    struct decoder_alac_mac_t* d = (struct decoder_alac_mac_t*)data;
-    
-    ca_assert(AudioConverterDispose(d->converter_ref));
-    
-    free(d);
     
 }
 

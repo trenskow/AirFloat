@@ -37,7 +37,7 @@
 
 typedef struct condition_t *condition_p;
 
-condition_p condition_create();
+condition_p condition_create(void);
 void condition_destroy(condition_p c);
 void condition_wait(condition_p c, mutex_p mutex);
 bool condition_times_wait(condition_p c, mutex_p mutex, int milliseconds);

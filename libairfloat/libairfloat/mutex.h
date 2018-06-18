@@ -35,7 +35,7 @@
 
 typedef struct mutex_t *mutex_p;
 
-mutex_p mutex_create();
+mutex_p mutex_create(void);
 void mutex_destroy(mutex_p m);
 void mutex_lock(mutex_p m);
 bool mutex_trylock(mutex_p m);

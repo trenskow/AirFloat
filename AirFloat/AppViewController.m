@@ -148,14 +148,18 @@ void clientEndedRecording(raop_session_p raop_session, void* ctx) {
 
 void clientEnded(raop_session_p raop_session, void* ctx) {
     
-    AppViewController* viewController = (__bridge AppViewController*)ctx;
-    
-    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground && clientIsStreaming) {
-        clientIsStreaming = false;
-        [AirFloatSharedAppDelegate showNotification:@"Client disconnected."];
-    }
-    
-    [viewController performSelectorOnMainThread:@selector(clientEnded) withObject:nil waitUntilDone:NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        AppViewController* viewController = (__bridge AppViewController*)ctx;
+        
+        if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground && clientIsStreaming) {
+            clientIsStreaming = false;
+            [AirFloatSharedAppDelegate showNotification:@"Client disconnected."];
+        }
+        
+        [viewController performSelectorOnMainThread:@selector(clientEnded) withObject:nil waitUntilDone:NO];
+        
+    });
     
 }
 
@@ -369,7 +373,7 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
                          
                      } completion:^(BOOL finished) {
                          
-                         [_overlaidViewController viewDidAppear:YES];
+                         [self->_overlaidViewController viewDidAppear:YES];
                          
                      }];
     
@@ -396,9 +400,9 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
                          while ([self.overlaidViewContainer.subviews count] > 0)
                              [[self.overlaidViewContainer.subviews lastObject] removeFromSuperview];
                          
-                         [_overlaidViewController viewDidDisappear:YES];
+                         [self->_overlaidViewController viewDidDisappear:YES];
                          
-                         _overlaidViewController = nil;
+                         self->_overlaidViewController = nil;
                          
                      }];
     
@@ -559,8 +563,8 @@ void newServerSession(raop_server_p server, raop_session_p new_session, void* ct
                          self.blurredArtworkImageView.alpha = 0.0;
                          self.artworkImageView.image = [UIImage imageNamed:@"NoArtwork.png"];
                          self.blurredArtworkImageView.image = nil;
-                         _artworkImage = nil;
-                         _albumTitle = nil;
+                         self->_artworkImage = nil;
+                         self->_albumTitle = nil;
                      }];
     
     [self.adView startAnimation];

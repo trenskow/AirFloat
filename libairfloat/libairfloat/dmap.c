@@ -32,10 +32,10 @@
 #include <assert.h>
 #include <string.h>
 
-#include "Endian.h"
+#include "endian.h"
 #include "log.h"
 
-#include "DMAP.h"
+#include "dmap.h"
 
 struct dmap_atom_type {
     const uint32_t tag;
@@ -52,6 +52,7 @@ struct dmap_atom {
 };
 
 struct dmap_t {
+    object_p object;
     struct dmap_atom* atoms;
     uint32_t count;
 };
@@ -218,31 +219,28 @@ const struct dmap_atom_type _atom_types[] = {
 
 const uint32_t _atom_type_count = sizeof(_atom_types) / sizeof(struct dmap_atom_type);
 
-struct dmap_t* dmap_create() {
+void _dmap_destroy(void* object) {
     
-    struct dmap_t* t = (struct dmap_t*)malloc(sizeof(struct dmap_t));
-    bzero(t, sizeof(struct dmap_t));
+    struct dmap_t* d = (struct dmap_t*)object;
     
-    return t;
+    for (uint32_t i = 0 ; i < d->count ; i++) {
+        if (d->atoms[i].type == dmap_type_container) {
+            object_release(d->atoms[i].container);
+        }
+        
+        if (d->atoms[i].buffer != NULL) {
+            free(d->atoms[i].buffer);
+        }
+    }
+    
+    if (d->count > 0) {
+        free(d->atoms);
+    }
     
 }
 
-void dmap_destroy(struct dmap_t* d) {
-    
-    for (uint32_t i = 0 ; i < d->count ; i++) {
-        if (d->atoms[i].type == dmap_type_container)
-            dmap_destroy(d->atoms[i].container);
-        
-        if (d->atoms[i].buffer != NULL)
-            free(d->atoms[i].buffer);
-        
-    }
-    
-    if (d->count > 0)
-        free(d->atoms);
-    
-    free(d);
-    
+struct dmap_t* dmap_create() {
+    return (struct dmap_t*)object_create(sizeof(struct dmap_t), _dmap_destroy);
 }
 
 void dmap_parse(struct dmap_t* d, const void* data, size_t data_size) {

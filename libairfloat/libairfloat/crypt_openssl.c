@@ -85,17 +85,11 @@ struct crypt_aes_t* crypt_aes_create(void* key, void* iv, size_t size) {
     
     assert(size == 16);
     
-    struct crypt_aes_t* d = (struct crypt_aes_t*)malloc(sizeof(struct crypt_aes_t));
+    struct crypt_aes_t* d = (struct crypt_aes_t*)object_create(sizeof(struct crypt_aes_t), NULL);
     AES_set_decrypt_key(key, 128, &d->key);
     memcpy(d->iv, iv, 16);
     
     return d;
-    
-}
-
-void crypt_aes_destroy(struct crypt_aes_t* d) {
-    
-    free(d);
     
 }
 

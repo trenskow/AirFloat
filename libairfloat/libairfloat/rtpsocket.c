@@ -33,6 +33,8 @@
 #include <string.h>
 #include <assert.h>
 
+#include "object.h"
+
 #include "rtpsocket.h"
 
 struct rtp_socket_info_t {
@@ -41,8 +43,9 @@ struct rtp_socket_info_t {
 };
 
 struct rtp_socket_t {
+    object_p object;
     char* name;
-    struct sockaddr* allowed_remote_end_point;
+    endpoint_p allowed_remote_endpoint;
     struct rtp_socket_info_t** sockets;
     uint32_t sockets_count;
     rtp_socket_data_received_callback received_callback;
@@ -50,26 +53,9 @@ struct rtp_socket_t {
     mutex_p mutex;
 };
 
-struct rtp_socket_t* rtp_socket_create(const char* name, struct sockaddr* allowed_remote_end_point) {
+void _rtp_socket_destroy(void* object) {
     
-    struct rtp_socket_t* rs = (struct rtp_socket_t*)malloc(sizeof(struct rtp_socket_t));
-    bzero(rs, sizeof(struct rtp_socket_t));
-    
-    if (allowed_remote_end_point != NULL)
-        rs->allowed_remote_end_point = sockaddr_copy(allowed_remote_end_point);
-    
-    if (name) {
-        rs->name = (char*)malloc(strlen(name) + 1);
-        strcpy(rs->name, name);
-    }
-    
-    rs->mutex = mutex_create();
-    
-    return rs;
-    
-}
-
-void rtp_socket_destroy(struct rtp_socket_t* rs) {
+    struct rtp_socket_t* rs = (struct rtp_socket_t*)object;
     
     mutex_lock(rs->mutex);
     
@@ -83,15 +69,34 @@ void rtp_socket_destroy(struct rtp_socket_t* rs) {
     
     mutex_unlock(rs->mutex);
     
-    if (rs->allowed_remote_end_point)
-        sockaddr_destroy(rs->allowed_remote_end_point);
+    if (rs->allowed_remote_endpoint){
+        object_release(rs->allowed_remote_endpoint);
+    }
     
-    if (rs->name)
+    if (rs->name) {
         free(rs->name);
+    }
     
     mutex_destroy(rs->mutex);
     
-    free(rs);
+}
+
+struct rtp_socket_t* rtp_socket_create(const char* name, endpoint_p allowed_remote_endpoint) {
+    
+    struct rtp_socket_t* rs = object_create(sizeof(struct rtp_socket_t), _rtp_socket_destroy);
+    
+    if (allowed_remote_endpoint != NULL) {
+        rs->allowed_remote_endpoint = (endpoint_p)object_retain(allowed_remote_endpoint);
+    }
+    
+    if (name) {
+        rs->name = (char*)malloc(strlen(name) + 1);
+        strcpy(rs->name, name);
+    }
+    
+    rs->mutex = mutex_create();
+    
+    return rs;
     
 }
 
@@ -101,10 +106,10 @@ void _rtp_socket_socket_closed_callback(socket_p socket, void* ctx) {
     
     mutex_lock(rs->mutex);
     
-    for (uint32_t i = 0 ; i < rs->sockets_count ; i++)
+    for (uint32_t i = 0 ; i < rs->sockets_count ; i++) {
         if (rs->sockets[i]->socket == socket) {
             
-            socket_destroy(rs->sockets[i]->socket);
+            object_release(rs->sockets[i]->socket);
             
             free(rs->sockets[i]);
             
@@ -116,18 +121,19 @@ void _rtp_socket_socket_closed_callback(socket_p socket, void* ctx) {
             break;
             
         }
+    }
     
     mutex_unlock(rs->mutex);
     
 }
 
-ssize_t _rtp_socket_socket_receive_callback(socket_p socket, const void* data, size_t data_size, struct sockaddr* remote_end_point, void* ctx) {
+ssize_t _rtp_socket_socket_receive_callback(socket_p socket, const void* data, size_t data_size, endpoint_p remote_endpoint, void* ctx) {
     
     struct rtp_socket_t* rs = (struct rtp_socket_t*)ctx;
     
     size_t used = data_size;
     
-    if (sockaddr_equals_host(remote_end_point, rs->allowed_remote_end_point) && rs->received_callback != NULL)
+    if (endpoint_equals_host(remote_endpoint, rs->allowed_remote_endpoint) && rs->received_callback != NULL)
         used = rs->received_callback(rs, socket, (const char*)data, data_size, rs->received_callback_ctx);
     
     return used;
@@ -164,12 +170,12 @@ bool _rtp_socket_accept_callback(socket_p socket, socket_p new_socket, void* ctx
     
     if (new_socket != NULL) {
         
-        if (rs->allowed_remote_end_point == NULL || sockaddr_equals_host(socket_get_remote_end_point(new_socket), rs->allowed_remote_end_point)) {
+        if (rs->allowed_remote_endpoint == NULL || endpoint_equals_host(socket_get_remote_endpoint(new_socket), rs->allowed_remote_endpoint)) {
             _rtp_socket_add_socket(rs, new_socket, true);
             return true;
         } else {
             socket_close(new_socket);
-            socket_destroy(new_socket);
+            object_release(new_socket);
         }
         
     }
@@ -179,12 +185,12 @@ bool _rtp_socket_accept_callback(socket_p socket, socket_p new_socket, void* ctx
 }
 
 
-bool rtp_socket_setup(struct rtp_socket_t* rs, struct sockaddr* local_end_point) {
+bool rtp_socket_setup(struct rtp_socket_t* rs, endpoint_p local_endpoint) {
     
     socket_p udp_socket = socket_create("RTP UDP Socket", true);
     socket_p tcp_socket = socket_create("RTP TCP Listen Socket", false);
     
-    if (socket_bind(udp_socket, local_end_point) && socket_bind(tcp_socket, local_end_point)) {
+    if (socket_bind(udp_socket, local_endpoint) && socket_bind(tcp_socket, local_endpoint)) {
         _rtp_socket_add_socket(rs, udp_socket, true);
         socket_set_receive_callback(udp_socket, _rtp_socket_socket_receive_callback, rs);
         _rtp_socket_add_socket(rs, tcp_socket, false);
@@ -192,8 +198,8 @@ bool rtp_socket_setup(struct rtp_socket_t* rs, struct sockaddr* local_end_point)
         return true;
     }
     
-    socket_destroy(udp_socket);
-    socket_destroy(tcp_socket);
+    object_release(udp_socket);
+    object_release(tcp_socket);
     
     return false;
     
@@ -206,19 +212,23 @@ void rtp_socket_set_data_received_callback(struct rtp_socket_t* rs, rtp_socket_d
     
 }
 
-void rtp_socket_send_to(struct rtp_socket_t* rs, struct sockaddr* dst, const void* buffer, uint32_t size) {
+void rtp_socket_send_to(struct rtp_socket_t* rs, endpoint_p dst, const void* buffer, uint32_t size) {
     
-    for (uint32_t i = 0 ; i < rs->sockets_count ; i++)
-        if (rs->sockets[i]->is_data_socket)
+    for (uint32_t i = 0 ; i < rs->sockets_count ; i++) {
+        if (rs->sockets[i]->is_data_socket) {
             socket_send_to(rs->sockets[i]->socket, dst, buffer, size);
+        }
+    }
     
 }
 
 uint16_t rtp_socket_get_local_port(rtp_socket_p rs) {
     
-    for (uint32_t i = 0 ; i < rs->sockets_count ; i++)
-        if (!rs->sockets[i]->is_data_socket)
-            return sockaddr_get_port(socket_get_local_end_point(rs->sockets[i]->socket));
+    for (uint32_t i = 0 ; i < rs->sockets_count ; i++) {
+        if (!rs->sockets[i]->is_data_socket) {
+            return endpoint_get_port(socket_get_local_endpoint(rs->sockets[i]->socket));
+        }
+    }
     
     return 0;
     

@@ -33,6 +33,8 @@
 
 #include <stdint.h>
 
+#include "object.h"
+
 #define DMAP_INDEX_NOT_FOUND UINT32_MAX
 
 typedef enum {
@@ -59,8 +61,7 @@ typedef struct {
 
 typedef struct dmap_t *dmap_p;
 
-dmap_p dmap_create();
-void dmap_destroy(dmap_p d);
+dmap_p dmap_create(void);
 void dmap_parse(dmap_p d, const void* data, size_t data_size);
 dmap_p dmap_copy(dmap_p d);
 

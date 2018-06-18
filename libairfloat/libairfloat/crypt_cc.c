@@ -21,6 +21,7 @@
 #include "crypt.h"
 
 struct crypt_aes_t {
+    object_p object;
     uint8_t key[16];
     uint8_t iv[16];
 };
@@ -49,6 +50,7 @@ SecKeyRef _crypt_get_private_key() {
             privateKey = NULL;
     }
     
+    CFRelease(key);
     CFRelease(items);
     CFRelease(options);
     
@@ -104,16 +106,12 @@ crypt_aes_p crypt_aes_create(void* key, void* iv, size_t size) {
     
     assert(size == 16);
     
-    struct crypt_aes_t *d = (struct crypt_aes_t*)malloc(sizeof(struct crypt_aes_t));
+    struct crypt_aes_t *d = (struct crypt_aes_t*)object_create(sizeof(struct crypt_aes_t), NULL);
     memcpy(d->key, key, 16);
     memcpy(d->iv, iv, 16);
     
     return d;
     
-}
-
-void crypt_aes_destroy(crypt_aes_p d) {
-    free(d);
 }
 
 size_t crypt_aes_decrypt(crypt_aes_p d, void* encrypted_data, size_t encrypted_data_size, void* data, size_t data_size) {
@@ -130,7 +128,7 @@ size_t crypt_aes_decrypt(crypt_aes_p d, void* encrypted_data, size_t encrypted_d
     if (data_moved < encrypted_data_size) {
         memcpy(data + data_moved, encrypted_data + data_moved, encrypted_data_size - data_moved);
     }
-    err = CCCryptorRelease(cryptor);
+    (void)CCCryptorRelease(cryptor);
     
     return encrypted_data_size;
     

@@ -45,6 +45,7 @@ struct parameter_t {
 };
 
 struct parameters_t {
+    object_p object;
     struct parameter_t* parameters;
     uint32_t parameters_count;
 };
@@ -169,11 +170,21 @@ size_t _parameters_write_http_header(struct parameters_t* p, void* buffer, size_
     
 }
 
+void _parameters_destroy(void* object) {
+    
+    struct parameters_t* p = (struct parameters_t*)object;
+    
+    for (uint32_t i = 0 ; i < p->parameters_count ; i++) {
+        free(p->parameters[i].key);
+    }
+    
+    free(p->parameters);
+    
+}
+
 struct parameters_t* parameters_create(const void* buffer, size_t size, enum parameters_type type) {
     
-    struct parameters_t* p = (struct parameters_t*)malloc(sizeof(struct parameters_t));
-    bzero(p, sizeof(struct parameters_t));
-    memset(p, 0, sizeof(struct parameters_t));
+    struct parameters_t* p = (struct parameters_t*)object_create(sizeof(struct parameters_t), _parameters_destroy);
     
     switch (type) {
         case parameters_type_text:
@@ -205,17 +216,6 @@ struct parameters_t* parameters_create(const void* buffer, size_t size, enum par
     }
     
     return p;
-    
-}
-
-void parameters_destroy(struct parameters_t* p) {
-    
-    for (uint32_t i = 0 ; i < p->parameters_count ; i++)
-        free(p->parameters[i].key);
-    
-    free(p->parameters);
-    
-    free(p);
     
 }
 

@@ -43,6 +43,7 @@
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
 struct web_request_t {
+    object_p object;
     char* method;
     char* path;
     char* protocol;
@@ -51,18 +52,9 @@ struct web_request_t {
     web_headers_p headers;
 };
 
-struct web_request_t* web_request_create() {
+void _web_request_destroy(void* object) {
     
-    struct web_request_t* wr = (struct web_request_t*)malloc(sizeof(struct web_request_t));
-    bzero(wr, sizeof(struct web_request_t));
-    
-    wr->headers = web_headers_create();
-        
-    return wr;
-    
-}
-
-void web_request_destroy(struct web_request_t* wr) {
+    struct web_request_t* wr = (struct web_request_t*)object;
     
     free(wr->method);
     free(wr->path);
@@ -71,9 +63,17 @@ void web_request_destroy(struct web_request_t* wr) {
     if (wr->content != NULL)
         free(wr->content);
     
-    web_headers_destroy(wr->headers);
+    object_release(wr->headers);
     
-    free(wr);
+}
+
+struct web_request_t* web_request_create() {
+    
+    struct web_request_t* wr = (struct web_request_t*)object_create(sizeof(struct web_request_t), _web_request_destroy);
+    
+    wr->headers = web_headers_create();
+        
+    return wr;
     
 }
 
@@ -140,7 +140,7 @@ ssize_t web_request_parse(struct web_request_t* wr, const void* data, size_t dat
             wr->protocol = (char*)malloc(strlen(protocol) + 1);
             strcpy(wr->protocol, protocol);
             
-            web_headers_destroy(wr->headers);
+            object_release(wr->headers);
             wr->headers = headers;
             
             log_message(LOG_INFO, "Req: %s %s (%d bytes)", wr->method, wr->path, content_length);
@@ -150,7 +150,7 @@ ssize_t web_request_parse(struct web_request_t* wr, const void* data, size_t dat
             ret = content_start + content_length - buffer;
             
         } else {
-            web_headers_destroy(headers);
+            object_release(headers);
         }
         
     }
@@ -163,8 +163,7 @@ ssize_t web_request_parse(struct web_request_t* wr, const void* data, size_t dat
 
 struct web_request_t* web_request_copy(struct web_request_t* wr) {
     
-    struct web_request_t* request = (struct web_request_t*)malloc(sizeof(struct web_request_t));
-    bzero(request, sizeof(struct web_request_t));
+    struct web_request_t* request = (struct web_request_t*)object_create(sizeof(struct web_request_t), _web_request_destroy);
     
     if (wr->method != NULL) {
         request->method = malloc(strlen(wr->method) + 1);

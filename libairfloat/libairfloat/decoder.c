@@ -42,17 +42,29 @@ enum decoder_type {
 };
 
 struct decoder_t {
+    object_p object;
     enum decoder_type type;
     mutex_p mutex;
     void* data;
 };
 
+void _decoder_destroy(void* object) {
+    
+    struct decoder_t* d = (struct decoder_t*)object;
+    
+    if (d->type == decoder_type_alac) {
+        object_release(d->data);
+    }
+    
+    mutex_destroy(d->mutex);
+    
+}
+
 struct decoder_t* decoder_create(const char* type, const char* rtp_fmtp) {
     
     assert(type);
 
-    struct decoder_t* d = (struct decoder_t*)malloc(sizeof(struct decoder_t));
-    bzero(d, sizeof(struct decoder_t));
+    struct decoder_t* d = (struct decoder_t*)object_create(sizeof(struct decoder_t), _decoder_destroy);
     
     d->mutex = mutex_create();
     
@@ -64,17 +76,6 @@ struct decoder_t* decoder_create(const char* type, const char* rtp_fmtp) {
     }
     
     return d;
-    
-}
-
-void decoder_destroy(struct decoder_t* d) {
-    
-    if (d->type == decoder_type_alac)
-        decoder_alac_destroy(d->data);
-    
-    mutex_destroy(d->mutex);
-    
-    free(d);
     
 }
 

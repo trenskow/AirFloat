@@ -33,12 +33,12 @@
 
 #include "crypt.h"
 #include "audioqueue.h"
-#include "sockaddr.h"
+#include "endpoint.h"
+#include "object.h"
 
 typedef struct rtp_recorder_t *rtp_recorder_p;
 
-rtp_recorder_p rtp_recorder_create(crypt_aes_p crypt, audio_queue_p audio_queue, struct sockaddr* local_end_point, struct sockaddr* remote_end_point, uint16_t remote_control_port, uint16_t remote_timing_port);
-void rtp_recorder_destroy(rtp_recorder_p rr);
+rtp_recorder_p rtp_recorder_create(crypt_aes_p crypt, audio_queue_p audio_queue, endpoint_p local_endpoint, endpoint_p remote_endpoint, uint16_t remote_control_port, uint16_t remote_timing_port);
 bool rtp_recorder_start(rtp_recorder_p rr);
 uint16_t rtp_recorder_get_streaming_port(rtp_recorder_p rr);
 uint16_t rtp_recorder_get_control_port(rtp_recorder_p rr);

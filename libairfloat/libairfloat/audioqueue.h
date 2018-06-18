@@ -36,6 +36,7 @@
 
 #include "audiooutput.h"
 #include "decoder.h"
+#include "object.h"
 
 typedef struct audio_queue_t *audio_queue_p;
 
@@ -47,7 +48,6 @@ struct audio_queue_missing_packet_window {
 };
 
 audio_queue_p audio_queue_create(decoder_p decoder);
-void audio_queue_destroy(audio_queue_p aq);
 void audio_queue_set_received_audio_callback(audio_queue_p aq, audio_queue_received_audio_callback callback, void* ctx);
 void audio_queue_disable_synchronization(audio_queue_p aq);
 void audio_queue_synchronize(audio_queue_p aq, uint32_t current_sample_time, double current_time, uint32_t next_sample_time);

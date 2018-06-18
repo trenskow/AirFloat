@@ -31,7 +31,7 @@
 #ifndef __hardware_h
 #define __hardware_h
 
-uint64_t hardware_identifier();
-double hardware_get_time();
+uint64_t hardware_identifier(void);
+double hardware_get_time(void);
 
 #endif

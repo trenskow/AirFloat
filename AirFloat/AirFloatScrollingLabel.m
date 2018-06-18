@@ -78,7 +78,7 @@
                                                        delay:0.0
                                                      options:UIViewAnimationOptionCurveEaseIn
                                                   animations:^{
-                                                      _maskLayer.colors = @[(id)[UIColor clearColor].CGColor, (id)[UIColor blackColor].CGColor, (id)[UIColor blackColor].CGColor, (id)[UIColor blackColor].CGColor];
+                                                      self->_maskLayer.colors = @[(id)[UIColor clearColor].CGColor, (id)[UIColor blackColor].CGColor, (id)[UIColor blackColor].CGColor, (id)[UIColor blackColor].CGColor];
                                                   } completion:nil];
                                  [UIView animateWithDuration:0.5
                                                        delay:3.0
@@ -89,7 +89,7 @@
                                                       if (label.superview) {
                                                           endFrame.origin.x = 0;
                                                           label.frame = endFrame;
-                                                          _maskLayer.colors = @[(id)[UIColor blackColor].CGColor, (id)[UIColor blackColor].CGColor, (id)[UIColor blackColor].CGColor, (id)[UIColor clearColor].CGColor];
+                                                          self->_maskLayer.colors = @[(id)[UIColor blackColor].CGColor, (id)[UIColor blackColor].CGColor, (id)[UIColor blackColor].CGColor, (id)[UIColor clearColor].CGColor];
                                                           [UIView animateWithDuration:0.5
                                                                                 delay:0.0
                                                                               options:UIViewAnimationOptionCurveEaseOut
@@ -105,7 +105,7 @@
         
         [UIView animateWithDuration:0.3
                          animations:^{
-                             _maskLayer.colors = @[(id)[UIColor clearColor].CGColor, (id)[UIColor blackColor].CGColor, (id)[UIColor blackColor].CGColor, (id)[UIColor clearColor].CGColor];
+                             self->_maskLayer.colors = @[(id)[UIColor clearColor].CGColor, (id)[UIColor blackColor].CGColor, (id)[UIColor blackColor].CGColor, (id)[UIColor clearColor].CGColor];
                          }];
         
     }

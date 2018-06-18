@@ -38,10 +38,12 @@
 #include "alac.h"
 #include "decoder.h"
 #include "alac_format.h"
+#include "object.h"
 
 #define MIN(x, y) (x < y ? x : y)
 
 struct decoder_alac_other_t {
+    object_p object;
     struct alac_magic_cookie_t magic_cookie;
     struct decoder_output_format_t output_format;
     alac_file* alac;
@@ -49,27 +51,24 @@ struct decoder_alac_other_t {
 
 void decoder_alac_reset(void* data);
 
-void* decoder_alac_create(const char* rtp_fmtp) {
-    
-    struct decoder_alac_other_t* d = (struct decoder_alac_other_t*)malloc(sizeof(struct decoder_alac_other_t));
-    bzero(d, sizeof(struct decoder_alac_other_t));
-    
-    d->magic_cookie = alac_format_parse(rtp_fmtp);
-    
-    decoder_alac_reset(d);
-    
-    return d;
-    
-}
-
-void decoder_alac_destroy(void* data) {
+void _decoder_alac_destroy(void* data) {
     
     struct decoder_alac_other_t* d = (struct decoder_alac_other_t*)data;
     
     deallocate_buffers(d->alac);
     dispose_alac(d->alac);
     
-    free(d);
+}
+
+void* decoder_alac_create(const char* rtp_fmtp) {
+    
+    struct decoder_alac_other_t* d = (struct decoder_alac_other_t*)object_create(sizeof(struct decoder_alac_other_t), _decoder_alac_destroy);
+    
+    d->magic_cookie = alac_format_parse(rtp_fmtp);
+    
+    decoder_alac_reset(d);
+    
+    return d;
     
 }
 

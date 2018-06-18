@@ -53,7 +53,7 @@
 
 typedef void (*audio_output_callback)(audio_output_p ao, void* buffer, size_t size, double host_time, void* ctx);
 
-double audio_output_get_host_time();
+double audio_output_get_host_time(void);
 
 audio_output_p audio_output_create(struct decoder_output_format_t decoder_output_format);
 void audio_output_destroy(audio_output_p ao);
@@ -166,6 +166,7 @@ void audio_packet_destroy(struct audio_packet_t* ap) {
 }
 
 struct audio_queue_t {
+    object_p object;
 #if DEBUG
     uint32_t non_garbage;
 #endif
@@ -502,27 +503,9 @@ void _audio_queue_output_render(audio_output_p ao, void* buffer, size_t size, do
     
 }
 
-struct audio_queue_t* audio_queue_create(decoder_p decoder) {
+void _audio_queue_destroy(void* object) {
     
-    struct audio_queue_t* aq = (struct audio_queue_t*)malloc(sizeof(struct audio_queue_t));
-    bzero(aq, sizeof(struct audio_queue_t));
-    
-    aq->decoder = decoder;
-    aq->output_format = decoder_get_output_format(decoder);
-    aq->mutex = mutex_create();
-    aq->condition = condition_create();
-    
-    aq->flush_last_seq_no = true;
-    aq->synchronization_enabled = true;
-  
-    aq->output = audio_output_create(aq->output_format);
-    audio_output_set_callback(aq->output, _audio_queue_output_render, aq);
-    
-    return aq;
-    
-}
-
-void audio_queue_destroy(struct audio_queue_t* aq) {
+    struct audio_queue_t* aq = (struct audio_queue_t*)object;
     
     mutex_lock(aq->mutex);
     
@@ -545,7 +528,26 @@ void audio_queue_destroy(struct audio_queue_t* aq) {
     mutex_destroy(aq->mutex);
     condition_destroy(aq->condition);
     
-    free(aq);
+    object_release(aq->decoder);
+    
+}
+
+struct audio_queue_t* audio_queue_create(decoder_p decoder) {
+    
+    struct audio_queue_t* aq = (struct audio_queue_t*)object_create(sizeof(struct audio_queue_t), _audio_queue_destroy);
+    
+    aq->decoder = (decoder_p)object_retain(decoder);
+    aq->output_format = decoder_get_output_format(decoder);
+    aq->mutex = mutex_create();
+    aq->condition = condition_create();
+    
+    aq->flush_last_seq_no = true;
+    aq->synchronization_enabled = true;
+  
+    aq->output = audio_output_create(aq->output_format);
+    audio_output_set_callback(aq->output, _audio_queue_output_render, aq);
+    
+    return aq;
     
 }
 
@@ -802,7 +804,7 @@ void audio_queue_flush(struct audio_queue_t* aq, uint16_t last_seq_no) {
     aq->last_known_sample = aq->last_known_sample_time = 0;
     
     audio_output_flush(aq->output);
-    decoder_reset(aq->decoder),
+    decoder_reset(aq->decoder);
     
     mutex_unlock(aq->mutex);
     

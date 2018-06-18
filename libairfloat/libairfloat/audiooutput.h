@@ -40,6 +40,6 @@ typedef struct audio_output_t *audio_output_p;
 void audio_output_set_volume(audio_output_p ao, double volume);
 void audio_output_set_muted(audio_output_p ao, bool muted);
 
-void audio_output_session_start();
-void audio_output_session_stop();
+void audio_output_session_start(void);
+void audio_output_session_stop(void);
 #endif

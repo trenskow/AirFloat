@@ -4,4 +4,4 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 
-uint64_t iOSDeviceID();
+uint64_t iOSDeviceID(void);

@@ -42,6 +42,7 @@
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
 struct web_response_t {
+    object_p object;
     uint16_t status_code;
     char* status_message;
     web_headers_p headers;
@@ -50,29 +51,30 @@ struct web_response_t {
     bool keep_alive;
 };
 
+void _web_response_destroy(void* object) {
+    
+    struct web_response_t* wr = (struct web_response_t*)object;
+    
+    if (wr->status_message != NULL) {
+        free(wr->status_message);
+    }
+    
+    if (wr->content != NULL) {
+        free(wr->content);
+    }
+    
+    object_release(wr->headers);
+    
+}
+
 struct web_response_t* web_response_create() {
     
-    struct web_response_t* wr = (struct web_response_t*)malloc(sizeof(struct web_response_t));
-    bzero(wr, sizeof(struct web_response_t));
+    struct web_response_t* wr = (struct web_response_t*)object_create(sizeof(struct web_response_t), _web_response_destroy);
     
     wr->headers = web_headers_create();
     web_response_set_status(wr, 500, "Internal Server Error");
     
     return wr;
-    
-}
-
-void web_response_destroy(struct web_response_t* wr) {
-    
-    if (wr->status_message != NULL)
-        free(wr->status_message);
-    
-    if (wr->content != NULL)
-        free(wr->content);
-    
-    web_headers_destroy(wr->headers);
-    
-    free(wr);
     
 }
 
@@ -135,7 +137,7 @@ ssize_t web_response_parse(web_response_p wr, const void* data, size_t data_size
             wr->status_message = (char*)malloc(strlen(status_message) + 1);
             strcpy(wr->status_message, status_message);
             
-            web_headers_destroy(wr->headers);
+            object_release(wr->headers);
             wr->headers = headers;
             
             log_message(LOG_INFO, "(Complete) - %d bytes", content_length);
@@ -146,7 +148,7 @@ ssize_t web_response_parse(web_response_p wr, const void* data, size_t data_size
             
         } else {
             log_message(LOG_INFO, "(Incomplete)");
-            web_headers_destroy(headers);
+            object_release(headers);
         }
         
     }

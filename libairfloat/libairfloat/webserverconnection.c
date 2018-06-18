@@ -36,7 +36,7 @@
 #include "log.h"
 #include "mutex.h"
 #include "socket.h"
-#include "sockaddr.h"
+#include "endpoint.h"
 #include "webtools.h"
 #include "webheaders.h"
 #include "webrequest.h"
@@ -45,6 +45,7 @@
 #define MAX(x,y) (x > y ? x : y)
 
 struct web_server_connection_t {
+    object_p object;
     mutex_p mutex;
     bool is_connected;
     bool has_taken_off;
@@ -56,7 +57,7 @@ struct web_server_connection_t {
     void* closed_callback_ctx;
 };
 
-ssize_t _web_server_connection_socket_recieve_callback(socket_p socket, const void* data, size_t data_size, struct sockaddr* remote_end_point, void* ctx) {
+ssize_t _web_server_connection_socket_recieve_callback(socket_p socket, const void* data, size_t data_size, endpoint_p remote_endpoint, void* ctx) {
     
     struct web_server_connection_t* wc = (struct web_server_connection_t*)ctx;
     
@@ -76,16 +77,25 @@ ssize_t _web_server_connection_socket_recieve_callback(socket_p socket, const vo
     } else
         mutex_unlock(wc->mutex);
     
-    web_request_destroy(request);
+    object_release(request);
     
     return ret;
         
 }
 
+void _web_server_connection_destroy(void* object) {
+    
+    struct web_server_connection_t* wc = (struct web_server_connection_t*)object;
+    
+    web_server_connection_close(wc);
+    
+    mutex_destroy(wc->mutex);
+    
+}
+
 struct web_server_connection_t* web_server_connection_create(socket_p socket, web_server_p server) {
     
-    struct web_server_connection_t* wc = (struct web_server_connection_t*)malloc(sizeof(struct web_server_connection_t));
-    bzero(wc, sizeof(struct web_server_connection_t));
+    struct web_server_connection_t* wc = (struct web_server_connection_t*)object_create(sizeof(struct web_server_connection_t), _web_server_connection_destroy);
     
     wc->socket = socket;
     wc->server = server;
@@ -99,16 +109,6 @@ struct web_server_connection_t* web_server_connection_create(socket_p socket, we
     wc->mutex = mutex_create();
     
     return wc;
-    
-}
-
-void web_server_connection_destroy(struct web_server_connection_t* wc) {
-    
-    web_server_connection_close(wc);
-    
-    mutex_destroy(wc->mutex);
-    
-    free(wc);
     
 }
 
@@ -173,9 +173,9 @@ void web_server_connection_take_off(struct web_server_connection_t* wc) {
     
     mutex_unlock(wc->mutex);
     
-    const char *ip = sockaddr_get_host(socket_get_remote_end_point(wc->socket));
+    const char *ip = endpoint_get_host(socket_get_remote_endpoint(wc->socket));
     
-    log_message(LOG_INFO, "RAOPConnection (%p) took over connection from %s:%d", wc, ip, sockaddr_get_port(socket_get_remote_end_point(wc->socket)));
+    log_message(LOG_INFO, "RAOPConnection (%p) took over connection from %s:%d", wc, ip, endpoint_get_port(socket_get_remote_endpoint(wc->socket)));
     
 }
 
@@ -204,26 +204,26 @@ void web_server_connection_close(struct web_server_connection_t* wc) {
     
 }
 
-struct sockaddr* web_server_connection_get_local_end_point(struct web_server_connection_t* wc) {
+endpoint_p web_server_connection_get_local_endpoint(struct web_server_connection_t* wc) {
     
-    return socket_get_local_end_point(wc->socket);
+    return socket_get_local_endpoint(wc->socket);
     
 }
 
-struct sockaddr* web_server_connection_get_remote_end_point(struct web_server_connection_t* wc) {
+endpoint_p web_server_connection_get_remote_endpoint(struct web_server_connection_t* wc) {
     
-    return socket_get_remote_end_point(wc->socket);
+    return socket_get_remote_endpoint(wc->socket);
     
 }
 
 const char* web_server_connection_get_host(struct web_server_connection_t* wc) {
     
-    return sockaddr_get_host(socket_get_remote_end_point(wc->socket));
+    return endpoint_get_host(socket_get_remote_endpoint(wc->socket));
     
 }
 
 uint16_t web_server_connection_get_port(struct web_server_connection_t* wc) {
     
-    return sockaddr_get_port(socket_get_remote_end_point(wc->socket));
+    return endpoint_get_port(socket_get_remote_endpoint(wc->socket));
     
 }

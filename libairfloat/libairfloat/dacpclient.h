@@ -31,7 +31,8 @@
 #ifndef _dacpclient_h
 #define _dacpclient_h
 
-#include "sockaddr.h"
+#include "endpoint.h"
+#include "object.h"
 
 enum dacp_client_playback_state {
     dacp_client_playback_state_stopped = 2,
@@ -45,8 +46,7 @@ typedef void(*dacp_client_controls_became_available_callback)(dacp_client_p clie
 typedef void(*dacp_client_controls_became_unavailable_callback)(dacp_client_p client, void* ctx);
 typedef void(*dacp_client_playback_state_changed_callback)(dacp_client_p client, enum dacp_client_playback_state state, void* ctx);
 
-dacp_client_p dacp_client_create(struct sockaddr* end_point, const char* identifier, const char* active_remote);
-void dacp_client_destroy(dacp_client_p dc);
+dacp_client_p dacp_client_create(endpoint_p endpoint, const char* identifier, const char* active_remote);
 void dacp_client_set_controls_became_available_callback(dacp_client_p dc, dacp_client_controls_became_available_callback callback, void* ctx);
 void dacp_client_set_controls_became_unavailable_callback(dacp_client_p dc, dacp_client_controls_became_unavailable_callback callback, void* ctx);
 void dacp_client_set_playback_state_changed_callback(dacp_client_p dc, dacp_client_playback_state_changed_callback callback, void* ctx);

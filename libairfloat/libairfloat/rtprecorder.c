@@ -147,6 +147,7 @@ struct rtp_packet_t _rtp_header_read(const void* buffer, size_t size) {
 }
 
 struct rtp_recorder_t {
+    object_p object;
     crypt_aes_p crypt;
     audio_queue_p audio_queue;
     mutex_p timer_mutex;
@@ -156,8 +157,8 @@ struct rtp_recorder_t {
     rtp_socket_p streaming_socket;
     rtp_socket_p timing_socket;
     rtp_socket_p control_socket;
-    struct sockaddr* remote_timing_end_point;
-    struct sockaddr* remote_control_end_point;
+    endpoint_p remote_timing_endpoint;
+    endpoint_p remote_control_endpoint;
     uint16_t emulated_seq_no;
     
     rtp_recorder_updated_track_position_callback updated_track_position_callback;
@@ -200,7 +201,7 @@ void _rtp_recorder_send_timing_request(struct rtp_recorder_t* rr) {
     double send_time = hardware_get_time();
     pckt.send_time = _ntp_time_from_hardware_time(send_time);
     
-    rtp_socket_send_to(rr->timing_socket, rr->remote_timing_end_point, &pckt, RTP_TIMING_PACKET_SIZE);
+    rtp_socket_send_to(rr->timing_socket, rr->remote_timing_endpoint, &pckt, RTP_TIMING_PACKET_SIZE);
     
     log_message(LOG_INFO, "Timing synchronization request sent (@ %1.6f)", send_time);
     
@@ -251,7 +252,7 @@ void _rtp_recorder_send_resend_request(struct rtp_recorder_t* rr, uint16_t seq_n
     pckt.seq_num = pckt.count = htons(count);
     pckt.missed_seq = htons(seq_num);
     
-    rtp_socket_send_to(rr->control_socket, rr->remote_control_end_point, &pckt, RTP_RESEND_PACKET_SIZE);
+    rtp_socket_send_to(rr->control_socket, rr->remote_control_endpoint, &pckt, RTP_RESEND_PACKET_SIZE);
     
     log_message(LOG_INFO, "Requested packet resend (seq: %d / count %d)", seq_num, count);
     
@@ -360,60 +361,34 @@ size_t _rtp_recorder_socket_data_received_callback(rtp_socket_p rtp_socket, sock
     
 }
 
-rtp_socket_p _rtp_recorder_create_socket(struct rtp_recorder_t* rr, const char* name, struct sockaddr* local_end_point, struct sockaddr* remote_end_point) {
+rtp_socket_p _rtp_recorder_create_socket(struct rtp_recorder_t* rr, const char* name, endpoint_p local_endpoint, endpoint_p remote_endpoint) {
     
-    rtp_socket_p ret = rtp_socket_create(name, remote_end_point);
+    rtp_socket_p ret = rtp_socket_create(name, remote_endpoint);
     
     unsigned short p;
     for (p = 6000 ; p < 6100 ; p++) {
-        struct sockaddr* ep = sockaddr_copy(local_end_point);
-        sockaddr_set_port(ep, p);
+        endpoint_p ep = endpoint_copy(local_endpoint);
+        endpoint_set_port(ep, p);
         if (rtp_socket_setup(ret, ep)) {
             rtp_socket_set_data_received_callback(ret, _rtp_recorder_socket_data_received_callback, rr);
             log_message(LOG_INFO, "Setup socket on port %u", p);
-            sockaddr_destroy(ep);
+            object_release(ep);
             return ret;
         }
-        sockaddr_destroy(ep);
+        object_release(ep);
     }
     
     log_message(LOG_ERROR, "Unable to bind socket.");
     
-    rtp_socket_destroy(ret);
+    object_release(ret);
     
     return NULL;
     
 }
 
-struct rtp_recorder_t* rtp_recorder_create(crypt_aes_p crypt, audio_queue_p audio_queue, struct sockaddr* local_end_point, struct sockaddr* remote_end_point, uint16_t remote_control_port, uint16_t remote_timing_port) {
+void _rtp_recorder_destroy(void* object) {
     
-    struct rtp_recorder_t* rr = (struct rtp_recorder_t*)malloc(sizeof(struct rtp_recorder_t));
-    bzero(rr, sizeof(struct rtp_recorder_t));
-    
-    rr->crypt = crypt;
-    rr->audio_queue = audio_queue;
-    
-    rr->timer_mutex = mutex_create();
-    rr->timer_cond = condition_create();
-    
-    rr->remote_control_end_point = sockaddr_copy(remote_end_point);
-    rr->remote_timing_end_point = sockaddr_copy(remote_end_point);
-    
-    sockaddr_set_port(rr->remote_control_end_point, remote_control_port);
-    sockaddr_set_port(rr->remote_timing_end_point, remote_timing_port);
-    
-    rr->streaming_socket = _rtp_recorder_create_socket(rr, "Straming socket", local_end_point, remote_end_point);
-    rr->control_socket = _rtp_recorder_create_socket(rr, "Control socket", local_end_point, remote_end_point);
-    rr->timing_socket = _rtp_recorder_create_socket(rr, "Timing socket", local_end_point, remote_end_point);
-    
-    rr->updated_track_position_callback = NULL;
-    rr->updated_track_position_callback_ctx = NULL;
-    
-    return rr;
-    
-}
-
-void rtp_recorder_destroy(struct rtp_recorder_t* rr) {
+    struct rtp_recorder_t* rr = (struct rtp_recorder_t*)object;
     
     mutex_lock(rr->timer_mutex);
     
@@ -428,17 +403,45 @@ void rtp_recorder_destroy(struct rtp_recorder_t* rr) {
     
     mutex_unlock(rr->timer_mutex);
     
-    rtp_socket_destroy(rr->streaming_socket);
-    rtp_socket_destroy(rr->control_socket);
-    rtp_socket_destroy(rr->timing_socket);
+    object_release(rr->streaming_socket);
+    object_release(rr->control_socket);
+    object_release(rr->timing_socket);
     
-    sockaddr_destroy(rr->remote_control_end_point);
-    sockaddr_destroy(rr->remote_timing_end_point);
+    object_release(rr->remote_control_endpoint);
+    object_release(rr->remote_timing_endpoint);
+    
+    object_release(rr->audio_queue);
+    object_release(rr->crypt);
     
     mutex_destroy(rr->timer_mutex);
     condition_destroy(rr->timer_cond);
     
-    free(rr);
+}
+
+struct rtp_recorder_t* rtp_recorder_create(crypt_aes_p crypt, audio_queue_p audio_queue, endpoint_p local_endpoint, endpoint_p remote_endpoint, uint16_t remote_control_port, uint16_t remote_timing_port) {
+    
+    struct rtp_recorder_t* rr = (struct rtp_recorder_t*)object_create(sizeof(struct rtp_recorder_t), _rtp_recorder_destroy);
+    
+    rr->crypt = (crypt_aes_p)object_retain(crypt);
+    rr->audio_queue = (audio_queue_p)object_retain(audio_queue);
+    
+    rr->timer_mutex = mutex_create();
+    rr->timer_cond = condition_create();
+    
+    rr->remote_control_endpoint = (endpoint_p)object_retain(remote_endpoint);
+    rr->remote_timing_endpoint = (endpoint_p)object_retain(remote_endpoint);
+    
+    endpoint_set_port(rr->remote_control_endpoint, remote_control_port);
+    endpoint_set_port(rr->remote_timing_endpoint, remote_timing_port);
+    
+    rr->streaming_socket = _rtp_recorder_create_socket(rr, "Straming socket", local_endpoint, remote_endpoint);
+    rr->control_socket = _rtp_recorder_create_socket(rr, "Control socket", local_endpoint, remote_endpoint);
+    rr->timing_socket = _rtp_recorder_create_socket(rr, "Timing socket", local_endpoint, remote_endpoint);
+    
+    rr->updated_track_position_callback = NULL;
+    rr->updated_track_position_callback_ctx = NULL;
+    
+    return rr;
     
 }
 

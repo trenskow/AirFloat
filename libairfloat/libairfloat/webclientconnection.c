@@ -38,6 +38,7 @@
 #include "webclientconnection.h"
 
 struct web_client_connection_t {
+    object_p object;
     socket_p socket;
     mutex_p mutex;
     web_request_p* requests;
@@ -94,7 +95,7 @@ void _web_client_connection_socket_connect_failed_callback(socket_p socket, void
     
 }
 
-ssize_t _web_client_connection_socket_receive_callback(socket_p socket, const void* data, size_t data_size, struct sockaddr* remote_end_point, void* ctx) {
+ssize_t _web_client_connection_socket_receive_callback(socket_p socket, const void* data, size_t data_size, endpoint_p remote_endpoint, void* ctx) {
     
     struct web_client_connection_t* wc = (struct web_client_connection_t*)ctx;
     
@@ -111,10 +112,11 @@ ssize_t _web_client_connection_socket_receive_callback(socket_p socket, const vo
             mutex_lock(wc->mutex);
         }
         
-        web_request_destroy(wc->requests[0]);
+        object_release(wc->requests[0]);
         
-        for (uint32_t i = 0 ; i < wc->requests_count - 1 ; i++)
+        for (uint32_t i = 0 ; i < wc->requests_count - 1 ; i++) {
             wc->requests[i] = wc->requests[i + 1];
+        }
         
         wc->requests_count--;
         
@@ -124,7 +126,7 @@ ssize_t _web_client_connection_socket_receive_callback(socket_p socket, const vo
         
     }
     
-    web_response_destroy(response);
+    object_release(response);
     
     return ret;
     
@@ -139,27 +141,26 @@ void _web_connection_socket_closed_callback(socket_p socket, void* ctx) {
     
 }
 
-struct web_client_connection_t* web_client_connection_create() {
+void _web_client_connection_destroy(void* object) {
     
-    struct web_client_connection_t* wc = (struct web_client_connection_t*)malloc(sizeof(struct web_client_connection_t));
-    bzero(wc, sizeof(struct web_client_connection_t));
-    
-    wc->mutex = mutex_create();
-    
-    return wc;
-    
-}
-
-void web_client_connection_destroy(struct web_client_connection_t* wc) {
+    struct web_client_connection_t* wc = (struct web_client_connection_t*)object;
     
     if (wc->socket != NULL) {
-        socket_destroy(wc->socket);
+        object_release(wc->socket);
         wc->socket = NULL;
     }
     
     mutex_destroy(wc->mutex);
+        
+}
+
+struct web_client_connection_t* web_client_connection_create() {
     
-    free(wc);
+    struct web_client_connection_t* wc = (struct web_client_connection_t*)object_create(sizeof(struct web_client_connection_t), _web_client_connection_destroy);
+    
+    wc->mutex = mutex_create();
+    
+    return wc;
     
 }
 
@@ -191,7 +192,7 @@ void web_client_connection_set_disconneced_callback(struct web_client_connection
     
 }
 
-void web_client_connection_connect(struct web_client_connection_t* wc, struct sockaddr* end_point) {
+void web_client_connection_connect(struct web_client_connection_t* wc, endpoint_p endpoint) {
     
     if (wc->socket == NULL) {
         
@@ -202,7 +203,7 @@ void web_client_connection_connect(struct web_client_connection_t* wc, struct so
         socket_set_receive_callback(wc->socket, _web_client_connection_socket_receive_callback, wc);
         socket_set_closed_callback(wc->socket, _web_connection_socket_closed_callback, wc);
         
-        socket_connect(wc->socket, end_point);
+        socket_connect(wc->socket, endpoint);
         
     }
     
@@ -228,9 +229,9 @@ void web_client_connection_send_request(web_client_connection_p wc, web_request_
         
         mutex_unlock(wc->mutex);
         
-        if (send)
+        if (send) {
             _web_client_connection_send_next_request(wc);
-        
+        }
     }
     
 }

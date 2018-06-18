@@ -111,8 +111,8 @@
                          } completion:^(BOOL finished) {
                              while ([self.subviews count] > 0)
                                  [[self.subviews objectAtIndex:0] removeFromSuperview];
-                             _currentImage = 0;
-                             _isAnimating = NO;
+                             self->_currentImage = 0;
+                             self->_isAnimating = NO;
                              self.alpha = 1.0;
                              self.hidden = YES;
                          }];

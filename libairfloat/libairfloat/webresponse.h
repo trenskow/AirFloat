@@ -32,13 +32,13 @@
 #define __webresponse_h
 
 #include "webheaders.h"
+#include "object.h"
 
 #include <stdbool.h>
 
 typedef struct web_response_t *web_response_p;
 
-web_response_p web_response_create();
-void web_response_destroy(web_response_p wr);
+web_response_p web_response_create(void);
 ssize_t web_response_parse(web_response_p wr, const void* data, size_t data_size);
 web_headers_p web_response_get_headers(web_response_p wr);
 void web_response_set_status(web_response_p wr, uint16_t code, const char* message);

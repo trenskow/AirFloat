@@ -35,9 +35,10 @@
 
 #include "thread.h"
 #include "socket.h"
-#include "sockaddr.h"
+#include "endpoint.h"
 #include "webrequest.h"
 #include "webresponse.h"
+#include "object.h"
 
 #define READ_SIZE 16384
 
@@ -52,15 +53,14 @@ typedef void(*web_server_connection_request_callback)(web_server_connection_p co
 typedef void(*web_server_connection_closed_callback)(web_server_connection_p connection, void* ctx);
 
 web_server_connection_p web_server_connection_create(socket_p socket, web_server_p server);
-void web_server_connection_destroy(web_server_connection_p connection);
 void web_server_connection_set_request_callback(web_server_connection_p wc, web_server_connection_request_callback request_callback, void* ctx);
 void web_server_connection_set_closed_callback(web_server_connection_p wc, web_server_connection_closed_callback closed_callback, void* ctx);
 void web_server_connection_send_response(web_server_connection_p wc, web_response_p response, const char* protocol, bool close_after_send);
 bool web_server_connection_is_connected(web_server_connection_p wc);
 void web_server_connection_take_off(struct web_server_connection_t* wc);
 void web_server_connection_close(web_server_connection_p wc);
-struct sockaddr* web_server_connection_get_local_end_point(web_server_connection_p wc);
-struct sockaddr* web_server_connection_get_remote_end_point(web_server_connection_p wc);
+endpoint_p web_server_connection_get_local_endpoint(web_server_connection_p wc);
+endpoint_p web_server_connection_get_remote_endpoint(web_server_connection_p wc);
 const char* web_server_connection_get_host(web_server_connection_p wc);
 uint16_t web_server_connection_get_port(web_server_connection_p wc);
 

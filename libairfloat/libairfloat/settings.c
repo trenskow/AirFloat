@@ -35,30 +35,31 @@
 #include "settings.h"
 
 struct settings_t {
+    object_p object;
     char* name;
     char* password;
     bool ignore_source_volume;
 };
 
+void _settings_destroy(void* object) {
+    
+    struct settings_t* s = (struct settings_t *)object;
+    
+    free(s->name);
+    if (s->password != NULL) {
+        free(s->password);
+    }
+    
+}
+
 struct settings_t* settings_create(const char* name, const char* password) {
     
-    struct settings_t* s = (struct settings_t*)malloc(sizeof(struct settings_t));
-    bzero(s, sizeof(struct settings_t));
+    struct settings_t* s = (struct settings_t*)object_create(sizeof(struct settings_t), _settings_destroy);
     
     settings_set_name(s, name);
     settings_set_password(s, password);
     
     return s;
-    
-}
-
-void settings_destroy(struct settings_t* s) {
-    
-    free(s->name);
-    if (s->password != NULL)
-        free(s->password);
-    
-    return free(s);
     
 }
 
@@ -70,12 +71,14 @@ const char* settings_get_name(struct settings_t* s) {
 
 void settings_set_name(struct settings_t* s, const char* new_name) {
     
-    if (s->name != NULL)
+    if (s->name != NULL) {
         free(s->name);
+    }
     
     const char* s_name = new_name;
-    if (new_name == NULL || strlen(new_name) == 0)
+    if (new_name == NULL || strlen(new_name) == 0) {
         s_name = "AirFloat";
+    }
     
     s->name = (char*)malloc(strlen(s_name) + 1);
     strcpy(s->name, s_name);
@@ -83,9 +86,7 @@ void settings_set_name(struct settings_t* s, const char* new_name) {
 }
 
 const char* settings_get_password(struct settings_t* s) {
-    
     return s->password;
-    
 }
 
 void settings_set_password(struct settings_t* s, const char* new_password) {
