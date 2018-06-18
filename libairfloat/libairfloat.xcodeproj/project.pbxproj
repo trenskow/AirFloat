@@ -10,7 +10,7 @@
 		A12364281B7C111100E1605D /* hex.c in Sources */ = {isa = PBXBuildFile; fileRef = A12364261B7C111100E1605D /* hex.c */; };
 		A123642C1B7C15FC00E1605D /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1CF856416F3C02B009114B2 /* libcrypto.a */; };
 		A1AEEC7320D7735B00CB1903 /* object.c in Sources */ = {isa = PBXBuildFile; fileRef = A1AEEC7220D7735B00CB1903 /* object.c */; };
-		A1D0DC80195037EE004717F5 /* hardware_apple.c in Sources */ = {isa = PBXBuildFile; fileRef = A150B60D16E6A03800C369C5 /* hardware_apple.c */; };
+		A1D0DC80195037EE004717F5 /* hardware_apple.m in Sources */ = {isa = PBXBuildFile; fileRef = A150B60D16E6A03800C369C5 /* hardware_apple.m */; };
 		A1D0DC81195037EE004717F5 /* base64.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4B2F16CA95E200E5D60F /* base64.c */; };
 		A1D0DC82195037EE004717F5 /* settings.c in Sources */ = {isa = PBXBuildFile; fileRef = A1B5D8E016DABEDA00181FCE /* settings.c */; };
 		A1D0DC83195037EE004717F5 /* dmap.c in Sources */ = {isa = PBXBuildFile; fileRef = A19E4AD016CA952700E5D60F /* dmap.c */; };
@@ -46,7 +46,6 @@
 		A1EB940C1DD7E33800ED8159 /* decoder_alac_apple.c in Sources */ = {isa = PBXBuildFile; fileRef = A1E9740C16DBAE9B000AD9E4 /* decoder_alac_apple.c */; };
 		A1EB940D1DD7E35600ED8159 /* crypt_openssl.c in Sources */ = {isa = PBXBuildFile; fileRef = A179A2FE16DC275F00A1E58F /* crypt_openssl.c */; };
 		A1FE60E81B7BFD9800C314ED /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1FE60E71B7BFD9800C314ED /* Security.framework */; };
-		C80FE37F1C83F56D00E4A847 /* DeviceIDRetriver.m in Sources */ = {isa = PBXBuildFile; fileRef = C80FE37D1C83F56D00E4A847 /* DeviceIDRetriver.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -80,7 +79,7 @@
 		A150075F16ED018E00B1A877 /* zeroconf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = zeroconf.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A150076016ED019900B1A877 /* zeroconf_apple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = zeroconf_apple.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		A150B60C16E6A03100C369C5 /* hardware.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hardware.h; sourceTree = "<group>"; };
-		A150B60D16E6A03800C369C5 /* hardware_apple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hardware_apple.c; sourceTree = "<group>"; };
+		A150B60D16E6A03800C369C5 /* hardware_apple.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = hardware_apple.m; sourceTree = "<group>"; };
 		A179A2FD16DC274D00A1E58F /* crypt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
 		A179A2FE16DC275F00A1E58F /* crypt_openssl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crypt_openssl.c; sourceTree = "<group>"; };
 		A19E4ACA16CA951500E5D60F /* settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
@@ -139,8 +138,6 @@
 		A1FE60E11B7BFB2100C314ED /* crypt_key.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crypt_key.h; sourceTree = "<group>"; };
 		A1FE60E21B7BFB6500C314ED /* crypt_cc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crypt_cc.c; sourceTree = "<group>"; };
 		A1FE60E71B7BFD9800C314ED /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
-		C80FE37D1C83F56D00E4A847 /* DeviceIDRetriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceIDRetriver.m; sourceTree = "<group>"; };
-		C80FE37E1C83F56D00E4A847 /* DeviceIDRetriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceIDRetriver.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -240,7 +237,7 @@
 			isa = PBXGroup;
 			children = (
 				A150B60C16E6A03100C369C5 /* hardware.h */,
-				A150B60D16E6A03800C369C5 /* hardware_apple.c */,
+				A150B60D16E6A03800C369C5 /* hardware_apple.m */,
 			);
 			name = Hardware;
 			sourceTree = "<group>";
@@ -331,8 +328,6 @@
 		A19E4B0E16CA95BB00E5D60F /* Web */ = {
 			isa = PBXGroup;
 			children = (
-				C80FE37D1C83F56D00E4A847 /* DeviceIDRetriver.m */,
-				C80FE37E1C83F56D00E4A847 /* DeviceIDRetriver.h */,
 				A1CD9F2717076E350015CBBA /* Client */,
 				A1CD9F2617076D880015CBBA /* Server */,
 				A19E4B1C16CA95D300E5D60F /* webtools.h */,
@@ -506,7 +501,6 @@
 				A1D0DC89195037FD004717F5 /* alac.c in Sources */,
 				A1D0DC8D19503824004717F5 /* audiooutput_apple.m in Sources */,
 				A1D0DC8C195037FD004717F5 /* decoder.c in Sources */,
-				C80FE37F1C83F56D00E4A847 /* DeviceIDRetriver.m in Sources */,
 				A1D0DC85195037EE004717F5 /* log.c in Sources */,
 				A1D0DC81195037EE004717F5 /* base64.c in Sources */,
 				A1D0DC88195037EE004717F5 /* thread_posix.c in Sources */,
@@ -525,7 +519,7 @@
 				A1D0DC9F1950384F004717F5 /* rtpsocket.c in Sources */,
 				A1D0DC83195037EE004717F5 /* dmap.c in Sources */,
 				A1D0DC8A195037FD004717F5 /* alac_format.c in Sources */,
-				A1D0DC80195037EE004717F5 /* hardware_apple.c in Sources */,
+				A1D0DC80195037EE004717F5 /* hardware_apple.m in Sources */,
 				A1D0DC82195037EE004717F5 /* settings.c in Sources */,
 				A1D0DC931950383D004717F5 /* webserverconnection.c in Sources */,
 			);

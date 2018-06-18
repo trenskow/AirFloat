@@ -38,9 +38,12 @@
 #include <net/if_dl.h>
 #include <ifaddrs.h>
 
-#include <mach/mach_time.h>
+#import <TargetConditionals.h>
+#if TARGET_OS_IPHONE
+#import <UIKit/UIKit.h>
+#endif
 
-#include "DeviceIDRetriver.h"
+#include <mach/mach_time.h>
 
 bool _hardware_time_initiated = false;
 uint32_t _hardware_time_to_nanos_numerator;
@@ -65,10 +68,22 @@ uint64_t hardware_identifier() {
     
     uint64_t ret = 0;
     
+#if TARGET_OS_IPHONE
+    
+    // get ID string
+    NSString *idString = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+    
+    // convert to data, then store sufficient data into uint64_t.
+    // this is a crude NSString -> uint64_t hash
+    NSData *idData = [idString dataUsingEncoding:NSUTF8StringEncoding];
+    [idData getBytes:&ret length:sizeof(uint64_t)];
+    
+#else
+    
     struct ifaddrs* if_addrs = NULL;
     struct ifaddrs* if_addr = NULL;
     
-    if (0 == getifaddrs(&if_addrs))
+    if (0 == getifaddrs(&if_addrs)) {
         for (if_addr = if_addrs ; if_addr != NULL ; if_addr = if_addr->ifa_next) {
             
             if (if_addr->ifa_name != NULL && if_addr->ifa_addr->sa_family == AF_LINK && strcmp("en0", if_addr->ifa_name) == 0) {
@@ -82,15 +97,15 @@ uint64_t hardware_identifier() {
             }
             
         }
+    }
     
     freeifaddrs(if_addrs);
     
-    //return ret;
+#endif
     
-//}
+    return ret;
     
-    return iOSDeviceID();
-  }
+}
     
 double hardware_get_time() {
     
