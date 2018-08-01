@@ -72,13 +72,13 @@ bool condition_times_wait(struct condition_t* c, mutex_p mutex, int milliseconds
     
     gettimeofday(&tv, NULL);
     
-    int micro = milliseconds * 1000;
-    while (micro >= 1000000) {
-        tv.tv_sec++;
-        micro -= 1000000;
-    }
+    int64_t now = tv.tv_sec * 1000000 + tv.tv_usec;
     
-    struct timespec req = {tv.tv_sec, (tv.tv_usec + micro) * 1000};
+    int micro = milliseconds * 1000;
+
+    int64_t except_time = now + micro;
+    
+    struct timespec req = {except_time / 1000000 , (except_time % 1000000) * 1000};
     
     if (pthread_cond_timedwait(&c->cond, mutex_pthread(mutex), &req) == ETIMEDOUT)
         return true;
