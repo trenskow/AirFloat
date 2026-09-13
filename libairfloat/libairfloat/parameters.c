@@ -107,7 +107,10 @@ void _parameters_parse_http_authentication(struct parameters_t* p, const void* b
     _parameters_parse(p, buffer, size, ",", "=");
     
     for (uint32_t i = 0 ; i < p->parameters_count ; i++) {
-                
+
+        if (p->parameters[i].value == NULL)
+            continue;
+
         if (p->parameters[i].value[0] == '"' || p->parameters[i].value[0] == '\'') {
             
             p->parameters[i].value++;
@@ -196,7 +199,7 @@ struct parameters_t* parameters_create(const void* buffer, size_t size, enum par
             
             for (uint32_t i = 0 ; i < p->parameters_count ; i++) {
                 struct parameter_t* param = &p->parameters[i];
-                if (strcmp(param->key, "a") == 0) {
+                if (strcmp(param->key, "a") == 0 && param->value != NULL) {
                     char* colon = strchr(param->value, ':');
                     if (colon != NULL) {
                         param->key[1] = '-';
