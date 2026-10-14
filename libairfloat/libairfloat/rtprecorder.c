@@ -334,8 +334,13 @@ size_t _rtp_recorder_socket_data_received_airtunes_v2(struct rtp_recorder_t* rr,
             _rtp_recorder_process_sync_packet(rr, &packet);
             break;
         case RTP_AUDIO_RESEND_DATA:
-            packet = _rtp_header_read(&((char*)buffer)[4], size - 4);
-            log_message(LOG_INFO, "Received missing packet %d", packet.seq_num);
+            // A resent packet is the original RTP packet wrapped in a 4 byte header.
+            if (size > 4 + 12) {
+                struct rtp_packet_t resent_packet = _rtp_header_read(&((char*)buffer)[4], size - 4);
+                log_message(LOG_INFO, "Received missing packet %d", resent_packet.seq_num);
+                if (resent_packet.packet_data_size > 8)
+                    _rtp_recorder_process_audio_packet(rr, &resent_packet);
+            }
             break;
         case RTP_AUDIO_DATA:
             if (packet.packet_data_size > 0)
@@ -428,8 +433,10 @@ struct rtp_recorder_t* rtp_recorder_create(crypt_aes_p crypt, audio_queue_p audi
     rr->timer_mutex = mutex_create();
     rr->timer_cond = condition_create();
     
-    rr->remote_control_endpoint = (endpoint_p)object_retain(remote_endpoint);
-    rr->remote_timing_endpoint = (endpoint_p)object_retain(remote_endpoint);
+    // Each endpoint needs its own copy: they get different ports, and object_retain would
+    // hand out the same object (so the last endpoint_set_port would win for both).
+    rr->remote_control_endpoint = endpoint_copy(remote_endpoint);
+    rr->remote_timing_endpoint = endpoint_copy(remote_endpoint);
     
     endpoint_set_port(rr->remote_control_endpoint, remote_control_port);
     endpoint_set_port(rr->remote_timing_endpoint, remote_timing_port);
