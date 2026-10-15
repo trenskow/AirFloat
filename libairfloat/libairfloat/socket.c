@@ -35,6 +35,9 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <string.h>
+#include <fcntl.h>
+#include <sys/select.h>
+#include <sys/time.h>
 
 #include "log.h"
 #include "mutex.h"
@@ -49,6 +52,7 @@ struct socket_t {
     bool is_udp;
     int socket;
     bool is_connected;
+    volatile bool closing;
     mutex_p mutex;
     thread_p accept_thread;
     thread_p receive_thread;
@@ -88,6 +92,13 @@ void _socket_destroy(void* object) {
     struct socket_t* s = (struct socket_t*)object;
     
     socket_close(s);
+    
+    // A connection attempt that never succeeded leaves its thread behind (socket_close only
+    // handles connected sockets). Wait for it before anything it uses is freed.
+    if (s->receive_thread != NULL) {
+        thread_destroy(s->receive_thread);
+        s->receive_thread = NULL;
+    }
     
     mutex_lock(s->mutex);
     
@@ -237,7 +248,59 @@ void _socket_connect(void* ctx) {
     
     const struct sockaddr* addr = endpoint_get_sockaddr(s->remote_endpoint);
     
-    if (!connect(s->socket, addr, addr->sa_len)) {
+    int fd = s->socket;
+    bool connected = false;
+    int connect_errno = 0;
+    
+    // The connection is made non-blocking so that closing or destroying the socket can abort an
+    // attempt that is still in progress. Otherwise the socket would have to be freed (or the
+    // destroying thread blocked for a long time) while this thread is still inside connect().
+    int flags = fcntl(fd, F_GETFL, 0);
+    fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+    
+    if (connect(fd, addr, addr->sa_len) == 0)
+        connected = true;
+    else if (errno == EINPROGRESS) {
+        
+        for (int waited = 0 ; waited < 10000 && !s->closing ; waited += 100) {
+            
+            fd_set write_set;
+            FD_ZERO(&write_set);
+            FD_SET(fd, &write_set);
+            struct timeval timeout = { 0, 100000 };
+            
+            int ready = select(fd + 1, NULL, &write_set, NULL, &timeout);
+            
+            if (ready > 0) {
+                int error = 0;
+                socklen_t length = sizeof(error);
+                getsockopt(fd, SOL_SOCKET, SO_ERROR, &error, &length);
+                if (error == 0)
+                    connected = true;
+                else
+                    connect_errno = error;
+                break;
+            }
+            
+            if (ready < 0 && errno != EINTR) {
+                connect_errno = errno;
+                break;
+            }
+            
+        }
+        
+        if (!connected && connect_errno == 0)
+            connect_errno = ETIMEDOUT;
+        
+    } else
+        connect_errno = errno;
+    
+    if (s->closing)
+        return;
+    
+    fcntl(fd, F_SETFL, flags);
+    
+    if (connected) {
         
         if (s->callbacks.connected != NULL)
             s->callbacks.connected(s, s->callbacks.ctx.connected);
@@ -246,7 +309,7 @@ void _socket_connect(void* ctx) {
         
     } else {
         
-        log_message(LOG_ERROR, "Unable to connect (%s)", strerror(errno));
+        log_message(LOG_ERROR, "Unable to connect (%s)", strerror(connect_errno));
         
         if (s->callbacks.connect_failed != NULL)
             s->callbacks.connect_failed(s, s->callbacks.ctx.connect_failed);
@@ -427,6 +490,8 @@ ssize_t socket_send_to(struct socket_t* s, endpoint_p endpoint, const void* buff
 }
 
 void socket_close(struct socket_t* s) {
+    
+    s->closing = true;
     
     mutex_lock(s->mutex);
     
