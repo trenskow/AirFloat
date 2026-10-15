@@ -61,6 +61,7 @@ struct dacp_client_t {
     } callbacks;
     enum dacp_client_playback_state playback_state;
     bool is_destroyed;
+    bool web_connection_dead;
 };
 
 void _dacp_client_web_connection_connected_callback(web_client_connection_p connection, void* ctx) {
@@ -78,8 +79,13 @@ void _dacp_client_web_connection_connect_failed_callback(web_client_connection_p
     
     struct dacp_client_t* dc = (struct dacp_client_t*)ctx;
     
-    object_release(dc->web_connection);
-    dc->web_connection = NULL;
+    if (dc->is_destroyed || dc->web_connection == NULL || dc->web_connection != connection)
+        return;
+    
+    // This callback runs on the connection's own socket thread. Releasing the connection here
+    // would destroy the socket that thread is still using, so only mark it as dead. It is
+    // released later from another thread (see _dacp_client_release_dead_connection).
+    dc->web_connection_dead = true;
     
 }
 
@@ -87,15 +93,24 @@ void _dacp_client_web_connection_disconnected_callback(web_client_connection_p c
     
     struct dacp_client_t* dc = (struct dacp_client_t*)ctx;
     
-    if (dc->web_connection != NULL) {
+    if (dc->is_destroyed || dc->web_connection == NULL || dc->web_connection != connection || dc->web_connection_dead)
+        return;
+    
+    dc->web_connection_dead = true;
+    
+    if (dc->callbacks.controls_became_unavailable != NULL)
+        dc->callbacks.controls_became_unavailable(dc, dc->callbacks.ctx.controls_became_unavailable);
+    
+}
+
+// Must not be called from the connection's own socket thread.
+void _dacp_client_release_dead_connection(struct dacp_client_t* dc) {
+    
+    if (dc->web_connection != NULL && dc->web_connection_dead) {
         
-        if (dc->callbacks.controls_became_unavailable != NULL)
-            dc->callbacks.controls_became_unavailable(dc, dc->callbacks.ctx.controls_became_unavailable);
-        
-        if (!dc->is_destroyed) {
-            object_release(dc->web_connection);
-            dc->web_connection = NULL;
-        }
+        object_release(dc->web_connection);
+        dc->web_connection = NULL;
+        dc->web_connection_dead = false;
         
     }
     
@@ -142,6 +157,8 @@ void _dacp_client_web_connection_response_received_callback(web_client_connectio
 void _dacp_client_zeroconf_resolved_callback(zeroconf_dacp_discover_p zeroconf_dacp_discover, const char* name, const endpoint_p* endpoints, uint32_t endpoints_count, void* ctx) {
     
     struct dacp_client_t* dc = (struct dacp_client_t*)ctx;
+    
+    _dacp_client_release_dead_connection(dc);
     
     if (dc->web_connection == NULL && strlen(name) > 12 && memcmp(name, "iTunes_Ctrl_", 12) == 0 && strcmp(name + 12, dc->identifier) == 0) {
         

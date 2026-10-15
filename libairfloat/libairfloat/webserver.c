@@ -61,26 +61,36 @@ void _web_server_socket_closed(socket_p socket, void* ctx) {
     
     struct web_server_t* ws = (struct web_server_t*)ctx;
     
+    web_server_connection_p closed_connection = NULL;
+    socket_p closed_socket = NULL;
+
     mutex_lock(ws->mutex);
-    
+
     for (uint32_t i = 0 ; i < ws->connection_count ; i++)
         if (ws->connections[i].socket == socket) {
-            
-            object_release(ws->connections[i].web_connection);
-            object_release(ws->connections[i].socket);
-            
+
+            closed_connection = ws->connections[i].web_connection;
+            closed_socket = ws->connections[i].socket;
+
             for (uint32_t x = i ; x < ws->connection_count - 1 ; x++) {
                 ws->connections[x] = ws->connections[x + 1];
             }
-            
+
             ws->connection_count--;
-            
+
             break;
-            
+
         }
-    
+
     mutex_unlock(ws->mutex);
-    
+
+    if (closed_connection != NULL) {
+        // Notify the connection's owner (e.g. the RAOP session) that the peer is gone.
+        web_server_connection_close(closed_connection);
+        object_release(closed_connection);
+        object_release(closed_socket);
+    }
+
 }
 
 void _web_server_destroy(void* object) {

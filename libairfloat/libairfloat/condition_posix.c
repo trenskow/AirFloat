@@ -72,7 +72,7 @@ bool condition_times_wait(struct condition_t* c, mutex_p mutex, int milliseconds
     
     gettimeofday(&tv, NULL);
     
-    int64_t now = tv.tv_sec * 1000000 + tv.tv_usec;
+    int64_t now = (int64_t)tv.tv_sec * 1000000 + tv.tv_usec;
     
     int micro = milliseconds * 1000;
 

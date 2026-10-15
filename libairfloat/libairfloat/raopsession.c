@@ -138,8 +138,9 @@ bool _raop_session_check_authentication(struct raop_session_t* rs, const char* m
         
         if (authentication_parameter != NULL) {
             
-            const char* param_begin = strstr(authentication_parameter, " ") + 1;
-            if (param_begin) {
+            const char* param_begin_ptr = strstr(authentication_parameter, " ");
+            const char* param_begin = (param_begin_ptr != NULL) ? param_begin_ptr + 1 : NULL;
+            if (param_begin != NULL) {
                 
                 parameters_p parameters = parameters_create(param_begin, strlen(param_begin), parameters_type_http_authentication);
                 
@@ -305,8 +306,8 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
         if ((content_length = web_request_get_content(request, NULL, 0)) > 0) {
             
             const char* content_type = web_headers_value(request_headers, "Content-Type");
-            
-            if (strcmp(content_type, "application/sdp") == 0 || strcmp(content_type, "text/parameters") == 0) {
+
+            if (content_type != NULL && (strcmp(content_type, "application/sdp") == 0 || strcmp(content_type, "text/parameters") == 0)) {
                 
                 char* content[content_length];
                 
@@ -575,7 +576,7 @@ void _raop_session_raop_connection_request_callback(web_server_connection_p conn
                     char* data = (char*)malloc(data_size);
                     web_request_get_content(request, data, data_size);
                     
-                    if (rs->callbacks.updated_track_info != NULL && 0 == strcmp(mime_type, "application/x-dmap-tagged")) {
+                    if (rs->callbacks.updated_track_info != NULL && mime_type != NULL && 0 == strcmp(mime_type, "application/x-dmap-tagged")) {
                         
                         dmap_p tags = dmap_create();
                         dmap_parse(tags, data, data_size);
